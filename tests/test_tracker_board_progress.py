@@ -465,3 +465,21 @@ class TestTheBarFillsFromTheLeft(unittest.TestCase):
     def test_a_bucket_with_no_share_is_left_out_entirely(self):
         bar = board.feature_bar(self.item("done", "done"))
         self.assertEqual([("seg-done", "100")], self.widths(bar))
+
+
+def test_history_since_is_the_floor_of_both_charts(tmp_path, monkeypatch):
+    """A declared history_since in .common-rules.json is the earliest date the
+    progress block shows (Loom, 2026-09-25: "reset the old data from the graph")."""
+    from tools.tracker import board as B
+    calls = []
+
+    def fake_series(project, since=None, granularity="day"):
+        calls.append((since, granularity))
+        return [{"date": "2026-09-25", "tickets_total": 2, "tickets_done": 1, "completion_pct": 50.0,
+                 "by_status": {"done": 1, "not started": 1}}]
+    monkeypatch.setattr(B.HIST, "series", fake_series)
+    monkeypatch.setattr(B.P, "load", lambda project: {"history_since": "2026-09-25"})
+    html = B.progress_block(tmp_path)
+    assert "Progress over time" in html
+    assert calls[0] == ("2026-09-25", "day")
+    assert calls[1][0] >= "2026-09-25" and calls[1][1] == "hour"

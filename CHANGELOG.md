@@ -1,5 +1,14 @@
 ## 1.3.0 · Guide and architecture traceability · 2026-09-20
 
+## 2026-09-25 · `history_since`: the progress graph starts where the project's story does
+
+`.common-rules.json` may declare `"history_since": "YYYY-MM-DD"`; the tracker
+board's two progress charts then start at that date instead of the first
+commit. Optional; nothing changes for a project that does not declare it.
+Loom asked for it after consolidating 25 ledgers into two: the old counts
+made the graph read as a collapse, and the sponsor said "reset the old data
+from the graph". History stays in git; only the page's window moves.
+
 **Standard change (mandatory):** projects can now keep a validated
 requirement-to-evidence traceability row in each proposal ledger:
 requirement IDs → guide section → architecture section → implementation files

@@ -118,6 +118,7 @@ the first carries the refusal.
 from __future__ import annotations
 
 import copy
+import datetime
 import glob
 import json
 import os
@@ -445,6 +446,21 @@ def _checked(data: dict) -> tuple[dict, list[str]]:
             bad.append(f"{FILE}: staging_branch must be one line")
         else:
             ok["staging_branch"] = v.strip()
+    if "history_since" in data:
+        # The tracker's progress graph starts here rather than at the first
+        # commit. Loom asked for it on 2026-09-25 after consolidating 25
+        # ledgers into two: the old counts (299 done, then 28) made the graph
+        # read as a collapse, and the sponsor said "reset the old data from
+        # the graph". A date, never a deletion: history stays in git; the page
+        # just starts its story where the project did.
+        v = data["history_since"]
+        try:
+            if not isinstance(v, str):
+                raise ValueError
+            datetime.date.fromisoformat(v)
+            ok["history_since"] = v
+        except ValueError:
+            bad.append(f'{FILE}: history_since must be a YYYY-MM-DD date, got {v!r}')
     if "goal" in data:
         why = _goal_problem(data["goal"])
         if why:

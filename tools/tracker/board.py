@@ -700,12 +700,15 @@ def progress_block(project) -> str:
         return ""
     try:
         started = time.monotonic()
-        rows = HIST.series(project)
+        # A declared `history_since` in .common-rules.json is the earliest
+        # date either chart shows: the project's story starts there.
+        floor = (P.load(Path(project)).get("history_since") or None)
+        rows = HIST.series(project, since=floor)
         hourly_since = (datetime.datetime.now(HIST.TZ) - datetime.timedelta(hours=72)).date().isoformat()
-        hourly_rows = HIST.series(project, since=hourly_since, granularity="hour")
+        hourly_rows = HIST.series(project, since=max(hourly_since, floor or hourly_since), granularity="hour")
         if time.monotonic() - started > _HISTORY_BUDGET:
             since = (datetime.date.today() - datetime.timedelta(days=60)).isoformat()
-            rows = HIST.series(project, since=since)
+            rows = HIST.series(project, since=max(since, floor or since))
     except Exception:
         return ""
     if not rows:
