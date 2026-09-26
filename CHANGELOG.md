@@ -1,5 +1,14 @@
 ## 1.3.0 · Guide and architecture traceability · 2026-09-20
 
+## 2026-09-26 · The tracker's progress graph is one line
+
+The "Progress over time" block drew two charts, the first with a line per
+status (five lines, two in the same green). The sponsor: "there are multiple
+progress lines in the tracker, fix it." It is now one chart with one line,
+completion over time; the per-status counts stay on the totals bar. Not a
+Standard change: a project regenerates its page with `tracker board` and
+nothing else moves.
+
 ## 2026-09-25 · `history_since`: the progress graph starts where the project's story does
 
 `.common-rules.json` may declare `"history_since": "YYYY-MM-DD"`; the tracker

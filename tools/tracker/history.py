@@ -502,7 +502,7 @@ def _status_line_chart(width: int, height: int, rows: list[dict]) -> str:
         "in testing": "var(--tracker-status-testing, #0891B2)",
         "blocked": "var(--tracker-status-blocked, #E05263)",
         "not started": "var(--tracker-status-todo, #64748B)",
-        "deferred": "var(--tracker-status-deferred, #2FB170)",
+        "deferred": "var(--tracker-status-deferred, #7BC8A4)",
     }
     dates = [r["date"] for r in rows]
     series = []
@@ -546,17 +546,20 @@ def _spread_end_labels(end_labels, y_min, y_max, min_gap=14.0):
 
 
 def svg(series_rows: list[dict], width: int = 640, height: int = 210) -> str:
-    """Two inline SVG line charts: one line per non-empty ticket status,
-    then the percentage line. Counts and percentage remain separate units;
-    each chart uses its own observed range."""
+    """ONE inline SVG line chart with ONE line: completion over time.
+
+    Until 2026-09-26 this returned two charts, the first with a line per
+    status (done, in progress, blocked, not started, deferred -- five lines,
+    two of them the same green). The sponsor: "there are multiple progress
+    lines in the tracker, fix it." Progress is one number; the per-status
+    counts are still on the page's totals bar and in `_status_line_chart`,
+    which stays available to a caller that wants it."""
     dates = [r["date"] for r in series_rows]
     completion = [r["completion_pct"] for r in series_rows]
-    counts = _status_line_chart(width, height, series_rows)
-    pct = _line_chart(
+    return _line_chart(
         width, height,
         [("completion", completion, "var(--tracker-line-completion, #B15EFF)")],
-        dates, title="Completion over time", fmt=_fmt_percent)
-    return counts + "\n" + pct
+        dates, title="Progress over time", fmt=_fmt_percent)
 
 
 # ---------------------------------------------------------------- CLI -----
