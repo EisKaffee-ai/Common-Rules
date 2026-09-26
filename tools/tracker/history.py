@@ -235,6 +235,25 @@ def _as_date(value) -> datetime.date | None:
     return datetime.date.fromisoformat(str(value).split("T", 1)[0])
 
 
+def _as_floor(value) -> datetime.datetime | None:
+    """`since` as a local moment. A date means its local midnight; an ISO
+    timestamp names the hour a project's story starts (Loom, 2026-09-26:
+    its ledgers were consolidated at 20:00 on 25 Sept, and a date floor
+    left the hourly chart showing the old counts -- "clear this history
+    from the graph"). A naive timestamp is read in TZ."""
+    if value is None:
+        return None
+    if isinstance(value, datetime.datetime):
+        when = value
+    elif isinstance(value, datetime.date):
+        return datetime.datetime.combine(value, datetime.time.min, tzinfo=TZ)
+    elif "T" not in str(value):
+        return datetime.datetime.combine(datetime.date.fromisoformat(str(value)), datetime.time.min, tzinfo=TZ)
+    else:
+        when = datetime.datetime.fromisoformat(str(value))
+    return when.replace(tzinfo=TZ) if when.tzinfo is None else when.astimezone(TZ)
+
+
 def series(project, since=None, granularity: str = "day") -> list[dict]:
     """Progress rows from the first ledger commit to now.
 
@@ -268,10 +287,9 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
     start_bucket = bucket(commits[0][1])
     now = datetime.datetime.now(TZ)
     end_bucket = bucket(now)
-    since_date = _as_date(since)
-    if since_date is not None:
-        requested = datetime.datetime.combine(since_date, datetime.time.min, tzinfo=TZ)
-        start_bucket = max(start_bucket, bucket(requested))
+    since_at = _as_floor(since)
+    if since_at is not None:
+        start_bucket = max(start_bucket, bucket(since_at))
 
     # A zoom window commonly starts between commits. Seed its first bucket
     # with the latest snapshot at or before the requested start, then carry
@@ -327,8 +345,7 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
     if dirty:
         _save_cache(cache_path, cache)
 
-    if since_date is not None:
-        rows = [r for r in rows if _as_date(r["date"]) >= since_date]
+    # Rows begin at start_bucket, which is already at or after the floor.
     return rows
 
 

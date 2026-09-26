@@ -457,10 +457,12 @@ def _checked(data: dict) -> tuple[dict, list[str]]:
         try:
             if not isinstance(v, str):
                 raise ValueError
-            datetime.date.fromisoformat(v)
+            # A date, or an ISO timestamp when the story starts mid-day
+            # (Loom, 2026-09-26: the hourly chart still showed the old counts).
+            (datetime.datetime if "T" in v else datetime.date).fromisoformat(v)
             ok["history_since"] = v
         except ValueError:
-            bad.append(f'{FILE}: history_since must be a YYYY-MM-DD date, got {v!r}')
+            bad.append(f'{FILE}: history_since must be a YYYY-MM-DD date or an ISO timestamp, got {v!r}')
     if "goal" in data:
         why = _goal_problem(data["goal"])
         if why:

@@ -501,3 +501,16 @@ def test_the_progress_block_draws_both_charts_and_no_two_status_lines_share_a_co
     status = {series: stroke for stroke, series in strokes if series != "completion"}
     assert len(set(status.values())) == len(status), status
 
+
+
+def test_history_since_may_be_a_timestamp():
+    """history_since accepts an ISO timestamp as well as a date (Loom,
+    2026-09-26: "clear this history from the graph" on the hourly chart);
+    anything else is still refused."""
+    from tools import project as P
+    ok, bad = P._checked({"history_since": "2026-09-25T20:00:00+01:00"})
+    assert ok["history_since"] == "2026-09-25T20:00:00+01:00" and not bad
+    ok, bad = P._checked({"history_since": "2026-09-25"})
+    assert ok["history_since"] == "2026-09-25" and not bad
+    ok, bad = P._checked({"history_since": "25 Sept"})
+    assert "history_since" not in ok and any("history_since" in b for b in bad)

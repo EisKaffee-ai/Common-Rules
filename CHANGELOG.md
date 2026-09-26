@@ -1,5 +1,14 @@
 ## 1.3.0 · Guide and architecture traceability · 2026-09-20
 
+## 2026-09-26 · `history_since` may name an hour
+
+`"history_since"` in `.common-rules.json` now also takes an ISO timestamp
+(`"2026-09-25T20:00:00+01:00"`; a naive one is read in the tracker's local
+time). A date still means that day's midnight. Loom consolidated its ledgers
+at 20:00 on 25 September, so a date floor left the hourly chart showing the
+old counts, and the sponsor said "clear this history from the graph". Not a
+Standard change: a project regenerates its page with `tracker board`.
+
 ## 2026-09-26 · Both progress charts, and no two status lines alike
 
 The sponsor asked to fix "multiple progress lines"; the status chart was
