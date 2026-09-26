@@ -111,7 +111,7 @@ class ProgressChartsCase(unittest.TestCase):
         path = repo.root / "docs" / "proposals" / "30-x.json"
         text = board.render([(path, led)], "demo", None, repo.root)
         self.assertIn('<section class="progress" id="progress">', text)
-        self.assertEqual(text.count("<svg"), 2)  # daily + hourly, ONE chart each (one progress line)
+        self.assertEqual(text.count("<svg"), 4)  # daily + hourly, two charts each
         self.assertIn("Progress over time", text)
         self.assertIn("1 of 1 nested tasks done · 100.0% overall", text)
 
@@ -485,15 +485,19 @@ def test_history_since_is_the_floor_of_both_charts(tmp_path, monkeypatch):
     assert calls[1][0] >= "2026-09-25" and calls[1][1] == "hour"
 
 
-def test_the_progress_block_draws_exactly_one_line(tmp_path):
-    """Sponsor, 2026-09-26: 'there are multiple progress lines in the
-    tracker, fix it.' One chart, one polyline, and it is the completion."""
+
+def test_the_progress_block_draws_both_charts_and_no_two_status_lines_share_a_colour():
+    """Sponsor, 2026-09-26: first "there are multiple progress lines", then
+    "one graph is missing from the tracker". Both charts are drawn; what
+    stays fixed is that deferred no longer reuses done's green."""
+    import re
     from tools.tracker import history
     rows = [{"date": "2026-09-25", "completion_pct": 40.0, "by_status": {"done": 2, "blocked": 1, "deferred": 1}},
             {"date": "2026-09-26", "completion_pct": 60.0, "by_status": {"done": 3, "blocked": 1, "deferred": 1}}]
     out = history.svg(rows)
-    assert out.count("<svg") == 1
-    assert out.count("<polyline") == 1
-    assert 'data-series="completion"' in out
-    assert "Tasks by status" not in out
+    assert out.count("<svg") == 2
+    assert "Tasks by status over time" in out and "Completion over time" in out
+    strokes = re.findall(r'<polyline[^>]*stroke="([^"]+)"[^>]*data-series="([^"]+)"', out)
+    status = {series: stroke for stroke, series in strokes if series != "completion"}
+    assert len(set(status.values())) == len(status), status
 

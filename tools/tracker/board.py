@@ -689,7 +689,7 @@ def completion_projection(rows: list[dict]) -> str:
 
 
 def progress_block(project) -> str:
-    """P-08: history.series(project) as ONE chart (one progress line), server-rendered SVG, no
+    """P-08: history.series(project)'s two charts, server-rendered SVG, no
     JS and no external resources. Quietly omitted when the project has no
     git history yet or series() cannot be computed (a plain directory, a
     shallow clone, git missing) -- a graph nobody can trust is worse than no

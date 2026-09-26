@@ -502,7 +502,7 @@ def _status_line_chart(width: int, height: int, rows: list[dict]) -> str:
         "in testing": "var(--tracker-status-testing, #0891B2)",
         "blocked": "var(--tracker-status-blocked, #E05263)",
         "not started": "var(--tracker-status-todo, #64748B)",
-        "deferred": "var(--tracker-status-deferred, #7BC8A4)",
+        "deferred": "var(--tracker-status-deferred, #EAB308)",
     }
     dates = [r["date"] for r in rows]
     series = []
@@ -546,20 +546,22 @@ def _spread_end_labels(end_labels, y_min, y_max, min_gap=14.0):
 
 
 def svg(series_rows: list[dict], width: int = 640, height: int = 210) -> str:
-    """ONE inline SVG line chart with ONE line: completion over time.
+    """Two inline SVG line charts: one line per non-empty ticket status,
+    then the completion line. Counts and percentage stay separate units;
+    each chart uses its own observed range.
 
-    Until 2026-09-26 this returned two charts, the first with a line per
-    status (done, in progress, blocked, not started, deferred -- five lines,
-    two of them the same green). The sponsor: "there are multiple progress
-    lines in the tracker, fix it." Progress is one number; the per-status
-    counts are still on the page's totals bar and in `_status_line_chart`,
-    which stays available to a caller that wants it."""
+    2026-09-26: the sponsor first asked to fix "multiple progress lines" and
+    the status chart was removed; he then said "one graph is missing from
+    the tracker", so both charts are back. What stays fixed: `deferred` no
+    longer shares `done`'s green, so no two status lines look alike."""
     dates = [r["date"] for r in series_rows]
     completion = [r["completion_pct"] for r in series_rows]
-    return _line_chart(
+    counts = _status_line_chart(width, height, series_rows)
+    pct = _line_chart(
         width, height,
         [("completion", completion, "var(--tracker-line-completion, #B15EFF)")],
-        dates, title="Progress over time", fmt=_fmt_percent)
+        dates, title="Completion over time", fmt=_fmt_percent)
+    return counts + "\n" + pct
 
 
 # ---------------------------------------------------------------- CLI -----

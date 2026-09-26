@@ -1,13 +1,13 @@
 ## 1.3.0 · Guide and architecture traceability · 2026-09-20
 
-## 2026-09-26 · The tracker's progress graph is one line
+## 2026-09-26 · Both progress charts, and no two status lines alike
 
-The "Progress over time" block drew two charts, the first with a line per
-status (five lines, two in the same green). The sponsor: "there are multiple
-progress lines in the tracker, fix it." It is now one chart with one line,
-completion over time; the per-status counts stay on the totals bar. Not a
-Standard change: a project regenerates its page with `tracker board` and
-nothing else moves.
+The sponsor asked to fix "multiple progress lines"; the status chart was
+removed, and he then said "one graph is missing from the tracker". Both
+charts are back ("Tasks by status over time" and "Completion over time").
+What stays fixed: `deferred` has its own colour instead of `done`'s green,
+so no two status lines look the same. Not a Standard change: a project
+regenerates its page with `tracker board`.
 
 ## 2026-09-25 · `history_since`: the progress graph starts where the project's story does
 
