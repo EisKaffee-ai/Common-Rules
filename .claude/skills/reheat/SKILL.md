@@ -51,6 +51,13 @@ hold, shown every time
 not just the news). `queue:` lists what `--queue` wrote, or says there was
 nothing new.
 
+The delta uses the same warm card as `/warmup`; when the project has a
+`.common-rules.json` `goal` contract, that card carries its compact outcome,
+constraints, and verification criteria forward as well. Keep the mirror
+aligned with the host's native `/goal` when the objective changes. The
+generated project tracker also becomes stale until regenerated after that
+change.
+
 `no change since the last warm-up · <status>` means exactly that: read
 nothing further, keep working.
 

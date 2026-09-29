@@ -31,15 +31,16 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 TRACKER = ROOT / "bin" / "tracker"
+from tools.tracker import board  # noqa: E402
 
 
-def ledger(number, title, items, asks=(), status="accepted"):
+def ledger(number, title, items, asks=(), status="accepted", traceability=()):
     return {
         "proposal": number, "title": title, "status": status, "updated": "2026-09-14",
         "tiers": {"C2": {"tier": "medium", "model": "sonnet", "effort": "medium", "rule": "bounded"},
                   "C4": {"tier": "lead", "model": "lead model", "effort": "-", "rule": "lead"}},
         "phases": [{"id": "W", "name": "Build", "goal": "the goal", "exit": "the exit"}],
-        "items": list(items), "asks": list(asks),
+        "items": list(items), "traceability": list(traceability), "asks": list(asks),
     }
 
 
@@ -98,6 +99,30 @@ class TestBoardPage(unittest.TestCase):
         self.assertTrue(self.p.page.is_file())
         self.assertIn("2 done / 1 in progress / 1 blocked / 2 not started", r.stdout)
 
+    def test_goal_contract_is_shown_and_makes_the_page_stale_when_changed(self):
+        (self.p.root / ".common-rules.json").write_text(json.dumps({
+            "goal": {
+                "outcome": "ship the smallest release",
+                "constraints": ["preserve behavior"],
+                "verification": ["run the gate"],
+            }
+        }))
+        self.assertEqual(0, self.p.run().returncode)
+        text = self.p.page.read_text()
+        self.assertIn("ship the smallest release", text)
+        self.assertIn("preserve behavior", text)
+        self.assertEqual("ok", board.project_page_state(self.p.root)[0])
+        (self.p.root / ".common-rules.json").write_text(json.dumps({
+            "goal": {
+                "outcome": "ship a verified release",
+                "constraints": ["preserve behavior"],
+                "verification": ["run the gate"],
+            }
+        }))
+        self.assertEqual("stale", board.project_page_state(self.p.root)[0])
+        (self.p.root / ".common-rules.json").unlink()
+        self.assertEqual("stale", board.project_page_state(self.p.root)[0])
+
     def test_every_item_appears_once_with_its_proposal_and_status(self):
         self.p.run()
         text = self.p.page.read_text()
@@ -134,7 +159,7 @@ class TestBoardPage(unittest.TestCase):
                                    r'.*?<span class="n">(\d+)</span>', text))
         # C-06: two more filter chips, always built (even at zero).
         self.assertEqual(statuses, {"in progress": "1", "in review": "0", "in testing": "0",
-                                     "blocked": "1", "not started": "2", "done": "2"})
+                                     "blocked": "1", "not started": "2", "done": "2", "deferred": "0"})
         self.assertRegex(text, r'<input[^>]+type="search"')
         owners = re.findall(r'<option value="([^"]*)"', text)
         self.assertIn("sponsor", owners)
@@ -157,6 +182,40 @@ class TestBoardPage(unittest.TestCase):
         text = self.p.page.read_text()
         self.assertIn('data-ask="A-01"', text)
         self.assertIn("waits on the sponsor &amp; his go", text)
+
+    def test_deferred_is_a_green_terminal_column_with_its_reason(self):
+        row = item("D-01", "deferred", title="parked work", log=[{
+            "at": "2026-09-20T10:00:00+02:00", "event": "deferred", "by": "lead",
+            "evidence": "not part of this release", "status": "deferred"}],
+            deferred_reason="not part of this release")
+        self.p.write("22-deferred.json", ledger(22, "Deferred", [row]))
+        r = self.p.run()
+        self.assertEqual(0, r.returncode, r.stderr)
+        text = self.p.page.read_text()
+        self.assertIn('data-column="deferred"', text)
+        self.assertIn("not part of this release", text)
+        self.assertIn("s-deferred", text)
+
+    def test_traceability_is_rendered_as_a_contract_map(self):
+        row = {
+            "id": "TR-01", "item": "W-02", "requirement_ids": ["REQ-01", "REQ-02"],
+            "guide_section": "docs/guides/operator.md#commands",
+            "architecture_section": "docs/architecture/system.md#boundary",
+            "implementation_files": ["src/runner.py", "src/receipt.py"],
+            "tests_commands": ["pytest tests/test_runner.py"],
+            "receipt_or_refusal": "receipt: run-2026-09-20-01",
+            "owner": "lead", "status": "in progress",
+        }
+        self.p.write("22-traceability.json", ledger(22, "Traceability", [item("W-02", "in progress")],
+                                                      traceability=[row]))
+        r = self.p.run()
+        self.assertEqual(0, r.returncode, r.stderr)
+        text = self.p.page.read_text()
+        self.assertIn('id="traceability"', text)
+        self.assertIn("REQ-01", text)
+        self.assertIn("docs/guides/operator.md#commands", text)
+        self.assertIn("receipt: run-2026-09-20-01", text)
+        self.assertIn('data-traceability="TR-01"', text)
 
     def test_filtered_blocks_hide_outside_the_artifact_wrapper(self):
         # A card is display:flex, which beats the browser's own [hidden] rule, so a
@@ -310,7 +369,7 @@ class TestReviewRoundOne(unittest.TestCase):
         # C-06: two more columns, always shown (even at zero), between
         # "in progress" and "blocked".
         self.assertEqual(cols, [("in progress", "1"), ("in review", "0"), ("in testing", "0"),
-                                 ("blocked", "1"), ("not started", "2"), ("done", "2")])
+                                 ("blocked", "1"), ("not started", "2"), ("done", "2"), ("deferred", "0")])
 
     def test_page_declares_doctype_and_charset(self):
         two_ledgers(self.p)
@@ -446,6 +505,17 @@ class TestTheSidecarHelpers(unittest.TestCase):
         self.assertEqual(board.digests(paths), board.page_digests(self.p.page))
         for name in ("19-warmup.json", "21-standard.json"):
             self.assertIn(name, board.page_digests(self.p.page))
+
+    def test_goal_digest_is_carried_when_declared(self):
+        from tools.tracker import board
+        two_ledgers(self.p)
+        (self.p.root / ".common-rules.json").write_text(json.dumps({
+            "goal": {"outcome": "ship", "constraints": ["safe"], "verification": ["test"]}
+        }))
+        self.assertEqual(0, self.p.run().returncode)
+        text = self.p.page.read_text()
+        self.assertIn('meta name="goal-digest"', text)
+        self.assertEqual("ok", board.freshness(board.ledger_paths(self.p.root), self.p.page, self.p.root))
 
     def test_a_page_without_the_meta_or_no_page_at_all_reads_none(self):
         from tools.tracker import board

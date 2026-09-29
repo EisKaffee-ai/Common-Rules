@@ -23,6 +23,13 @@ block beside the decisions: what was not built, and why. A partial-completion
 status naming nothing is indistinguishable from quietly marking something
 done -- that block is what keeps it honest.
 
+VISUALS ARE A WARNING, NOT A VIOLATION. A proposal is a page someone reads to
+make a decision, so new proposals should be answerable from their visuals:
+before the Decisions heading, carry at least one table, diagram, or headline
+figure block. Existing pages are not failed retroactively; proposalcheck
+prints a warning and remains successful. This is deliberately a judgement
+assist rather than a brittle layout gate.
+
 GRANDFATHERED BY DATE, NOT BY LIST. A proposal decided before EFFECTIVE_DATE,
 or carrying no `proposal-decided` date at all, is exempt from the
 answers-recorded check. finance-tracker alone has 8 accepted proposals whose
@@ -180,6 +187,15 @@ KNOWN_STATUS_RE = re.compile(
 # negotiated is expected to have open decisions.
 DECISION_STATUSES = {"accepted", "completed", "completed in part", "built"}
 
+# The visual rule is intentionally small and HTML-native: no chart library,
+# screenshot, or build step. A table, inline SVG, or the reusable `.big`/`.stat`
+# blocks from templates/proposal.html gives a reader something to scan before
+# the precise text decisions.
+DECISIONS_HEADING_RE = re.compile(r'<h2\b[^>]*>\s*Decisions\s*</h2\s*>', re.I)
+VISUAL_RE = re.compile(
+    r'<(?:table|svg)\b|class=["\'][^"\']*\b(?:big|stat)\b[^"\']*["\']', re.I
+)
+
 
 def meta(text: str, name: str) -> str | None:
     # `\s*/?>` -- a self-closing `<meta ... />` is valid HTML and must read
@@ -213,6 +229,24 @@ def records_answers(text: str) -> bool:
 
 def records_exceptions(text: str) -> bool:
     return bool(re.search(r'\bid="exceptions"', text))
+
+
+def visual_warning(text: str) -> str | None:
+    """Return the warning for a proposal with no visual before Decisions.
+
+    Supporting sections and legacy pages may not have a Decisions heading;
+    those are left alone. The warning is intentionally based on the source
+    order, not the browser layout, so it stays cheap, deterministic and
+    readable in a terminal.
+    """
+    heading = DECISIONS_HEADING_RE.search(text)
+    if not heading:
+        return None
+    before = text[:heading.start()]
+    if VISUAL_RE.search(before):
+        return None
+    return ('no table, diagram, or headline-figure block before Decisions -- '
+            'add <table>, <svg>, or a .big/.stat block')
 
 
 def grandfathered(decided: str | None, floor: str = EFFECTIVE_DATE) -> bool:
@@ -450,10 +484,15 @@ def main(argv: list[str] | None = None) -> int:
               "is skipped (fetch full history)", file=sys.stderr)
 
     total_violations = 0
+    total_warnings = 0
     for path, text in documents:
         for v in check_proposal(path, text, ctx):
             print(f"{path.name}: {v}")
             total_violations += 1
+        warning = visual_warning(text)
+        if warning:
+            print(f"{path.name}: warning: {warning}")
+            total_warnings += 1
 
     # Project-level, so it runs over the whole set rather than per document.
     for v in collisions(documents):
@@ -473,7 +512,7 @@ def main(argv: list[str] | None = None) -> int:
     # separate "checked and clean" from "there was nothing to check".
     asked = sum(1 for _, text in documents if asks_decisions(text))
     print(f"{proj.name}: {len(documents)} proposal(s), {asked} asked decisions "
-          f"-- no violations.")
+          f"-- no violations; {total_warnings} visual warning(s).")
     return 0
 
 

@@ -30,6 +30,7 @@ from pathlib import Path
 from tools.tracker import ledger
 
 CREATABLE_STATUSES = ("in progress", "blocked", "done")
+TERMINAL_STATUSES = frozenset(("done", "deferred"))
 
 _NEXT_ID = re.compile(r'"id":')
 
@@ -190,12 +191,12 @@ def main(argv: list[str]) -> int:
             continue
 
         state = found.get("state")
-        if status == "done" and state == "OPEN":
+        if status in TERMINAL_STATUSES and state == "OPEN":
             if args.dry_run:
                 print(f"would close: #{issue_no} ({iid})")
             else:
                 evidence = _last_evidence(item)
-                comment = f"Closed by tracker sync: {iid} is done in {ledger_path}."
+                comment = f"Closed by tracker sync: {iid} is {status} in {ledger_path}."
                 if evidence:
                     comment += f" {evidence}"
                 try:
@@ -204,7 +205,7 @@ def main(argv: list[str]) -> int:
                     print(f"tracker sync: gh issue close failed for {iid}: {exc}", file=sys.stderr)
                     return 2
             closed += 1
-        elif state == "CLOSED" and status != "done":
+        elif state == "CLOSED" and status not in TERMINAL_STATUSES:
             drift_lines.append(f"DRIFT {iid} #{issue_no}: issue closed, ledger says {status}")
 
     for line in drift_lines:

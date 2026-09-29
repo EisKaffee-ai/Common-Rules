@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>35 · proposed · Guide and architecture traceability</title>
+<meta name="proposal-id" content="35">
+<meta name="proposal-status" content="proposed">
+<meta name="common-rules-template" content="proposal/21">
+<!--
+  Written by common-rules bin/new-proposal from templates/proposal.html
+  (proposal 21, S-02). Replace every highlighted passage; delete none of
+  the sections. The status appears in four places that must agree: the
+  proposal-status meta above, the <title>, the <h1>, and the
+  "Proposal NN · proposed DATE" line under the heading. The Decided
+  section below says exactly what to change when the sponsor answers.
+  Visual rule: make the page answerable at a glance before Decisions. Use
+  .tk for comparisons, .big/.stat for headline figures, .verdict for the
+  recommendation, and .ev directly under the claim it supports. Inline SVG
+  diagrams must use the page's CSS variables, not hardcoded light-only fills,
+  so they remain legible in dark mode.
+-->
+<style>
+  :root {
+    --ground: #F1F2F4; --surface: #FFFFFF; --ink: #16191D; --dim: #5E6873;
+    --border: #D3D8DE; --accent: #C2521F; --accent-soft: #F7E3D8;
+    --fill: #FFF3BF; --fill-ink: #5C4400;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #111417; --surface: #1A1F24; --ink: #E5E8EB; --dim: #939DA7;
+      --border: #2F3841; --accent: #EE7A45; --accent-soft: #3A2419;
+      --fill: #3B3313; --fill-ink: #F2DC8C;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 90px; }
+  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -.01em; margin: 0; }
+  h1 .num, h1 .status { color: var(--accent); }
+  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 40px 0 10px; }
+  .sub { color: var(--dim); margin: 10px 0 0; max-width: 72ch; }
+  .card { background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; margin-top: 12px; }
+  blockquote { margin: 0; padding: 14px 20px; background: var(--surface); border-left: 3px solid var(--accent); font-size: 17px; }
+  blockquote cite { display: block; margin-top: 8px; font-style: normal; font-size: 13px; color: var(--dim); }
+  .opt { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .opt .card h3 { margin: 0 0 6px; font-size: 16px; }
+  .tk { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); margin-top: 12px; }
+  .tk th, .tk td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .tk th { color: var(--dim); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+  .tk tr:last-child td { border-bottom: 0; }
+  .tk .take, .tk .yes { color: #18794E; font-weight: 700; }
+  .tk .leave, .tk .no { color: var(--accent); font-weight: 700; }
+  .tk .maybe, .tk .open { color: #9A6B00; font-weight: 700; }
+  .big { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; }
+  .stat strong { display: block; font-size: 28px; line-height: 1; }
+  .stat span { display: block; color: var(--dim); font-size: 13px; margin-top: 7px; }
+  .verdict { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; margin-top: 12px; }
+  .verdict b { letter-spacing: .06em; text-transform: uppercase; }
+  .ev { color: var(--dim); font-size: 13px; margin: 4px 0 0; }
+  @media (prefers-color-scheme: dark) { .tk .take, .tk .yes { color: #73D6A6; } .tk .maybe, .tk .open { color: #E7BE60; } }
+  ol.decisions { background: var(--surface); border: 1px solid var(--border); margin: 12px 0 0; padding: 14px 20px 14px 44px; }
+  ol.decisions li + li { margin-top: 6px; }
+  .slot { border: 1px dashed var(--border); padding: 14px 20px; margin-top: 12px; color: var(--dim); }
+  .slot li + li { margin-top: 8px; }
+  .m { font-family: var(--mono); font-size: .9em; }
+  pre.m { background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 8px 12px; margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .fill { background: var(--fill); color: var(--fill-ink); padding: 0 3px; }
+  .src { font-size: 13px; color: var(--dim); margin-top: 36px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1><span class="num">35</span> · <span class="status">proposed</span> · Guide and architecture traceability</h1>
+<p class="sub">Proposal 35 · proposed 2026-09-20. <span class="fill">One paragraph: what this asks the sponsor to decide, and why now.</span></p>
+
+<h2>The ask</h2>
+<blockquote>
+  <span class="fill">The sponsor's words, verbatim, read from disk: a transcript line, a message, or a ledger ask. Never a summary or a paraphrase.</span>
+  <cite><span class="fill">The sponsor, the date and time, and where the words are recorded.</span></cite>
+</blockquote>
+
+<h2>What was found</h2>
+<div class="card">
+  <ul>
+    <li><span class="fill">A finding, measured, with the number and where it came from.</span></li>
+    <li><span class="fill">Another finding. Say what was not verified, too.</span></li>
+  </ul>
+</div>
+
+<h2>Options</h2>
+<div class="opt">
+  <div class="card">
+    <h3>A · <span class="fill">option name</span></h3>
+    <p><span class="fill">What gets built, what it costs, and what it rules out.</span></p>
+  </div>
+  <div class="card">
+    <h3>B · <span class="fill">option name</span></h3>
+    <p><span class="fill">What gets built, what it costs, and what it rules out.</span></p>
+  </div>
+</div>
+<p><b>Recommended:</b> <span class="fill">the option, and the one reason that decides it.</span></p>
+
+<h2>Decision at a glance</h2>
+<!-- Keep this compact. The sponsor should see the recommendation and the
+     evidence shape before reading the numbered decisions below. -->
+<div class="verdict"><b><span class="fill">TAKE / LEAVE / TRY ONCE</span></b> <span class="fill">the one-line recommendation.</span><p class="ev"><span class="fill">Evidence directly under the claim: one measurement, source, or limitation.</span></p></div>
+<div class="big">
+  <div class="stat"><strong><span class="fill">00%</span></strong><span><span class="fill">headline result or coverage</span></span></div>
+  <div class="stat"><strong><span class="fill">0×</span></strong><span><span class="fill">cost, risk, or change</span></span></div>
+  <div class="stat"><strong><span class="fill">N</span></strong><span><span class="fill">scope, options, or affected sessions</span></span></div>
+</div>
+<table class="tk">
+  <thead><tr><th>Option / claim</th><th>Verdict</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td><span class="fill">the important comparison</span></td><td class="take">TAKE</td><td class="ev"><span class="fill">short supporting measurement</span></td></tr>
+    <tr><td><span class="fill">the rejected or open alternative</span></td><td class="leave">LEAVE</td><td class="ev"><span class="fill">short reason or limitation</span></td></tr>
+  </tbody>
+</table>
+
+<h2>Decisions</h2>
+<p class="sub">Each numbered line is one thing the sponsor answers. Keep the numbers stable once shown: answers and ledger items cite them.</p>
+<ol class="decisions">
+  <li><b>D1.</b> <span class="fill">The first decision, as a question with one answer.</span></li>
+  <li><b>D2.</b> <span class="fill">The second decision. Add or remove lines; never leave the list empty.</span></li>
+</ol>
+
+<h2>Decided</h2>
+<section class="slot">
+  <p>Not decided yet. When the sponsor answers, change this page in this order.</p>
+  <ol>
+    <li><b>The date, first.</b> Copy this line into the head, directly under the status meta, and put the real date in place of YYYY-MM-DD:
+      <pre class="m">&lt;meta name="proposal-decided" content="YYYY-MM-DD"&gt;</pre>
+      Without it, bin/proposalcheck treats the page as decided before its rules existed and checks nothing.</li>
+    <li><b>Then the status.</b> Replace the proposed status meta with this line:
+      <pre class="m">&lt;meta name="proposal-status" content="accepted"&gt;</pre>
+      and change "proposed" to "accepted" in the title, the heading, and the "Proposal NN · proposed DATE" line under it.</li>
+    <li>Write both lines exactly as shown. Do not self-close them with <span class="m">/&gt;</span>: bin/proposalcheck does not read that form, and the page would read as undecided.</li>
+    <li>Give this section the id <span class="m">decided</span>, and replace this text with the sponsor's answer quoted from disk, the date, and what each of D1, D2 ... was decided as.</li>
+    <li>Add the items to the ledger beside this page (same number, <span class="m">.json</span>).</li>
+  </ol>
+  <p>The id is added by hand, on purpose. A page that shipped with an empty answers block would pass bin/proposalcheck while recording nothing.</p>
+  <p><b>Completed in part.</b> A proposal closed as <span class="m">completed in part</span> also needs a block with the id exceptions beside the <span class="m">&lt;ol class="decisions"&gt;</span> list, naming what was not built and why. The same rule applies: add it when it is true, never in advance.</p>
+</section>
+
+<p class="src"><span class="fill">Sources: every claim above, with the file, command, transcript or measurement it rests on, and what was not verified.</span></p>
+
+</div>
+</body>
+</html>

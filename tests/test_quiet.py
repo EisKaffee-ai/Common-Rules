@@ -561,3 +561,60 @@ class TestPlanUnits(unittest.TestCase):
                               "-s", str(self.dir), "-q"],
                              capture_output=True, text=True)
         self.assertIn("Ran 10 tests", seq.stdout + seq.stderr)
+
+
+# ── RQ-09: a green gate reported as FAILED ───────────────────────────────
+# From the PhotoVault app's open-fix list, 2026-09-24: `quiet` printed
+# "FAILED · 2 failed" on a gate that was 1,522 passed and 0 failed. Two
+# defects behind one symptom, and OPERATING-RULES sends every session to read
+# exactly that printed line, so a wrong verdict there is worse than none.
+
+
+class AGreenGateIsNotReportedAsFailed(unittest.TestCase):
+    def test_an_application_debug_line_is_not_read_as_a_pytest_summary(self):
+        """The exact line that did it: `failed` matched the prefix of
+        `failedBatches` because the alternation had no word boundary."""
+        output = ("[pv] hydrating viewport\n"
+                  "[pv] batch settled found=2 failedBatches=0 ok=2\n"
+                  "1522 passed, 3 warnings in 41.20s\n")
+        summary, ok = quiet._detect(output)
+        self.assertTrue(ok, f"a green gate was reported as failing: {summary}")
+        self.assertIn("1522 passed", summary)
+
+    def test_a_summary_shaped_substring_inside_a_line_is_ignored(self):
+        """The second defect: the search was unanchored and ran line by line,
+        so the first summary-looking fragment in the log won over pytest's
+        real one."""
+        output = ("collected 4 items / 1 error recovered, 2 failed retries queued\n"
+                  "4 passed in 0.10s\n")
+        summary, ok = quiet._detect(output)
+        self.assertTrue(ok, summary)
+        self.assertTrue(summary.startswith("4 passed"), summary)
+
+    def test_a_real_failure_is_still_a_failure(self):
+        """The fix must not buy quiet by making it quiet about real failures."""
+        summary, ok = quiet._detect("2 failed, 1520 passed in 41.20s\n")
+        self.assertFalse(ok)
+        self.assertIn("2 failed", summary)
+
+    def test_the_padded_form_pytest_actually_prints_is_matched(self):
+        summary, ok = quiet._detect(
+            "=========== 1522 passed, 3 warnings in 41.20s ============\n")
+        self.assertTrue(ok, summary)
+        self.assertIn("1522 passed", summary)
+
+    def test_zeros_spelled_out_are_still_green(self):
+        """The engine's parallel gate prints its zeros; this is the regression
+        the surrounding comment in bin/quiet was already written about."""
+        summary, ok = quiet._detect(
+            "426 passed, 0 failed, 0 errors, 2 skipped in 12.00s\n")
+        self.assertTrue(ok, summary)
+
+    def test_xfailed_and_deselected_counts_do_not_read_as_failures(self):
+        """`xfailed` begins with an x, not with `failed`, but a count of
+        deselected or xfailed tests is not a failure either way -- and the
+        engine's own gate prints both."""
+        summary, ok = quiet._detect(
+            "8078 passed, 83 skipped, 17 xfailed in 540.00s\n")
+        self.assertTrue(ok, summary)
+        self.assertIn("17 xfailed", summary)

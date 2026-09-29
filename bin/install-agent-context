@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Install explicit AGENTS-first warmup/reheat/preheat skills without replacing project rules or hooks."""
+import argparse
+import json
+from pathlib import Path
+import shlex
+import subprocess
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--project', required=True, type=Path)
+args = parser.parse_args()
+project = args.project.resolve()
+rules = Path(__file__).resolve().parent.parent
+if not (project / 'AGENTS.md').is_file():
+    parser.error('Project must already have AGENTS.md; instructions are never fabricated or overwritten.')
+def safe_destination(target):
+    current = target
+    while current != project:
+        if current.is_symlink():
+            parser.error(f'Refusing symlink installation destination: {current}')
+        current = current.parent
+    if not target.resolve().is_relative_to(project):
+        parser.error(f'Destination escapes project: {target}')
+
+config_path = project / '.common-rules.json'
+safe_destination(config_path)
+safe_destination(project / ".common-rules/warmup-state.json")
+config = json.loads(config_path.read_text()) if config_path.exists() else {}
+existing = config.get('read_order', [])
+if not isinstance(existing, list):
+    parser.error('Existing read_order must be a list')
+order = ['AGENTS.md'] + [p for p in existing if p != 'AGENTS.md']
+for name in ['UI-UX-GUIDELINES.md', 'REVIEW-STATUS.md', 'versions.json']:
+    if (project / name).is_file() and name not in order:
+        order.append(name)
+for file in sorted((project / 'templates').glob('*.md')):
+    name = file.relative_to(project).as_posix()
+    if name not in order:
+        order.append(name)
+config['read_order'] = order
+# Preflight every managed destination before writing anything.
+outputs = {}
+for host in ['.agents', '.claude']:
+    for name in ['warmup', 'reheat', 'preheat']:
+        mode = '' if name == 'warmup' else ' --reheat'
+        executable = ("./" + (rules / "bin/warmup").relative_to(project).as_posix()) if rules.is_relative_to(project) else str(rules / "bin/warmup")
+        command = f'{shlex.quote(executable)} --project . --no-pull --no-recall --state .common-rules/warmup-state.json{mode}'
+        text = f'''---
+name: {name}
+description: Read current project instructions and durable status through Common Rules ({name}).
+---
+<!-- managed: common-rules-agent-context -->
+Run from the project root:
+
+```sh
+{command}
+```
+
+Read every file named by `Read in order`, starting with AGENTS.md. The command hashes files; it does not read them into the model for you. Follow the current project instructions and accepted decisions. No manually composed handoff is required. Report missing context and do not invent approval. Do not fetch or upgrade the rules revision without authorization. Preheat is an alias of reheat, sharing the same saved baseline.
+'''
+        target = project / host / 'skills' / name / 'SKILL.md'
+        safe_destination(target)
+        if target.exists() and 'managed: common-rules-agent-context' not in target.read_text():
+            parser.error(f'Refusing to overwrite unmanaged skill: {target}')
+        outputs[target] = text
+for target, text in outputs.items():
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text)
+config_path.write_text(json.dumps(config, indent=2) + '\n')
+print('Installed warmup, reheat and preheat for Codex and Claude. Existing AGENTS.md and hooks preserved.')
+print('Read order: ' + ' → '.join(order))
+print('This installs context skills, not full tracker conformance. Run warmup to see remaining adoption requirements.')

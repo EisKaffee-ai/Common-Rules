@@ -149,7 +149,7 @@ def _summarize(items: list[dict]) -> dict:
     ids_all: set = set()
     ids_done: set = set()
     by_proposal: dict = {}
-    by_status = {key: 0 for key in ("done", "in progress", "in review", "in testing", "blocked", "not started")}
+    by_status = {key: 0 for key in ("done", "in progress", "in review", "in testing", "blocked", "not started", "deferred")}
     for it in items:
         prop = str(it["proposal"])
         agg = by_proposal.setdefault(prop, {"tickets_total": 0, "tickets_done": 0})
@@ -235,6 +235,25 @@ def _as_date(value) -> datetime.date | None:
     return datetime.date.fromisoformat(str(value).split("T", 1)[0])
 
 
+def _as_floor(value) -> datetime.datetime | None:
+    """`since` as a local moment. A date means its local midnight; an ISO
+    timestamp names the hour a project's story starts (Loom, 2026-09-26:
+    its ledgers were consolidated at 20:00 on 25 Sept, and a date floor
+    left the hourly chart showing the old counts -- "clear this history
+    from the graph"). A naive timestamp is read in TZ."""
+    if value is None:
+        return None
+    if isinstance(value, datetime.datetime):
+        when = value
+    elif isinstance(value, datetime.date):
+        return datetime.datetime.combine(value, datetime.time.min, tzinfo=TZ)
+    elif "T" not in str(value):
+        return datetime.datetime.combine(datetime.date.fromisoformat(str(value)), datetime.time.min, tzinfo=TZ)
+    else:
+        when = datetime.datetime.fromisoformat(str(value))
+    return when.replace(tzinfo=TZ) if when.tzinfo is None else when.astimezone(TZ)
+
+
 def series(project, since=None, granularity: str = "day") -> list[dict]:
     """Progress rows from the first ledger commit to now.
 
@@ -268,10 +287,9 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
     start_bucket = bucket(commits[0][1])
     now = datetime.datetime.now(TZ)
     end_bucket = bucket(now)
-    since_date = _as_date(since)
-    if since_date is not None:
-        requested = datetime.datetime.combine(since_date, datetime.time.min, tzinfo=TZ)
-        start_bucket = max(start_bucket, bucket(requested))
+    since_at = _as_floor(since)
+    if since_at is not None:
+        start_bucket = max(start_bucket, bucket(since_at))
 
     # A zoom window commonly starts between commits. Seed its first bucket
     # with the latest snapshot at or before the requested start, then carry
@@ -327,8 +345,7 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
     if dirty:
         _save_cache(cache_path, cache)
 
-    if since_date is not None:
-        rows = [r for r in rows if _as_date(r["date"]) >= since_date]
+    # Rows begin at start_bucket, which is already at or after the floor.
     return rows
 
 
@@ -494,7 +511,7 @@ def _line_chart(width: int, height: int, series_list, dates: list[str], title: s
 def _status_line_chart(width: int, height: int, rows: list[dict]) -> str:
     """Plot one line per status; separate lines keep status changes readable
     without the visual occlusion of a stacked area/bar chart."""
-    keys = ("done", "in progress", "in review", "in testing", "blocked", "not started")
+    keys = ("done", "in progress", "in review", "in testing", "blocked", "not started", "deferred")
     colors = {
         "done": "var(--tracker-status-done, #2FB170)",
         "in progress": "var(--tracker-status-progress, #D97706)",
@@ -502,6 +519,7 @@ def _status_line_chart(width: int, height: int, rows: list[dict]) -> str:
         "in testing": "var(--tracker-status-testing, #0891B2)",
         "blocked": "var(--tracker-status-blocked, #E05263)",
         "not started": "var(--tracker-status-todo, #64748B)",
+        "deferred": "var(--tracker-status-deferred, #EAB308)",
     }
     dates = [r["date"] for r in rows]
     series = []
@@ -546,8 +564,13 @@ def _spread_end_labels(end_labels, y_min, y_max, min_gap=14.0):
 
 def svg(series_rows: list[dict], width: int = 640, height: int = 210) -> str:
     """Two inline SVG line charts: one line per non-empty ticket status,
-    then the percentage line. Counts and percentage remain separate units;
-    each chart uses its own observed range."""
+    then the completion line. Counts and percentage stay separate units;
+    each chart uses its own observed range.
+
+    2026-09-26: the sponsor first asked to fix "multiple progress lines" and
+    the status chart was removed; he then said "one graph is missing from
+    the tracker", so both charts are back. What stays fixed: `deferred` no
+    longer shares `done`'s green, so no two status lines look alike."""
     dates = [r["date"] for r in series_rows]
     completion = [r["completion_pct"] for r in series_rows]
     counts = _status_line_chart(width, height, series_rows)

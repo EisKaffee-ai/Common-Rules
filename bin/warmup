@@ -654,6 +654,7 @@ def gather(project: Path, recall: bool, corpus: list[str]) -> dict:
                     else "main checkout",
         "prohibitions": prohibitions(project, decl["safety_rules"], confine="safety_rules" in own),
         "prohibitions_from": list(dict.fromkeys(rel for rel, _ in P.safety_sources(decl["safety_rules"]))),
+        "goal": decl.get("goal"),
         "prose": list(decl["read_order"]),
         "problems": [], "chain": [], "ledgers": {}, "files": {},
         # Proposal 30, P-04: every open item (with or without parts) falls
@@ -720,8 +721,12 @@ def gather(project: Path, recall: bool, corpus: list[str]) -> dict:
         state["chain"].append(("✗", "ledger · none under docs/proposals"))
     for lp in ledgers:
         rel = str(lp.relative_to(project))
-        read.append(lp)
-        state["files"][rel] = sha256(lp)
+        # Auto-discovered ledgers are parsed to build the compact card, but
+        # they are not added to the session's prose read-order. The card is
+        # the warm-up summary; a lead opens only the active ledger's full JSON
+        # (or a ledger explicitly named in .common-rules.json read_order).
+        # This preserves an explicit sponsor choice while avoiding a second
+        # raw-ledger read of every proposal after the card was generated.
         try:
             data = L.load(lp)
         except ValueError as exc:
@@ -1011,6 +1016,11 @@ def do_queue(project: Path, s: dict) -> str:
 
 def card(s: dict) -> str:
     out = [f"WARM · {s['name']} · {s['branch']} @ {s['head']} · {s['checkout']}"]
+    goal = s.get("goal")
+    if goal:
+        out.append(f"Goal: {shown(goal['outcome'])}")
+        out.append("  constraints: " + " · ".join(shown(x) for x in goal["constraints"]))
+        out.append("  verify: " + " · ".join(shown(x) for x in goal["verification"]))
     if s.get("context"):
         out.append(f"Context: {shown(s['context'])}")
     where = ", ".join(s.get("prohibitions_from") or ["HANDOFF.md"])

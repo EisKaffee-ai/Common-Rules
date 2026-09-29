@@ -82,6 +82,29 @@ class TestStatusAndAutoLog(TrackerSetCase):
         self.assertIn("status in progress", lines[0])
         self.assertIn("page rendered", lines[0])
 
+    def test_deferred_requires_reason_and_records_it_in_history(self):
+        before = self.ledger.read_bytes()
+        missing = self.run_set("W-01", "--status", "deferred")
+        self.assertEqual(1, missing.returncode)
+        self.assertEqual(before, self.ledger.read_bytes())
+        r = self.run_set("W-01", "--status", "deferred", "--reason", "parked until priorities change")
+        self.assertEqual(0, r.returncode, r.stderr)
+        item = self.item("W-01")
+        self.assertEqual("deferred", item["status"])
+        self.assertEqual("parked until priorities change", item["deferred_reason"])
+        self.assertEqual("deferred", item["log"][-1]["status"])
+        self.assertEqual("parked until priorities change", item["log"][-1]["evidence"])
+
+    def test_deferred_can_only_be_reopened_explicitly(self):
+        self.assertEqual(0, self.run_set("W-01", "--status", "deferred", "--reason", "parked").returncode)
+        refused = self.run_set("W-01", "--status", "in progress")
+        self.assertEqual(1, refused.returncode)
+        self.assertEqual("deferred", self.item("W-01")["status"])
+        reopened = self.run_set("W-01", "--status", "in progress", "--reopen")
+        self.assertEqual(0, reopened.returncode, reopened.stderr)
+        self.assertEqual("in progress", self.item("W-01")["status"])
+        self.assertNotIn("deferred_reason", self.item("W-01"))
+
 
 class TestCustomEvent(TrackerSetCase):
 

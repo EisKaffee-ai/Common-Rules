@@ -47,3 +47,7 @@ jobs:
 
       - name: Run test suite
         run: bin/workflow-stamp --check && bin/version-check --check && bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q
+
+      - name: Show test diagnostics on failure
+        if: failure()
+        run: cat /tmp/quiet/merge-gate-*.log

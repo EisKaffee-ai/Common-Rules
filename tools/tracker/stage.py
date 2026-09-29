@@ -1,7 +1,8 @@
 """tracker stage -- record an intended ledger change without touching the
 ledger (proposal 23, M-04: one writer for ledger and tracker files).
 
-  tracker stage LEDGER ITEM_ID [--status S] [--owner O] [--field KEY=VALUE ...]
+  tracker stage LEDGER ITEM_ID [--status S] [--reason TEXT] [--reopen]
+                                [--owner O] [--field KEY=VALUE ...]
                                 [--event TEXT [--evidence TEXT]]
                                 [--by NAME] [--at ISO8601]
 
@@ -46,6 +47,8 @@ def main(argv) -> int:
     ap.add_argument("ledger", type=Path)
     ap.add_argument("item_id")
     ap.add_argument("--status")
+    ap.add_argument("--reason")
+    ap.add_argument("--reopen", action="store_true")
     ap.add_argument("--owner")
     ap.add_argument("--field", action="append", default=[], metavar="KEY=VALUE")
     ap.add_argument("--event")
@@ -71,6 +74,8 @@ def main(argv) -> int:
     record = {
         "item_id": args.item_id,
         "status": args.status,
+        "reason": args.reason,
+        "reopen": args.reopen,
         "owner": args.owner,
         "fields": fields,
         "event": args.event,
@@ -90,6 +95,10 @@ def main(argv) -> int:
     parts = []
     if args.status is not None:
         parts.append(f"status {args.status}")
+    if args.reason is not None:
+        parts.append("deferred reason recorded")
+    if args.reopen:
+        parts.append("explicit reopen")
     if args.owner is not None:
         parts.append(f"owner {args.owner}")
     for key, _, shown in fields:

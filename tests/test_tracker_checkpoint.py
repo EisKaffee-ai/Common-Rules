@@ -75,6 +75,18 @@ class TestGroupsSection(unittest.TestCase):
         out = CP.render([(Path("x.json"), d)], "deadbeef", "manual", Path("."), NOW)
         self.assertIn("### Open work by group\n\n- none", out)
 
+    def test_deferred_items_are_not_open_work_or_next_actions(self):
+        entry = [{"at": "2026-09-20T21:00:00+02:00", "event": "deferred", "by": "lead",
+                  "evidence": "out of scope", "status": "deferred"}]
+        d = ledger([item("W-01", status="deferred", deferred_reason="out of scope", log=entry),
+                    item("W-02", status="not started", depends="W-01")])
+        out = CP.render([(Path("x.json"), d)], "deadbeef", "manual", Path("."), NOW)
+        self.assertIn("### Open work by group", out)
+        self.assertIn("- W-02 0%", out)
+        self.assertNotIn("- W-01", out)
+        self.assertIn("### Next unblocked", out)
+        self.assertIn("- W-02", out)
+
     def test_flat_sections_are_kept(self):
         # The existing sections are untouched -- P-04 adds a section, it does
         # not remove what a hook or a reader already relies on.

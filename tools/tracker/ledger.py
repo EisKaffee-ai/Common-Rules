@@ -7,13 +7,21 @@ Shape, as the PhotoVault engine's proposal 71 already writes it, plus `asks`:
       "proposal": 71, "title": "...", "status": "accepted", "updated": "2026-09-13",
       "tiers":  {"C1": {"tier": "low", "model": "haiku", "effort": "low", "rule": "..."}, ...},
       "phases": [{"id": "R", "name": "...", "goal": "...", "exit": "..."}],
-      "items":  [{"id": "R-01", "phase": "R", "cx": "C3", "title": "...",
+    "items":  [{"id": "R-01", "phase": "R", "cx": "C3", "title": "...",
                   "what": "...", "files": "...", "tests": "...", "done": "...",
                   "depends": "R-01 R-02", "status": "done",
                   "tier": "high", "model": "opus", "tag": "[ruflo · high · opus]",
                   "issue": 229, "discovered_from": "X-03",
                   "log": [{"at": "...", "event": "...", "by": "...", "evidence": "...",
                            "status": "done"}]}],
+      "traceability": [{"id": "TR-01", "item": "R-01",
+                         "requirement_ids": ["REQ-01"],
+                         "guide_section": "docs/guides/guide.md#contract",
+                         "architecture_section": "docs/architecture/system.md#boundary",
+                         "implementation_files": ["src/feature.py"],
+                         "tests_commands": ["pytest tests/test_feature.py"],
+                         "receipt_or_refusal": "receipt: test-run-01",
+                         "owner": "lead", "status": "in progress"}],
       "asks":   [{"id": "A-07", "at": "...", "kind": "research", "quote": "...",
                   "became": null, "state": "open"}],
       "proposed_changes": [...], "priority": {...}, "execution": {"ruflo_route": "..."}
@@ -37,7 +45,9 @@ from pathlib import Path
 # and "done" -- the code is written and it is now elsewhere, waiting on a
 # reviewer or a red-first test to go green. Purely additive: a ledger using
 # only the original four statuses stays valid and unaffected.
-STATUSES = ("not started", "in progress", "in review", "in testing", "blocked", "done")
+STATUSES = ("not started", "in progress", "in review", "in testing", "blocked", "done", "deferred")
+TERMINAL_STATUSES = frozenset(("done", "deferred"))
+DEFERRED_REASON = "deferred_reason"
 ASK_KINDS = ("research", "feature", "defect", "decision", "question")
 ASK_STATES = ("open", "answered", "became-item", "declined")
 CLASSES = ("C1", "C2", "C3", "C4")
@@ -73,6 +83,16 @@ FINDING_ID = re.compile(r"^F-\d{2,}\Z")
 FINDING_SOURCES = ("review", "test")
 FINDING_STATES = ("catalogued", "decided", "deferred", "declined")
 FINDING_SEVERITIES = ("low", "medium", "high", "critical")
+
+# Proposal 35: every implementation-facing requirement can keep one compact,
+# source-bound row connecting the user-facing guide to architecture, code and
+# verification. Optional so existing projects adopt it without a migration.
+TRACEABILITY_ID = re.compile(r"^TR-\d{2,}\Z")
+TRACEABILITY_FIELDS = (
+    "requirement_ids", "guide_section", "architecture_section",
+    "implementation_files", "tests_commands", "receipt_or_refusal",
+    "owner", "status",
+)
 
 
 def load(path) -> dict:
@@ -110,6 +130,11 @@ def findings(ledger: dict) -> list[dict]:
 
 def findings_by_id(ledger: dict) -> dict[str, dict]:
     return {f["id"]: f for f in findings(ledger) if "id" in f}
+
+
+def traceability(ledger: dict) -> list[dict]:
+    """The ledger's requirement-to-evidence rows, if the project uses them."""
+    return list(ledger.get("traceability") or [])
 
 
 def _last_log_date(row: dict, *, matches) -> "datetime.date | None":
@@ -169,7 +194,10 @@ def counts(ledger: dict) -> dict[str, int]:
     buckets sit beside the original four so a caller that only ever knew the
     original four keys (`c["done"]`, `c["in progress"]`, ...) still gets
     exactly what it always got."""
-    c = {"done": 0, "in progress": 0, "in review": 0, "in testing": 0, "blocked": 0, "not started": 0}
+    # Preserve the established six-key order; deferred is additive so callers
+    # that render the compact line or serialize these counters keep their
+    # existing shape unless a deferred row is actually present.
+    c = {s: 0 for s in ("done", "in progress", "in review", "in testing", "blocked", "not started", "deferred")}
     for i in items(ledger):
         s = i.get("status")
         if s in c:
@@ -185,7 +213,7 @@ def status_line(ledger: dict) -> str:
     line every reader has learned to scan."""
     c = counts(ledger)
     line = f'{c["done"]} done / {c["in progress"]} in progress / {c["blocked"]} blocked / {c["not started"]} not started'
-    extra = [f'{c[s]} {s}' for s in ("in review", "in testing") if c[s]]
+    extra = [f'{c[s]} {s}' for s in ("in review", "in testing", "deferred") if c[s]]
     return line + (" / " + " / ".join(extra) if extra else "")
 
 
@@ -197,7 +225,7 @@ def unblocked(ledger: dict) -> list[dict]:
         if i.get("status") != "not started":
             continue
         deps = [d for d in as_list(i.get("depends")) if d in ids]
-        if all(ids[d].get("status") == "done" for d in deps):
+        if all(ids[d].get("status") in TERMINAL_STATUSES for d in deps):
             out.append(i)
     return out
 
@@ -237,6 +265,12 @@ def validate(ledger: dict) -> list[str]:
             seen.add(iid)
         if i.get("status") and i["status"] not in STATUSES:
             problems.append(f"{name}: status {i['status']!r} is not one of {', '.join(STATUSES)}")
+        if i.get("status") == "deferred":
+            reason = i.get(DEFERRED_REASON)
+            if not isinstance(reason, str) or not reason.strip() or not _one_line(reason):
+                problems.append(f"{name}: deferred requires a non-empty one-line `deferred_reason`")
+        elif DEFERRED_REASON in i:
+            problems.append(f"{name}: `{DEFERRED_REASON}` is only valid while status is deferred")
         if i.get("cx") and i["cx"] not in CLASSES:
             problems.append(f"{name}: class {i['cx']!r} is not one of {', '.join(CLASSES)}")
         if phases and i.get("phase") and i["phase"] not in phases:
@@ -281,6 +315,7 @@ def validate(ledger: dict) -> list[str]:
     problems.extend(_validate_v2(ledger, ids, ask_ids))
     problems.extend(_validate_tracker(ledger))
     problems.extend(_validate_findings(ledger))
+    problems.extend(_validate_traceability(ledger))
     # A message can quote a malformed id; every problem is printed as one line
     # (V-02 final review: "Z-01\\nwarmup --check: ready" split a problem in two).
     return [_printable(p) for p in problems]
@@ -444,6 +479,53 @@ def _validate_findings(ledger: dict) -> list[str]:
             for k, entry in enumerate(f.get("log") or []):
                 if not isinstance(entry, dict):
                     problems.append(f"{name}: log[{k}] is not an object {{at, event, by, evidence}}")
+    return problems
+
+
+def _validate_traceability(ledger: dict) -> list[str]:
+    """Validate optional guide/architecture-to-evidence rows.
+
+    The fields are intentionally explicit instead of one long string: the
+    tracker can render the row as a table, and a reviewer can follow each link
+    without guessing which part of a sentence names the implementation or the
+    proof. Existing ledgers with no rows remain unchanged.
+    """
+    if "traceability" in ledger and not isinstance(ledger["traceability"], list):
+        return ["traceability: must be a list"]
+    problems: list[str] = []
+    ids = {i.get("id") for i in items(ledger)}
+    seen: set[str] = set()
+    for n, row in enumerate(traceability(ledger)):
+        name = row.get("id") if isinstance(row, dict) and row.get("id") else f"traceability[{n}]"
+        if not isinstance(row, dict):
+            problems.append(f"{name}: a traceability row must be an object")
+            continue
+        rid = row.get("id")
+        if not rid or not TRACEABILITY_ID.match(rid):
+            problems.append(f"{name}: traceability id is not TR-NN")
+        elif rid in seen:
+            problems.append(f"{rid}: traceability id appears more than once")
+        else:
+            seen.add(rid)
+        item_id = row.get("item")
+        if not item_id or item_id not in ids:
+            problems.append(f"{name}: item {item_id!r} is not an item in this ledger")
+        requirements = row.get("requirement_ids")
+        if not isinstance(requirements, list) or not requirements or not all(
+                isinstance(v, str) and _one_line(v) and v.strip() for v in requirements):
+            problems.append(f"{name}: requirement_ids must be a non-empty list of one-line ids")
+        for field in ("guide_section", "architecture_section", "receipt_or_refusal"):
+            if not isinstance(row.get(field), str) or not _one_line(row[field]) or not row[field].strip():
+                problems.append(f"{name}: {field} must be non-empty one-line text")
+        for field in ("implementation_files", "tests_commands"):
+            value = row.get(field)
+            if not isinstance(value, list) or not value or not all(
+                    isinstance(v, str) and _one_line(v) and v.strip() for v in value):
+                problems.append(f"{name}: {field} must be a non-empty list of one-line strings")
+        if not isinstance(row.get("owner"), str) or not OWNER.match(row.get("owner", "")):
+            problems.append(f"{name}: owner is not sponsor, lead or session:<name>")
+        if row.get("status") not in STATUSES:
+            problems.append(f"{name}: status {row.get('status')!r} is not one of {', '.join(STATUSES)}")
     return problems
 
 
@@ -640,7 +722,7 @@ def open_requests(ledger: dict) -> list[dict]:
 
 def merged_waiting(ledger: dict) -> list[str]:
     """Rows merged but not yet done: awaiting their evidence (D8)."""
-    return [i["id"] for i in items(ledger) if i.get("merged") not in (None, False, "") and i.get("status") != "done"]
+    return [i["id"] for i in items(ledger) if i.get("merged") not in (None, False, "") and i.get("status") not in TERMINAL_STATUSES]
 
 
 def readiness(ledger: dict) -> dict | None:

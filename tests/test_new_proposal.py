@@ -223,6 +223,15 @@ class TestWritten(Scratch):
         self.assertIsNone(re.search(r'<meta name="proposal-decided"', page))
         self.assertTrue(any(d in page for d in today_dates()), "page carries today's date")
 
+    def test_page_carries_visual_decision_primitives(self):
+        _, html, _ = self.make()
+        page = html.read_text()
+        self.assertIn('class="verdict"', page)
+        self.assertIn('class="big"', page)
+        self.assertIn('class="stat"', page)
+        self.assertIn('class="tk"', page)
+        self.assertLess(page.index('class="tk"'), page.index('<h2>Decisions</h2>'))
+
     def test_ledger_is_the_minimal_contract(self):
         _, _, ledger = self.make()
         data = json.loads(ledger.read_text())

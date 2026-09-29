@@ -24,6 +24,7 @@
      "depends": [], "status": "not started", "tier": "medium", "model": "sonnet",
      "tag": "[ruflo · medium · sonnet]", "issue": null, "log": []}
   ],
+  "traceability": [],
   "asks": [],
   "proposed_changes": [],
   "execution": {"ruflo_route": "{{RUFLO_ROUTE}}"}

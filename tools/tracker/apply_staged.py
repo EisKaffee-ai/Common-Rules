@@ -89,7 +89,8 @@ def main(argv) -> int:
         fields = [(k, v, shown) for k, v, shown in rec.get("fields") or []]
         parts = apply_change(candidate, rec["item_id"], status=rec.get("status"), owner=rec.get("owner"),
                               fields=fields, event=rec.get("event"), evidence=rec.get("evidence", ""),
-                              by=rec.get("by", "lead"), at=rec.get("at"))
+                              by=rec.get("by", "lead"), at=rec.get("at"),
+                              reason=rec.get("reason"), reopen=bool(rec.get("reopen")))
         if parts is None:
             print(f"{say} {f.name}: {rec['item_id']} is not an item in {args.ledger} -- left in place",
                   file=sys.stderr)
