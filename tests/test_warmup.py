@@ -127,6 +127,11 @@ def _seeded_template() -> Path:
         p.write_text(body)
 
     git("init", "-q", "-b", "main")
+    # This repository is copied as an immutable fixture. Background Git
+    # maintenance can remove lock files midway through copytree on Linux.
+    git("config", "maintenance.auto", "false")
+    git("config", "gc.auto", "0")
+    git("config", "gc.autoDetach", "false")
     git("config", "user.email", "t@example.com")
     git("config", "user.name", "t")
     write("README.md", "seed\n")
