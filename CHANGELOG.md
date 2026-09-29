@@ -1,3 +1,7 @@
+# Migration development note — 29 September 2026
+
+Unreleased: Common Rules migration adds an opt-in `bin/install-agent-context` for AGENTS-first Codex/Claude skills, with preheat as a reheat alias. It preserves project rules and hooks and does not claim full tracker conformance. Corrected the nonexistent Codex-workflow.md pointer. Existing installations are unchanged until explicitly installed.
+
 ## 1.1.12 · Release pin synchronization · 2026-09-19
 
 Synchronized the literal release-version regression test with the README

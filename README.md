@@ -1,8 +1,8 @@
-# Emberline — Shared Memory & Delivery Tracker for AI Agents
+# Common Rules — Shared Context & Delivery Tracker for AI Agents
 
 ### Keep the project moving when the chat changes.
 
-Emberline is an open-source **AI agent memory and project tracker** for
+Common Rules (formerly Emberline) is an open-source **AI agent memory and project tracker** for
 developer workflows. It keeps session context, proposals, decisions, and
 next steps connected across **Claude Code and OpenAI Codex**.
 
