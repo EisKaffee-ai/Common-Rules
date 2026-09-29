@@ -1,6 +1,6 @@
 # Getting started
 
-Emberline supplies a shared workflow for Claude Code and Codex projects.
+EisKaffee.ai / Common Rules supplies a shared workflow for Claude Code and Codex projects.
 The repository name and existing paths remain `common-rules`.
 
 ## Session commands

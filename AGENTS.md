@@ -1,4 +1,4 @@
-# common-rules — orientation for a session working in this folder directly
+# EisKaffee.ai / Common Rules — orientation for a session working in this folder directly
 
 This folder is not a project — it's shared workflow rules referenced by
 every project under `apps/` (see `README.md`). If you're
@@ -10,7 +10,7 @@ directory specifically to edit these rules.
 and the issue lifecycle). `README.md` explains how a project adopts it.
 `CHANGELOG.md` is the change history in plain language — read it before
 `git log`, which records that something changed but not what it was for.
-This folder is its own git repository (`github-owner/emberline-ai-tracker`,
+This folder is its own git repository (`EisKaffee-ai/Common-Rules`,
 private), separate from every project's.
 
 **The one rule that matters most for a session here**: per
