@@ -178,10 +178,11 @@ class FilterBarCase(unittest.TestCase):
         # item/proposal level: Pending reuses the same "hide finished" rule
         # the show-finished toggle already used (d.group === "done")
         self.assertIn('function hideFinished(){ return state.pending || !state.showFinished; }', script)
-        self.assertIn('hideFinished() && d.group === "done"', script)
+        self.assertIn('hideFinished() && isTerminal(el)', script)
+        self.assertIn('el.dataset.group === "done" || el.dataset.status === "deferred"', script)
         # part level: a done part is dropped under Pending even inside a
         # surviving (not fully done) item
-        self.assertIn('if (state.pending && row.dataset.pstatus === "done") return false;', script)
+        self.assertIn('if (state.pending && (row.dataset.pstatus === "done" || row.dataset.pstatus === "deferred")) return false;', script)
         # the item/proposal-level data this drives is present in the markup
         self.assertIn('data-id="D-01" data-proposal="30" data-status="done"', text)
         self.assertIn('data-pstatus="done"', text)

@@ -116,7 +116,7 @@ class FixtureRepo:
         (self.path / "docs").mkdir()
 
         fake_chrome = Path(self.tmp.name) / "fake-chrome"
-        fake_chrome.write_text(FAKE_CHROME)
+        fake_chrome.write_text(FAKE_CHROME.replace("#!/usr/bin/env python3", "#!" + sys.executable, 1))
         fake_chrome.chmod(fake_chrome.stat().st_mode | stat.S_IEXEC)
         self.fake_chrome = fake_chrome
 

@@ -61,8 +61,8 @@ The card ends with `Read in order:`. Read every file on that line, in that
 order, before any other action: HANDOFF.md (which now folds in
 docs/OPERATING-RULES.md — proposal 23, M-11) → this card itself → the latest
 checkpoint → common-rules' CLAUDE-workflow.md. The card has already validated
-and summarized every auto-discovered ledger; do not reopen every raw ledger
-JSON. Open the full JSON only for the item currently being worked, unless the
+and summarized every auto-discovered ledger. Read the card, not the raw
+ledger JSON. Open the full JSON only for the item currently being worked, unless the
 project explicitly names a ledger in `.common-rules.json` `read_order`.
 
 After a compaction the summary above is a paraphrase. The ledger is the

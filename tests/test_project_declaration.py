@@ -390,7 +390,8 @@ class TestAnAppShapedCard(AppProject):
     def test_read_order_starts_with_the_declared_files(self):
         out = self.warmup().stdout
         line = next(l for l in out.splitlines() if l.startswith("Read in order: "))
-        self.assertTrue(line.startswith(f"Read in order: CLAUDE.md → SPONSOR-CONSTRAINTS.md → {LEDGER}"), line)
+        self.assertTrue(line.startswith("Read in order: CLAUDE.md → SPONSOR-CONSTRAINTS.md → "), line)
+        self.assertNotIn(LEDGER, line, "auto-discovered ledgers are summarized by the card")
         self.assertNotIn("HANDOFF.md", line)
         self.assertTrue(line.endswith("CLAUDE-workflow.md"), line)
 

@@ -28,6 +28,7 @@ class AgentContextInstall(unittest.TestCase):
             for host in ['.agents','.claude']:
                 for name in ['warmup','reheat','preheat']:
                     self.assertTrue((project/host/'skills'/name/'SKILL.md').is_file())
+                    self.assertIn('--state .common-rules/warmup-state.json',(project/host/'skills'/name/'SKILL.md').read_text())
 
     def test_refuses_unmanaged_skill_before_writing(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -38,3 +39,18 @@ class AgentContextInstall(unittest.TestCase):
             self.assertFalse((project/'.common-rules.json').exists())
             self.assertFalse((project/'.agents').exists())
             self.assertEqual(skill.read_text(),'User skill')
+
+    def test_refuses_symlink_destinations_before_any_write(self):
+        for destination in ['.agents','.claude/skills','.common-rules.json','.common-rules','.common-rules/warmup-state.json']:
+            with self.subTest(destination=destination), tempfile.TemporaryDirectory() as tmp:
+                base=Path(tmp);project=base/'project';project.mkdir();(project/'AGENTS.md').write_text('Rules')
+                outside=base/'outside'
+                if destination.endswith('.json'):outside.write_text('{}')
+                else:outside.mkdir()
+                target=project/destination;target.parent.mkdir(parents=True,exist_ok=True);target.symlink_to(outside)
+                before={str(p):p.read_bytes() for p in base.rglob('*') if p.is_file() and not p.is_symlink()}
+                result=subprocess.run([sys.executable,str(ROOT/'bin/install-agent-context'),'--project',str(project)],capture_output=True)
+                self.assertNotEqual(result.returncode,0)
+                self.assertIn(b'symlink',result.stderr.lower())
+                after={str(p):p.read_bytes() for p in base.rglob('*') if p.is_file() and not p.is_symlink()}
+                self.assertEqual(before,after)

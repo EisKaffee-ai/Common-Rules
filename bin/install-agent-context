@@ -13,7 +13,18 @@ project = args.project.resolve()
 rules = Path(__file__).resolve().parent.parent
 if not (project / 'AGENTS.md').is_file():
     parser.error('Project must already have AGENTS.md; instructions are never fabricated or overwritten.')
+def safe_destination(target):
+    current = target
+    while current != project:
+        if current.is_symlink():
+            parser.error(f'Refusing symlink installation destination: {current}')
+        current = current.parent
+    if not target.resolve().is_relative_to(project):
+        parser.error(f'Destination escapes project: {target}')
+
 config_path = project / '.common-rules.json'
+safe_destination(config_path)
+safe_destination(project / ".common-rules/warmup-state.json")
 config = json.loads(config_path.read_text()) if config_path.exists() else {}
 existing = config.get('read_order', [])
 if not isinstance(existing, list):
@@ -33,7 +44,7 @@ for host in ['.agents', '.claude']:
     for name in ['warmup', 'reheat', 'preheat']:
         mode = '' if name == 'warmup' else ' --reheat'
         executable = ("./" + (rules / "bin/warmup").relative_to(project).as_posix()) if rules.is_relative_to(project) else str(rules / "bin/warmup")
-        command = f'{shlex.quote(executable)} --project . --no-pull --no-recall{mode}'
+        command = f'{shlex.quote(executable)} --project . --no-pull --no-recall --state .common-rules/warmup-state.json{mode}'
         text = f'''---
 name: {name}
 description: Read current project instructions and durable status through Common Rules ({name}).
@@ -48,6 +59,7 @@ Run from the project root:
 Read every file named by `Read in order`, starting with AGENTS.md. The command hashes files; it does not read them into the model for you. Follow the current project instructions and accepted decisions. No manually composed handoff is required. Report missing context and do not invent approval. Do not fetch or upgrade the rules revision without authorization. Preheat is an alias of reheat, sharing the same saved baseline.
 '''
         target = project / host / 'skills' / name / 'SKILL.md'
+        safe_destination(target)
         if target.exists() and 'managed: common-rules-agent-context' not in target.read_text():
             parser.error(f'Refusing to overwrite unmanaged skill: {target}')
         outputs[target] = text

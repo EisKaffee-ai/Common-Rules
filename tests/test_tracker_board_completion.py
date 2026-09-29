@@ -13,6 +13,8 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
+import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -50,6 +52,12 @@ def write(root: Path, number, data) -> Path:
 
 class CompletionOverviewCase(unittest.TestCase):
     def setUp(self):
+        class FixtureDate(datetime.date):
+            @classmethod
+            def today(cls): return cls(2026, 9, 17)
+        clock = mock.patch("tools.tracker.parts.datetime.date", FixtureDate)
+        clock.start()
+        self.addCleanup(clock.stop)
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         self.root = Path(tmp.name)

@@ -2,6 +2,12 @@
 
 Adds an opt-in AGENTS-first context installer for Codex and Claude, with warmup, reheat and preheat aliases. Preserves existing project instructions, reads declared guidelines and templates, and refuses to overwrite unmanaged skills. Carries forward the existing 1.3.0 development history and local tracker improvements. Existing projects are not silently upgraded. No architecture or publication approval is inferred from installation.
 
+Release verification correction: restored the explicit “card, not the raw ledger JSON” wording in warmup while preserving declared read-order exceptions. No command behaviour changes.
+
+Release verification fixes: pin the intended 1.4.0 version in its regression test; freeze waiting-date fixtures; retain terminal deferred filtering coverage; use the current Python interpreter for fake renderer tests; align the read-order expectation with summarized auto-discovered ledgers; add the missing in-progress traceability part without claiming completion. Reflowed existing visual-proposal guidance without changing its words.
+
+Installer review fixes: reject symlinked installation destinations before writing and save an explicit shared warmup/reheat/preheat baseline. Regression tests first reproduced both defects in disposable projects.
+
 # Migration development note — 29 September 2026
 
 Unreleased: Common Rules migration adds an opt-in `bin/install-agent-context` for AGENTS-first Codex/Claude skills, with preheat as a reheat alias. It preserves project rules and hooks and does not claim full tracker conformance. Corrected the nonexistent Codex-workflow.md pointer. Existing installations are unchanged until explicitly installed.
