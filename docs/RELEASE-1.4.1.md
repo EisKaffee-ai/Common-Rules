@@ -1,4 +1,4 @@
-# EisKaffee.ai / Common Rules 1.4.0
+# EisKaffee.ai / Common Rules 1.4.1
 
 ## Changes
 
@@ -18,3 +18,7 @@ A new Codex or Claude session may be required to discover newly installed skills
 ## Compatibility
 
 Existing warmup/reheat usage remains supported. The historical full installer is unchanged; the agent-context installer is opt-in. Project-specific instructions and safety constraints remain authoritative for their project. No original repository has been deleted or transferred by this migration.
+
+## Verification
+
+Full local suite: 2,017 tests passed. Installer regression tests additionally cover shared baseline state and symlinked configuration, skill and state destinations. Review performed in two report-only rounds; findings addressed. GitHub CI remains the final remote check.

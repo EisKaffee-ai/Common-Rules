@@ -1,3 +1,7 @@
+# 1.4.1 — Release verification and installer safety — 29 September 2026
+
+Includes the Common Rules migration prepared as 1.4.0, plus the release-gate corrections and installer containment/shared-state fixes below. Version 1.4.0 was an unreleased candidate; 1.4.1 is the publication candidate after its verification fixes.
+
 # 1.4.0 — EisKaffee.ai / Common Rules — 29 September 2026
 
 Adds an opt-in AGENTS-first context installer for Codex and Claude, with warmup, reheat and preheat aliases. Preserves existing project instructions, reads declared guidelines and templates, and refuses to overwrite unmanaged skills. Carries forward the existing 1.3.0 development history and local tracker improvements. Existing projects are not silently upgraded. No architecture or publication approval is inferred from installation.
