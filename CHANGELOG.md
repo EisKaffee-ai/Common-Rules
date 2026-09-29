@@ -1,3 +1,7 @@
+# 1.4.0 — EisKaffee.ai / Common Rules — 29 September 2026
+
+Adds an opt-in AGENTS-first context installer for Codex and Claude, with warmup, reheat and preheat aliases. Preserves existing project instructions, reads declared guidelines and templates, and refuses to overwrite unmanaged skills. Carries forward the existing 1.3.0 development history and local tracker improvements. Existing projects are not silently upgraded. No architecture or publication approval is inferred from installation.
+
 # Migration development note — 29 September 2026
 
 Unreleased: Common Rules migration adds an opt-in `bin/install-agent-context` for AGENTS-first Codex/Claude skills, with preheat as a reheat alias. It preserves project rules and hooks and does not claim full tracker conformance. Corrected the nonexistent Codex-workflow.md pointer. Existing installations are unchanged until explicitly installed.
