@@ -32,7 +32,8 @@ outputs = {}
 for host in ['.agents', '.claude']:
     for name in ['warmup', 'reheat', 'preheat']:
         mode = '' if name == 'warmup' else ' --reheat'
-        command = f'{shlex.quote(str(rules / "bin/warmup"))} --project . --no-pull --no-recall{mode}'
+        executable = ("./" + (rules / "bin/warmup").relative_to(project).as_posix()) if rules.is_relative_to(project) else str(rules / "bin/warmup")
+        command = f'{shlex.quote(executable)} --project . --no-pull --no-recall{mode}'
         text = f'''---
 name: {name}
 description: Read current project instructions and durable status through Common Rules ({name}).

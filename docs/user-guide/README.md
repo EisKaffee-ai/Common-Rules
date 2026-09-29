@@ -7,7 +7,7 @@ Start with the short product explanation, then choose the guide that matches
 what you are trying to do:
 
 1. [What Emberline is](01-what-is-emberline.md) — the problem, the record, and the human boundary.
-2. [Warm-up and reheat](02-warmup-and-reheat.md) — how a fresh or running session gets context.
+2. [Warm-up, reheat and preheat](02-warmup-and-reheat.md) — how a fresh or running session gets context.
 3. [The tracker and proposals](03-tracker-and-proposals.md) — where decisions, owners, and progress live.
 4. [Claude Code and Codex](04-claude-code-and-codex.md) — the shared model and the adoption path.
 5. [Repository structure](05-repository-structure.md) — what each visible folder is for and what must stay where it is.

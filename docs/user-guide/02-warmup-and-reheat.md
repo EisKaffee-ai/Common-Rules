@@ -1,33 +1,34 @@
-# Warm-up and reheat
+# Warm-up, reheat and preheat
 
-Warm-up and reheat solve different timing problems. Both read the project
-record and produce a compact starting card before implementation continues.
+There are three command names and two behaviours. `/warmup` establishes a fresh session. `/reheat` and `/preheat` refresh an existing session and share the same baseline.
 
-## Use warm-up for a fresh session
+## Fresh session
 
-Run `/warmup` when a new chat is opening on a project. It reads the required
-orientation files in order, checks the declared standard, loads the current
-ledger and latest checkpoint, and reports what is pending.
+Run `/warmup`. Read the files in the reported order, beginning with the project's AGENTS.md when using the agent-context installer. The card checks declared context, ledgers and checkpoint and identifies pending work. It does not inject the full contents of every file into the agent automatically.
 
-Warm-up is for establishing context. It should happen before making changes.
+## Refresh a running session
 
-## Use reheat for a running session
+Run `/reheat` or `/preheat`. Both show changes since the last saved baseline. Read changed instructions and source evidence before continuing. With no saved baseline, establish the full context first. If a compaction leaves you unsure what has been read, use `/warmup` again.
 
-Run `/reheat` when the session is already active and you need to know what
-changed since the last warm-up or reheat. It prints the delta, the standard's
-current status, and the pending queue without replaying the entire history.
+## Install the commands
 
-Reheat is for continuity inside a session. It is not a substitute for a fresh
-warm-up after a new session or a compaction.
+```sh
+./bin/install-agent-context --project /path/to/project
+```
 
-## The practical sequence
+This preserves AGENTS.md and installs all three skills into `.agents/skills` and `.claude/skills`. It does not replace hooks or certify full tracker conformance. A new host session may be needed to discover installed skills.
 
-1. Fresh chat: `/warmup`.
-2. Work on one owned item and record durable decisions.
-3. After a compaction or a long pause: `/reheat`.
-4. Before handoff: update the tracker and checkpoint.
-5. New chat or new agent: `/warmup` again.
+The existing full installer `bin/derecord` retains its historical warmup/reheat installation. Use the agent-context installer for the new cross-host preheat alias.
 
-The corresponding skills live in [`skills/warmup`](../../skills/warmup/) and
-[`skills/reheat`](../../skills/reheat/). The shell checks are available as
-`bin/warmup` and `bin/reheat` for repository validation.
+## Shell equivalents
+
+```sh
+./bin/warmup --project /path/to/project --no-pull --no-recall
+./bin/warmup --project /path/to/project --reheat --no-pull --no-recall
+```
+
+There is no separate bin/reheat executable. Preheat uses the second command too. The flags keep this session on its installed rules revision and avoid optional recall while reconstructing project context.
+
+## Durable state
+
+Record decisions and next work in the project ledger and generate its checkpoint. These are repository state that agents read independently; a manually composed chat handoff is not required by the AGENTS-first configuration. Configuration and evidence remain the source of truth, not conversational recollection.

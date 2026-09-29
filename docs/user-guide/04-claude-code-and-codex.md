@@ -1,6 +1,6 @@
 # Claude Code and Codex
 
-Emberline is consumer-neutral. Claude Code and OpenAI Codex may expose
+Common Rules is consumer-neutral. Claude Code and OpenAI Codex may expose
 different commands, skills, or tools, but they can use the same project record
 and follow the same operating contract.
 
@@ -9,9 +9,9 @@ and follow the same operating contract.
 1. Copy or reference the shared rules from the adopting project.
 2. Seed the handoff, operating, proposal, and checkpoint files with
    `bin/derecord` where appropriate.
-3. Install the session hooks for the chosen host.
+3. For AGENTS-first context, run `bin/install-agent-context --project PATH`; it installs warmup, reheat and preheat for both hosts without replacing hooks.
 4. Start with `/warmup` and confirm the tracker is valid.
-5. Use `/reheat` when the same session needs a delta.
+5. Use `/reheat` or `/preheat` when the same session needs a delta.
 
 See [Getting started](../GETTING-STARTED.md) for the short path and
 [`CLAUDE-workflow.md`](../../CLAUDE-workflow.md) for the full contract.

@@ -17,7 +17,7 @@ session a shared record — and you a clear view of what happens next.
 
 ## Pick up where the work left off.
 
-**Warm-up** gives a fresh chat its starting context. **Reheat** brings a running
+**Warm-up** gives a fresh chat its starting context. **Reheat / preheat** brings a running
 chat up to date. Your proposals, decisions, and next steps stay connected.
 
 ![Separate warm-up and reheat paths for fresh and running sessions](docs/assets/warmup-reheat-hero.svg)
@@ -45,7 +45,7 @@ A shared record supports the workflow; human review still decides what is accept
 Run `/standard` in the adopting project's chat to review the shared contract,
 then use [`bin/derecord`](bin/derecord) to seed the project's handoff, tracker,
 and hooks without overwriting its existing rules. Start the next session with
-`/warmup` and use `/reheat` when a running session needs the latest delta.
+`/warmup` and use `/reheat` or `/preheat` when a running session needs the latest delta.
 
 ## Copy this into a project chat
 

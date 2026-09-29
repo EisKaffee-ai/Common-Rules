@@ -5,13 +5,16 @@ The repository name and existing paths remain `common-rules`.
 
 ## Session commands
 
-In an adopting project's chat, use `/warmup` for a fresh session and `/reheat`
+In an adopting project's chat, use `/warmup` for a fresh session and `/reheat` or `/preheat`
 to refresh a running session. These are chat commands, not shell commands.
 They read and check the repository record; tracker tools generate the page.
 
 See the [warm-up skill](../skills/warmup/SKILL.md),
-[reheat skill](../skills/reheat/SKILL.md), and
+[reheat skill](../skills/reheat/SKILL.md),
+[preheat alias](../skills/preheat/SKILL.md), and
 [shared workflow](../CLAUDE-workflow.md) for setup and the operating contract.
+
+For AGENTS-first setup on both hosts, run `bin/install-agent-context --project PATH`. This includes the preheat alias and preserves existing rules. Full tracker adoption is a separate check.
 
 ## Keep the native goal and repository record aligned
 
