@@ -1,0 +1,85 @@
+{
+  "proposal": 35,
+  "title": "Guide and architecture traceability",
+  "status": "proposed",
+  "updated": "2026-09-20",
+  "tiers": {
+    "C1": {
+      "tier": "low",
+      "model": "haiku",
+      "effort": "low",
+      "rule": "Mechanical, one owned file, fully specified, no design choice"
+    },
+    "C2": {
+      "tier": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "rule": "Bounded implementation or tests, clear spec, one or two owned files and their tests"
+    },
+    "C3": {
+      "tier": "high",
+      "model": "sonnet",
+      "effort": "high",
+      "rule": "Cross-module design; changes a gate or the ledger contract; wrong means every project inherits it"
+    },
+    "C4": {
+      "tier": "lead",
+      "model": "opus",
+      "effort": "low or medium",
+      "rule": "Planning, merging, reconciling, anything in a project's real data, a sponsor decision"
+    }
+  },
+  "phases": [
+    {
+      "id": "T",
+      "name": "Traceability",
+      "goal": "Keep user-facing guide claims, architecture boundaries, implementation, and verification visibly connected.",
+      "exit": "Every traceability row names its requirement, guide and architecture sections, implementation files, verification command, receipt or refusal, owner, and status."
+    }
+  ],
+  "items": [
+    {
+      "id": "T-01",
+      "phase": "T",
+      "cx": "C3",
+      "title": "Track guide-to-architecture evidence as a first-class map",
+      "what": "Carry Loom-style traceability rows in the proposal ledger and render them in the project tracker so a guide claim can be followed through architecture, implementation, verification, and its receipt or refusal.",
+      "files": ["tools/tracker/ledger.py", "tools/tracker/board.py", "templates/ledger.json"],
+      "tests": ["tests/test_tracker_ledger.py", "tests/test_tracker_board.py"],
+      "done": "The ledger validates the complete traceability chain; the generated tracker renders it as a table; focused tests and tracker validation pass.",
+      "depends": [],
+      "status": "in progress",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "issue": null,
+      "owner": "lead",
+      "log": [
+        {
+          "at": "2026-09-20T12:00:00+02:00",
+          "event": "started",
+          "by": "session:common-rules-traceability",
+          "evidence": "Loom docs/handoffs/loom-cli-guide-maintenance-rule.md",
+          "status": "in progress"
+        }
+      ]
+    }
+  ],
+  "traceability": [
+    {
+      "id": "TR-01",
+      "item": "T-01",
+      "requirement_ids": ["LOOM-TR-01"],
+      "guide_section": "docs/user-guide/03-tracker-and-proposals.md#visual-by-default",
+      "architecture_section": "docs/handoffs/loom-cli-guide-maintenance-rule.md#mandatory-maintenance-and-traceability-rule",
+      "implementation_files": ["tools/tracker/ledger.py", "tools/tracker/board.py", "templates/ledger.json"],
+      "tests_commands": ["python3 -m unittest -q tests.test_tracker_ledger tests.test_tracker_board", "bin/tracker board --check"],
+      "receipt_or_refusal": "receipt: focused tracker suite green; refusal: incomplete rows fail ledger validation",
+      "owner": "lead",
+      "status": "in progress"
+    }
+  ],
+  "asks": [],
+  "proposed_changes": [],
+  "execution": {}
+}

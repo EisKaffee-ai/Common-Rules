@@ -2,7 +2,8 @@
 script that loads a ledger, changes one item and dumps it back (proposal 23,
 lever L4, L-04). Proposal 30 (P-02) extends it to an item's lettered parts.
 
-  tracker set LEDGER ITEM_ID [--status S] [--owner O] [--field KEY=VALUE ...]
+  tracker set LEDGER ITEM_ID [--status S] [--reason TEXT] [--reopen]
+                              [--owner O] [--field KEY=VALUE ...]
                               [--event TEXT [--evidence TEXT]]
                               [--by NAME] [--at ISO8601]
 
@@ -92,7 +93,7 @@ from tools.tracker import parts as PARTS
 from tools.tracker import render as R
 
 FORBIDDEN_FIELDS = frozenset({"id", "log", "phase"})
-PART_FIELDS = frozenset({"owner", "waiting_until", "risk", "risk_reason", "title", "share"})
+PART_FIELDS = frozenset({"owner", "waiting_until", "risk", "risk_reason", "deferred_reason", "title", "share"})
 PART_ID = re.compile(r"^(.+)\.([A-Z])$")
 
 # proposal 30, P-13: `--waiting-until` on an *existing* item or part previously
@@ -130,10 +131,30 @@ def _parse_field(raw: str) -> tuple[str, object, str] | None:
     return key, parsed, value
 
 
+def _deferred_transition(container: dict, status: str | None, reason: str | None,
+                         reopen: bool) -> None:
+    """Apply the explicit deferral/reopen contract to an item or part."""
+    old = container.get("status")
+    if reason is not None and status != "deferred":
+        raise ValueError("--reason requires --status deferred")
+    if reopen and (old != "deferred" or status in (None, "deferred")):
+        raise ValueError("--reopen requires a deferred item and a new non-deferred --status")
+    if status == "deferred":
+        if old != "deferred" and not reason:
+            raise ValueError("--status deferred requires --reason")
+        if reason is not None:
+            container[L.DEFERRED_REASON] = reason
+    elif status is not None and old == "deferred":
+        if not reopen:
+            raise ValueError("a deferred item may only be reopened explicitly with --reopen")
+        container.pop(L.DEFERRED_REASON, None)
+
+
 def apply_change(data: dict, item_id: str, *, status: str | None = None, owner: str | None = None,
                   fields: list[tuple[str, object, str]] = (), event: str | None = None,
                   evidence: str = "", by: str = "lead", at: str | None = None,
-                  waiting_until: str | None = None) -> list[str] | None:
+                  waiting_until: str | None = None, reason: str | None = None,
+                  reopen: bool = False) -> list[str] | None:
     """Apply one change to an already-loaded ledger `data` in place. Returns
     the human-readable parts on success, or None (nothing changed) when
     `item_id` is not in `data` -- the caller decides how to report that.
@@ -146,9 +167,12 @@ def apply_change(data: dict, item_id: str, *, status: str | None = None, owner: 
         return None
 
     parts = []
+    _deferred_transition(item, status, reason, reopen)
     if status is not None:
         item["status"] = status
         parts.append(f"status {status}")
+    if reason is not None:
+        parts.append("deferred reason recorded")
     if owner is not None:
         item["owner"] = owner
         parts.append(f"owner {owner}")
@@ -160,11 +184,12 @@ def apply_change(data: dict, item_id: str, *, status: str | None = None, owner: 
 
     event_text = event if event is not None else status
     if event_text is not None:
+        log_evidence = evidence or (reason if status == "deferred" else "")
         entry = {
             "at": at or _now(),
             "event": event_text,
             "by": by,
-            "evidence": evidence,
+            "evidence": log_evidence,
         }
         if status is not None:
             # RF-01: the log entry's own `status` key is what bin/conformance
@@ -191,7 +216,8 @@ def _next_letter(n: int) -> str:
 
 
 def add_part(item: dict, title: str, share: int, *, status: str | None = None, owner: str | None = None,
-             waiting_until: str | None = None, risk: str | None = None, risk_reason: str | None = None) -> str:
+             waiting_until: str | None = None, risk: str | None = None, risk_reason: str | None = None,
+             reason: str | None = None) -> str:
     """Append one new lettered part to `item`, in place. Returns its id."""
     ps = item.setdefault("parts", [])
     letter = _next_letter(len(ps))
@@ -205,6 +231,8 @@ def add_part(item: dict, title: str, share: int, *, status: str | None = None, o
         part["risk"] = risk
         if risk_reason:
             part["risk_reason"] = risk_reason
+    if reason is not None:
+        part[L.DEFERRED_REASON] = reason
     ps.append(part)
     return part_id
 
@@ -221,7 +249,7 @@ def set_parts(item: dict, spec_list: list) -> None:
         letter = _next_letter(n)
         part = {"id": f"{item.get('id')}.{letter}", "title": spec.get("title"), "share": spec.get("share"),
                 "status": spec.get("status") or "not started"}
-        for k in ("owner", "waiting_until", "risk", "risk_reason"):
+        for k in ("owner", "waiting_until", "risk", "risk_reason", L.DEFERRED_REASON):
             if spec.get(k) is not None:
                 part[k] = spec[k]
         new_parts.append(part)
@@ -231,7 +259,8 @@ def set_parts(item: dict, spec_list: list) -> None:
 def apply_part_change(data: dict, parent_id: str, letter: str, *, status: str | None = None,
                        owner: str | None = None, fields: list[tuple[str, object, str]] = (),
                        event: str | None = None, evidence: str = "", by: str = "lead",
-                       at: str | None = None, waiting_until: str | None = None) -> list[str] | None:
+                       at: str | None = None, waiting_until: str | None = None,
+                       reason: str | None = None, reopen: bool = False) -> list[str] | None:
     """Apply one change to part `parent_id`.`letter`, in place. Returns the
     human-readable parts on success, or None when the item or the part is
     not found. Raises ValueError for a `--field` not allowed on a part.
@@ -249,6 +278,7 @@ def apply_part_change(data: dict, parent_id: str, letter: str, *, status: str | 
         return None
 
     changed = []
+    _deferred_transition(part, status, reason, reopen)
     if owner is not None:
         part["owner"] = owner
         changed.append(f"owner {owner}")
@@ -262,10 +292,13 @@ def apply_part_change(data: dict, parent_id: str, letter: str, *, status: str | 
     if status is not None:
         part["status"] = status
         changed.append(f"status {status}")
+    if reason is not None:
+        changed.append("deferred reason recorded")
 
     event_text = event if event is not None else status
     if event_text is not None:
-        entry = {"at": at or _now(), "event": event_text, "by": by, "evidence": evidence}
+        entry = {"at": at or _now(), "event": event_text, "by": by,
+                 "evidence": evidence or (reason if status == "deferred" else "")}
         if status is not None:
             entry["status"] = status
         part.setdefault("log", []).append(entry)
@@ -296,6 +329,8 @@ def main(argv) -> int:
     ap.add_argument("ledger", type=Path)
     ap.add_argument("item_id")
     ap.add_argument("--status")
+    ap.add_argument("--reason", help="required with --status deferred; records why it was deferred")
+    ap.add_argument("--reopen", action="store_true", help="explicitly reopen a deferred item or part")
     ap.add_argument("--owner")
     ap.add_argument("--field", action="append", default=[], metavar="KEY=VALUE")
     ap.add_argument("--event")
@@ -353,8 +388,15 @@ def main(argv) -> int:
             return 1
         new_wait = None if (args.waiting_until and args.waiting_until.strip().lower() in CLEAR_WAITING_TOKENS) \
             else args.waiting_until
+        if args.reopen:
+            print(f"{say} --reopen cannot be used with --add-part -- nothing written", file=sys.stderr)
+            return 1
+        if args.status == "deferred" and not args.reason:
+            print(f"{say} --status deferred requires --reason -- nothing written", file=sys.stderr)
+            return 1
         part_id = add_part(item, args.add_part, args.share, status=args.status, owner=args.owner,
-                            waiting_until=new_wait, risk=args.risk, risk_reason=args.risk_reason)
+                            waiting_until=new_wait, risk=args.risk, risk_reason=args.risk_reason,
+                            reason=args.reason)
         data["updated"] = datetime.date.today().isoformat()
         result = [f"added {part_id}", f"share {args.share}"]
         if args.status:
@@ -383,7 +425,8 @@ def main(argv) -> int:
         try:
             result = apply_part_change(data, parent_id, letter, status=args.status, owner=args.owner,
                                         fields=fields, event=args.event, evidence=args.evidence,
-                                        by=args.by, at=args.at, waiting_until=args.waiting_until)
+                                        by=args.by, at=args.at, waiting_until=args.waiting_until,
+                                        reason=args.reason, reopen=args.reopen)
         except ValueError as exc:
             print(f"{say} {exc} -- nothing written", file=sys.stderr)
             return 1
@@ -394,7 +437,7 @@ def main(argv) -> int:
     else:
         result = apply_change(data, args.item_id, status=args.status, owner=args.owner, fields=fields,
                                event=args.event, evidence=args.evidence, by=args.by, at=args.at,
-                               waiting_until=args.waiting_until)
+                               waiting_until=args.waiting_until, reason=args.reason, reopen=args.reopen)
         if result is None:
             print(f"{say} {args.item_id} is not an item in {args.ledger} -- nothing written", file=sys.stderr)
             return 1

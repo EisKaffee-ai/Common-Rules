@@ -1,6 +1,71 @@
 # Migration development note — 29 September 2026
 
 Unreleased: Common Rules migration adds an opt-in `bin/install-agent-context` for AGENTS-first Codex/Claude skills, with preheat as a reheat alias. It preserves project rules and hooks and does not claim full tracker conformance. Corrected the nonexistent Codex-workflow.md pointer. Existing installations are unchanged until explicitly installed.
+## 1.3.0 · Guide and architecture traceability · 2026-09-20
+
+## 2026-09-26 · `history_since` may name an hour
+
+`"history_since"` in `.common-rules.json` now also takes an ISO timestamp
+(`"2026-09-25T20:00:00+01:00"`; a naive one is read in the tracker's local
+time). A date still means that day's midnight. Loom consolidated its ledgers
+at 20:00 on 25 September, so a date floor left the hourly chart showing the
+old counts, and the sponsor said "clear this history from the graph". Not a
+Standard change: a project regenerates its page with `tracker board`.
+
+## 2026-09-26 · Both progress charts, and no two status lines alike
+
+The sponsor asked to fix "multiple progress lines"; the status chart was
+removed, and he then said "one graph is missing from the tracker". Both
+charts are back ("Tasks by status over time" and "Completion over time").
+What stays fixed: `deferred` has its own colour instead of `done`'s green,
+so no two status lines look the same. Not a Standard change: a project
+regenerates its page with `tracker board`.
+
+## 2026-09-25 · `history_since`: the progress graph starts where the project's story does
+
+`.common-rules.json` may declare `"history_since": "YYYY-MM-DD"`; the tracker
+board's two progress charts then start at that date instead of the first
+commit. Optional; nothing changes for a project that does not declare it.
+Loom asked for it after consolidating 25 ledgers into two: the old counts
+made the graph read as a collapse, and the sponsor said "reset the old data
+from the graph". History stays in git; only the page's window moves.
+
+**Standard change (mandatory):** projects can now keep a validated
+requirement-to-evidence traceability row in each proposal ledger:
+requirement IDs → guide section → architecture section → implementation files
+→ tests/commands → receipt or refusal → owner → status. The generated tracker
+renders these rows as a first-class Traceability table so a task is not complete
+while its documentation, implementation, verification, and evidence disagree.
+
+## 1.2.0 · Visual proposals by default · 2026-09-20
+
+**Standard change (mandatory):** a proposal must be answerable from its
+visuals. New proposal pages should place at least one table, diagram, or
+headline-figure block before the Decisions list; verdicts should be single
+coloured words in their own column; evidence should sit under the claim it
+supports. `bin/proposalcheck` warns when a page has none, without failing
+existing pages, and `templates/proposal.html` now ships `.tk`, `.big`, `.stat`,
+`.verdict`, and `.ev` so projects stop hand-rolling them.
+
+## 1.1.13 · First-class deferred state · 2026-09-20
+
+Added the first-class `deferred` item state. It is terminal and green,
+requires a reason, is excluded from active-work and blocker counts, remains in
+history, and can only be reopened explicitly.
+
+Added an optional `.common-rules.json` goal contract with an outcome,
+constraints, and verification criteria. Warm-up now shows that compact
+repository-side mirror of the host's native `/goal`, so sessions can recover
+the current intent without reconstructing it from chat history. Existing
+projects are unchanged unless they opt in; the native goal remains the
+execution control. When opted in, the generated project tracker shows the
+same contract and detects goal edits as page-staleness.
+
+Warm-up now validates and summarizes auto-discovered ledgers without adding
+every raw ledger JSON file to the session read order. A project may still name
+a ledger explicitly in `read_order`; otherwise a lead opens only the ledger
+for the item being worked, reducing repeated context without hiding status.
+
 
 ## 1.1.12 · Release pin synchronization · 2026-09-19
 

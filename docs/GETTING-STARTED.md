@@ -13,6 +13,34 @@ See the [warm-up skill](../skills/warmup/SKILL.md),
 [reheat skill](../skills/reheat/SKILL.md), and
 [shared workflow](../CLAUDE-workflow.md) for setup and the operating contract.
 
+## Keep the native goal and repository record aligned
+
+Use the host's `/goal` for the durable execution objective. If the project
+needs the objective to remain visible after a handoff or compaction, add this
+small optional mirror to `.common-rules.json`:
+
+```json
+{
+  "goal": {
+    "outcome": "Ship the smallest useful release",
+    "constraints": ["Preserve existing behavior"],
+    "verification": ["Run the merge gate", "Review the generated tracker"]
+  }
+}
+```
+
+Warm-up and the generated project tracker print this contract. A goal change
+also makes the tracker page stale until it is regenerated, so the published
+view cannot silently carry old acceptance criteria. Keep it short and update
+it when the outcome or completion test changes; the native goal remains the
+execution control, while the repository contract is the handoff and
+verification view.
+
+Warm-up validates every discovered ledger to build its compact status card, but
+does not ask the session to reopen every raw ledger JSON. Open the full ledger
+only for the item being worked, unless the project explicitly lists a ledger
+in `read_order`.
+
 ## Repository tools
 
 From this repository:
@@ -33,6 +61,9 @@ the tracker; do not hand-edit the generated page.
 Tree, Kanban, Board, and List provide different views of the same work.
 Search and filter by status, owner, work group, and tier. Progress charts
 describe recorded task history; a completion projection is an estimate.
+`deferred` is a green terminal state that requires a reason, stays in history,
+and is excluded from active-work and blocker counts. Reopen it only with
+`tracker set ... --status <non-terminal> --reopen`.
 
 ## Boundaries
 

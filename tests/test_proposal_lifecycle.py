@@ -123,6 +123,35 @@ class ProposalLifecycleTests(unittest.TestCase):
     def write(self, name: str, text: str):
         (self.proposals / name).write_text(text)
 
+    def with_decisions_heading(self, extra: str = "") -> str:
+        return (proposal("proposed").replace(
+            "</body>", f'{extra}<h2>Decisions</h2><ol class="decisions">'
+            '<li>D1. Decide.</li></ol></body>'
+        ))
+
+    def test_visual_gap_is_a_warning_not_a_violation(self):
+        self.write("01-x.html", self.with_decisions_heading())
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("warning", r.stdout)
+        self.assertIn("no table, diagram, or headline-figure block", r.stdout)
+
+    def test_table_before_decisions_has_no_visual_warning(self):
+        self.write("01-x.html", self.with_decisions_heading(
+            '<table><tr><td>evidence</td></tr></table>'
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertNotIn("warning:", r.stdout)
+
+    def test_svg_and_stat_blocks_are_visual_evidence(self):
+        for visual in ('<svg aria-label="flow"></svg>', '<div class="stat"><b>3</b></div>'):
+            with self.subTest(visual=visual):
+                self.write("01-x.html", self.with_decisions_heading(visual))
+                r = run(self.tmp)
+                self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+                self.assertNotIn("warning:", r.stdout)
+
     # -- the requirement itself -------------------------------------------
 
     def test_accepted_with_unanswered_decisions_fails(self):

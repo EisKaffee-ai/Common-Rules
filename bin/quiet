@@ -138,13 +138,30 @@ def _detect(output: str):
         return f"{ran_n} tests", True
 
     # -- pytest --------------------------------------------------------------
+    # Two things this pattern has to get right, both of which it got wrong and
+    # both found in the field (PhotoVault app, RQ-09 on its 2026-09-24 fix
+    # list): `quiet` printed "FAILED · 2 failed" on a fully green gate, 1,522
+    # passed and 0 failed, and OPERATING-RULES sends every session to read
+    # exactly that line.
+    #
+    #   1. The word alternation had no trailing boundary, so `failed` matched
+    #      the prefix of an application's own `failedBatches=0`. The line that
+    #      did it was `... found=2 failedBatches=0 ...` -- "2 failed" to this
+    #      regex.
+    #   2. The search was unanchored and ran over every line in order, so the
+    #      first line in the log that happened to look summary-shaped won,
+    #      long before pytest printed its real one.
+    #
+    # So: word boundaries, and the summary must be the whole line (pytest pads
+    # it with `=` and may append `in 1.23s`), not something found inside one.
+    _WORD = r"(?:passed|failed|xfailed|xpassed|error|errors|skipped|deselected|warnings?)"
+    _SUMMARY = re.compile(
+        r"^=*\s*(\d+\s+" + _WORD + r"\b"
+        r"(?:,\s*\d+\s+" + _WORD + r"\b)*)"
+        r"(?:\s+in\s+[\d.]+s(?:\s*\([^)]*\))?)?\s*=*$"
+    )
     for line in lines:
-        m = re.search(
-            r"(\d+ (?:passed|failed|error|errors|skipped|warnings?)"
-            r"(?:,\s*\d+ (?:passed|failed|error|errors|skipped|warnings?))*)"
-            r"(?:\s+in\s+[\d.]+s)?",
-            line,
-        )
+        m = _SUMMARY.match(line.strip())
         if m and ("passed" in m.group(1) or "failed" in m.group(1) or "error" in m.group(1)):
             summary = m.group(1)
             # Read the COUNTS, never the words. `"failed" in summary` was a
@@ -156,7 +173,9 @@ def _detect(output: str):
             # failing test because grep exits 0 on a line containing
             # "FAILED"), committed inside the checker meant to prevent it.
             # A zero is a zero.
-            counts = re.findall(r"(\d+)\s+(passed|failed|error|errors|skipped|warnings?)", summary)
+            # Same boundary bug would live here too: without \b, a count of
+            # `failedBatches` would be read as a count of failures.
+            counts = re.findall(r"(\d+)\s+(" + _WORD + r")\b", summary)
             failed = any(int(n) > 0 for n, word in counts if word.startswith(("failed", "error")))
             return summary, not failed
 

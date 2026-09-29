@@ -37,7 +37,8 @@ from __future__ import annotations
 import datetime
 import re
 
-STATUSES = ("not started", "in progress", "in review", "in testing", "blocked", "done")
+STATUSES = ("not started", "in progress", "in review", "in testing", "blocked", "done", "deferred")
+TERMINAL_STATUSES = frozenset(("done", "deferred"))
 RISKS = ("high", "medium", "low")
 CUT = 80
 GROUPS = ("finish now", "back burner", "waiting", "done")
@@ -89,6 +90,12 @@ def validate_parts(item: dict, _depth: int = 0) -> list[str]:
             total += share
         if p.get("status") not in STATUSES:
             problems.append(f"{name}: status {p.get('status')!r} is not one of {', '.join(STATUSES)}")
+        if p.get("status") == "deferred":
+            reason = p.get("deferred_reason")
+            if not isinstance(reason, str) or not reason.strip() or any(ord(c) < 32 or 0x7f <= ord(c) <= 0x9f for c in reason):
+                problems.append(f"{name}: deferred requires a non-empty one-line `deferred_reason`")
+        elif "deferred_reason" in p:
+            problems.append(f"{name}: `deferred_reason` is only valid while status is deferred")
         owner = p.get("owner")
         if owner is not None and (not isinstance(owner, str) or not owner.strip()):
             problems.append(f"{name}: `owner` must be a non-empty string")
@@ -107,8 +114,11 @@ def validate_parts(item: dict, _depth: int = 0) -> list[str]:
             problems.extend(validate_parts(p, _depth + 1))
     if not any("share" in x for x in problems) and total != 100:
         problems.append(f"{iid}: part shares add up to {total}, not 100")
-    if item.get("status") == "done" and any(p.get("status") != "done" for p in parts(item)):
-        problems.append(f"{iid}: status done while a part is still open")
+    if item.get("status") in TERMINAL_STATUSES and any(p.get("status") not in TERMINAL_STATUSES for p in parts(item)):
+        if item.get("status") == "done":
+            problems.append(f"{iid}: status done while a part is still open")
+        else:
+            problems.append(f"{iid}: status deferred while a part is still open")
     return problems
 
 
@@ -118,7 +128,7 @@ def completion(item: dict) -> int:
     done and 0 otherwise. An item without parts is 100 or 0."""
     ps = parts(item)
     if not ps:
-        return 100 if item.get("status") == "done" else 0
+        return 100 if item.get("status") in TERMINAL_STATUSES else 0
     total = 0.0
     for p in ps:
         share = p.get("share") if type(p.get("share")) is int else 0
@@ -131,6 +141,7 @@ def tree(item: dict) -> dict:
     what a drill-down view renders."""
     return {"id": item.get("id"), "title": item.get("title"), "status": item.get("status"),
             "share": item.get("share"), "owner": item.get("owner"),
+            "deferred_reason": item.get("deferred_reason"),
             "waiting_until": item.get("waiting_until"), "risk": item.get("risk"),
             "risk_reason": item.get("risk_reason"), "completion": completion(item),
             "parts": [tree(p) for p in parts(item)]}
@@ -138,9 +149,11 @@ def tree(item: dict) -> dict:
 
 def open_parts(item: dict) -> list[dict]:
     ps = parts(item)
+    if item.get("status") in TERMINAL_STATUSES:
+        return []
     if not ps:
-        return [] if item.get("status") == "done" else [_implicit(item)]
-    return [p for p in ps if p.get("status") != "done"]
+        return [_implicit(item)]
+    return [p for p in ps if p.get("status") not in TERMINAL_STATUSES]
 
 
 def next_part(item: dict) -> dict | None:
@@ -177,6 +190,8 @@ def _implicit(item: dict) -> dict:
             "status": item.get("status") or "not started"}
     if item.get("owner"):
         part["owner"] = item["owner"]
+    if item.get("deferred_reason"):
+        part["deferred_reason"] = item["deferred_reason"]
     return part
 
 

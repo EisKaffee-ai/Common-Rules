@@ -48,13 +48,22 @@ process. A split item's line shows its completion %, next open part, and a
 group count line (finish now / back burner / waiting). What `--queue` wrote
 is listed at the end, under `queue:`.
 
+If `.common-rules.json` declares a `goal`, the card begins with its compact
+outcome, constraints, and verification criteria. Keep that repository mirror
+short and aligned with the host's native `/goal`: the host goal controls
+long-running execution; the mirror makes the current intent inspectable after
+handoff or compaction. The generated project tracker carries the same goal
+and is stale until regenerated after a goal change.
+
 ## 2. Read, in the order the card names
 
 The card ends with `Read in order:`. Read every file on that line, in that
 order, before any other action: HANDOFF.md (which now folds in
-docs/OPERATING-RULES.md — proposal 23, M-11) → this card itself, not the raw
-ledger JSON → the latest checkpoint → common-rules' CLAUDE-workflow.md. Open a
-ledger's full JSON only for the item currently being worked.
+docs/OPERATING-RULES.md — proposal 23, M-11) → this card itself → the latest
+checkpoint → common-rules' CLAUDE-workflow.md. The card has already validated
+and summarized every auto-discovered ledger; do not reopen every raw ledger
+JSON. Open the full JSON only for the item currently being worked, unless the
+project explicitly names a ledger in `.common-rules.json` `read_order`.
 
 After a compaction the summary above is a paraphrase. The ledger is the
 record. Quote a ruling from disk (the constraints file, the issue, the ledger
@@ -173,7 +182,10 @@ ask), never from the summary.
    take the first C3 yourself.
 
 While working, keep to one status line in the lead prompt's form:
-`N done / N in progress / N blocked / N not started · what changed · waiting on · yours:`
+`N done / N in progress / N blocked / N not started / N deferred · what changed · waiting on · yours:`
+
+`deferred` is terminal, green, and reasoned; it is not active work or a
+blocker. Reopen it only with `tracker set ... --status <non-terminal> --reopen`.
 
 Every sponsor message that is not an answer to a question becomes an ask
 row (`HANDOFF.md`, "Operating rules"), in the same turn.

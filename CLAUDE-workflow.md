@@ -50,6 +50,13 @@ only the pointer.
   before the next `rulecheck --align` — never the reverse.
 - **Every new proposal** is created with `bin/new-proposal`, never drafted
   by hand.
+- **Proposals are visual by default.** Before its Decisions list, a new
+  proposal carries at least one table, diagram, or headline-figure block so
+  the decision can be skimmed before its precise questions. Use the shared
+  `.tk`, `.big`, `.stat`, `.verdict`, and `.ev` primitives from
+  `templates/proposal.html`; `bin/proposalcheck` warns when the visual surface
+  is missing. This is a warning-first rule for existing pages, not a
+  retroactive failure gate.
 - **Anything needed from another project's session** is a `requests`
   entry in the ledger, never prose; every blocked row carries an `owner`.
 - **A lead ends at a boundary** — a milestone, day's end, or ~150k tokens

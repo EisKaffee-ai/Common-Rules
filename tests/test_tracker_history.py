@@ -203,6 +203,24 @@ class TestHistorySeries(unittest.TestCase):
         self.assertEqual(day_d["tickets_total"], 8)
         self.assertEqual(day_d["by_status"]["done"], 4)
 
+    def test_a_timestamp_floor_starts_the_hourly_chart_at_that_hour(self):
+        """history_since may name an hour (Loom, 2026-09-26: "clear this
+        history from the graph" -- a date floor left the old counts showing
+        on the hourly chart)."""
+        floor = f"{self.day_b.isoformat()}T15:00:00+01:00"
+        rows = history.series(self.repo.root, since=floor, granularity="hour")
+        self.assertEqual(rows[0]["date"], floor)
+        self.assertEqual(rows[0]["tickets_total"], 3)
+        self.assertTrue(all(r["tickets_total"] >= 3 for r in rows))
+
+    def test_a_timestamp_floor_starts_the_daily_chart_on_its_day(self):
+        rows = history.series(self.repo.root, since=f"{self.day_b.isoformat()}T15:00:00+01:00")
+        self.assertEqual(rows[0]["date"], self.day_b.isoformat())
+
+    def test_a_naive_timestamp_floor_is_read_in_local_time(self):
+        rows = history.series(self.repo.root, since=f"{self.day_b.isoformat()}T15:00", granularity="hour")
+        self.assertEqual(rows[0]["date"], f"{self.day_b.isoformat()}T15:00:00+01:00")
+
     def test_cache_reuse_reads_no_git_show_for_old_shas(self):
         history.series(self.repo.root)  # populates the cache
 

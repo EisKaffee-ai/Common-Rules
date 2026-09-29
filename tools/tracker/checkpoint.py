@@ -29,8 +29,8 @@ DIGEST_RE = re.compile(r"<!--\s*ledger-digest:\s*([0-9a-f]{64})\s*-->")
 
 
 def _is_open(items: list[dict]) -> bool:
-    """A ledger is open when it has items and at least one is not done."""
-    return bool(items) and not all(i.get("status") == "done" for i in items)
+    """A ledger is open when it has items and at least one is non-terminal."""
+    return bool(items) and not all(i.get("status") in ledger.TERMINAL_STATUSES for i in items)
 
 
 def open_ledgers(project) -> list[tuple[Path, dict]]:

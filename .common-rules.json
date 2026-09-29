@@ -17,5 +17,17 @@
     "docs": "low"
   },
   "risk_always": "restricted",
-  "ruflo_namespace": "patterns"
+  "ruflo_namespace": "patterns",
+  "goal": {
+    "outcome": "Keep Emberline's cross-session tracking precise, current, and evidence-backed.",
+    "constraints": [
+      "Native host goals choose the work; ledgers remain the durable record.",
+      "Keep the workflow small and preserve existing project compatibility."
+    ],
+    "verification": [
+      "Validate the affected project ledgers and generated tracker pages.",
+      "Run focused tests for declaration loading, warm-up, and tracker freshness."
+    ],
+    "updated": "2026-09-20"
+  }
 }

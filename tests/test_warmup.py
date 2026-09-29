@@ -402,6 +402,14 @@ class TestTheCard(Case):
         out = self.p.warmup().stdout
         self.assertRegex(out, r"warm-up read \d[\d,]* bytes \(~\d[\d,]* tokens\)")
 
+    def test_auto_discovered_ledgers_are_summarized_not_relisted_for_reading(self):
+        state = json.loads(self.p.warmup("--json").stdout)
+        self.assertIn(LEDGER, state["ledgers"])
+        self.assertNotIn(LEDGER, state["read_order"])
+        read_line = next(line for line in self.p.warmup().stdout.splitlines()
+                         if line.startswith("Read in order: "))
+        self.assertNotIn(LEDGER, read_line)
+
     def test_it_asks_nothing(self):
         out = self.p.warmup().stdout
         self.assertNotIn("?\n", out.replace("worth it", ""))
@@ -501,6 +509,20 @@ class TestRealProjectShapes(Case):
         # unrelated test-command line, which made the first draft fail for the
         # wrong reason once the prohibitions were already being read.
         self.assertNotIn("Prohibitions: none found", out)
+
+    def test_declared_goal_is_visible_on_the_warm_card(self):
+        self.p.write(".common-rules.json", json.dumps({
+            "goal": {
+                "outcome": "ship the smallest useful release",
+                "constraints": ["preserve existing behavior"],
+                "verification": ["run the merge gate"],
+            }
+        }))
+        self.p.commit("declare the project goal")
+        out = self.p.warmup().stdout
+        self.assertIn("Goal: ship the smallest useful release", out)
+        self.assertIn("constraints: preserve existing behavior", out)
+        self.assertIn("verify: run the merge gate", out)
 
     def test_a_hand_written_checkpoint_is_named_for_what_it_is(self):
         for f in (self.p.root / "docs" / "handovers").glob("*-checkpoint.md"):

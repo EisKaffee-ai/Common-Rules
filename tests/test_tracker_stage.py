@@ -85,6 +85,20 @@ class TestStageNeverTouchesTheLedger(StagingCase):
 
 class TestApplyStaged(StagingCase):
 
+    def test_deferred_stage_carries_reason_and_apply_can_reopen_explicitly(self):
+        r = self.stage("W-01", "--status", "deferred", "--reason", "parked")
+        self.assertEqual(0, r.returncode, r.stderr)
+        r = self.apply_staged()
+        self.assertEqual(0, r.returncode, r.stderr)
+        self.assertEqual("deferred", self.item("W-01")["status"])
+        self.assertEqual("parked", self.item("W-01")["deferred_reason"])
+        r = self.stage("W-01", "--status", "in progress", "--reopen")
+        self.assertEqual(0, r.returncode, r.stderr)
+        r = self.apply_staged()
+        self.assertEqual(0, r.returncode, r.stderr)
+        self.assertEqual("in progress", self.item("W-01")["status"])
+        self.assertNotIn("deferred_reason", self.item("W-01"))
+
     def test_two_staged_changes_from_different_owners_both_land(self):
         self.stage("W-01", "--status", "in progress", "--by", "session:builder-a")
         self.stage("W-02", "--status", "in progress", "--by", "session:builder-b")

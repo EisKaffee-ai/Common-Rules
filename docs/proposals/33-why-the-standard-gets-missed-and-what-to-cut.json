@@ -2,7 +2,7 @@
   "proposal": 33,
   "title": "Why the standard gets missed, and what to cut",
   "status": "accepted",
-  "updated": "2026-09-18",
+  "updated": "2026-09-24",
   "tiers": {
     "C1": {
       "tier": "low",
@@ -49,7 +49,7 @@
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
-      "tag": "[ruflo \u00b7 high \u00b7 sonnet]",
+      "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
       "log": [],
@@ -69,7 +69,7 @@
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
-      "tag": "[ruflo \u00b7 high \u00b7 sonnet]",
+      "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
       "log": [],
@@ -89,7 +89,7 @@
       "status": "not started",
       "tier": "medium",
       "model": "sonnet",
-      "tag": "[ruflo \u00b7 medium \u00b7 sonnet]",
+      "tag": "[ruflo · medium · sonnet]",
       "owner": "lead",
       "issue": null,
       "log": [],
@@ -109,7 +109,7 @@
       "status": "not started",
       "tier": "lead",
       "model": "opus",
-      "tag": "[ruflo \u00b7 lead \u00b7 opus]",
+      "tag": "[ruflo · lead · opus]",
       "owner": "lead",
       "issue": null,
       "log": [],
@@ -129,12 +129,47 @@
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
-      "tag": "[ruflo \u00b7 high \u00b7 sonnet]",
+      "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
       "log": [],
       "points": 5,
       "value": "medium"
+    },
+    {
+      "id": "R-06",
+      "phase": "R",
+      "cx": "C1",
+      "title": "quiet's verdict line cannot be fooled by an application's own output",
+      "what": "Reported by the PhotoVault app session as RQ-09 on its 2026-09-24 open-fix list: bin/quiet printed \"FAILED · 2 failed\" on a gate that was 1,522 passed and 0 failed. Exit code was right; only the printed verdict was wrong, which matters because OPERATING-RULES sends every session to read exactly that line -- a wrong verdict there is worse than none.\n\nTwo defects behind the one symptom, both reproduced before fixing. The word alternation had no trailing boundary, so `failed` matched the prefix of the app's own `failedBatches=0` and the line `found=2 failedBatches=0` read as \"2 failed\". And the search was unanchored and ran line by line, so the first summary-shaped fragment anywhere in the log won long before pytest printed its real summary. The app suggested anchoring with re.MULTILINE; anchoring the summary to a whole line does the same job and also covers pytest's `=` padding.",
+      "files": [
+        "bin/quiet",
+        "tests/test_quiet.py"
+      ],
+      "tests": [
+        "an application debug line is not read as a pytest summary",
+        "a summary-shaped substring inside a line is ignored",
+        "a real failure is still a failure",
+        "zeros spelled out are still green",
+        "xfailed and deselected counts do not read as failures"
+      ],
+      "depends": [],
+      "done": "A green gate prints a green verdict whatever the application under test logs, and a failing gate still prints FAILED.",
+      "status": "done",
+      "owner": "lead",
+      "tier": "low",
+      "model": "haiku",
+      "tag": "[ruflo · low · haiku]",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-09-24T13:10:00+02:00",
+          "event": "filed and fixed in the same turn, from the PhotoVault app's fix list (RQ-09)",
+          "by": "claude-ai",
+          "evidence": "bin/quiet: _WORD alternation with \\b boundaries and _SUMMARY anchored to a whole line, padding and duration tolerated; the counts regex got the same boundary. tests/test_quiet.py: 6 new tests, 46 passed.",
+          "status": "done"
+        }
+      ]
     }
   ],
   "asks": [

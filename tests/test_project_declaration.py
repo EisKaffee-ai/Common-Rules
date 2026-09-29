@@ -106,12 +106,24 @@ class TestLoad(Scratch):
                 "safety_rules": "CLAUDE.md#Hard safety rules",
                 "gates": {"quick": "sh tools/gate.sh --quick", "merge": "sh tools/gate.sh"},
                 "plan_check": "python3 tools/build_plan.py --check", "plan_page": "python3 tools/build_plan.py",
-                "ruflo_namespace": "patterns"}
+                "ruflo_namespace": "patterns",
+                "goal": {"outcome": "ship the app", "constraints": ["keep compatibility"],
+                         "verification": ["run the gate"]}}
         self.write(".common-rules.json", decl)
         d = P().load(self.root)
         for key, value in decl.items():
             self.assertEqual(value, d[key], key)
         self.assertEqual([], P().problems(self.root))
+
+    def test_goal_contract_is_loaded_and_invalid_goal_is_named(self):
+        goal = {"outcome": "ship the app", "constraints": ["keep compatibility"],
+                "verification": ["run the gate"]}
+        self.write(".common-rules.json", {"goal": goal})
+        self.assertEqual(goal, P().load(self.root)["goal"])
+        self.assertEqual([], P().problems(self.root))
+        self.write(".common-rules.json", {"goal": {"outcome": "ship", "constraints": [],
+                                                     "verification": ["run the gate"]}})
+        self.assertIn("goal.constraints", " ".join(P().problems(self.root)))
 
     def test_unknown_keys_are_ignored(self):
         self.write(".common-rules.json", {"switches": {"issues": False}, "routing": []})
@@ -766,6 +778,9 @@ class TestTheStateKeysWithNoDeclaration(unittest.TestCase):
                 # to avoid recursing into conformance's own `warmup --check`
                 # subprocess -- see bin/warmup's gather()).
                 "conformance", "mandatory_pending", "rules_head",
+                # added by the optional goal contract: the repository-side
+                # mirror of the host's native `/goal`.
+                "goal",
                 # added by proposal 30, P-04: every open item (with or
                 # without parts) counted into PT.GROUPS, for the card's
                 # "open work" line.

@@ -28,3 +28,13 @@ it preserves the same durable behavior.
 The agent may prepare a proposal, update evidence, and render a tracker. The
 sponsor or maintainer still accepts scope, resolves ambiguous decisions, and
 approves changes to shared rules.
+
+## Goals
+
+Use the host's native `/goal` when work spans multiple turns. Make it express
+an outcome, constraints, and a verifiable end state. For projects that need
+that intent visible to the next session, mirror the same compact contract in
+`.common-rules.json` under `goal.outcome`, `goal.constraints`, and
+`goal.verification`. Warm-up shows it on the card so the agent does not need
+to reconstruct the objective from chat history; the generated tracker shows
+the same contract and becomes stale when the goal mirror changes.

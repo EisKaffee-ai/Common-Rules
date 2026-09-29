@@ -3,7 +3,7 @@
 
   tracker lanes LEDGER... [--project DIR] [--json]
 
-For every item not done:
+For every non-terminal item:
 
   share  value weight (high 3, medium 2, low 1) x points, over the queue's total
   risk   impact x likelihood; at least 9 when the item routes restricted --
@@ -47,7 +47,7 @@ def _tail_lane(risk) -> str:
 def lanes(queue: list[dict], project) -> dict:
     sized, unsized = [], []
     for order, item in enumerate(queue):
-        if item.get("status") == "done":
+        if item.get("status") in L.TERMINAL_STATUSES:
             continue
         r = ROUTE.route(item, project)
         impact, likelihood = item.get("impact"), item.get("likelihood")
