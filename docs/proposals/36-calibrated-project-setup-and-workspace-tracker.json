@@ -1,21 +1,374 @@
 {
-  "proposal": 36, "title": "Calibrated project setup and workspace tracker", "status": "accepted", "updated": "2026-10-03",
-  "tiers": {"C3": {"tier": "high", "model": "sonnet", "effort": "high", "rule": "Cross-module standard inherited by projects"}, "C4": {"tier": "lead", "model": "opus", "effort": "medium", "rule": "Sponsor decisions, project truth and release reconciliation"}},
-  "phases": [{"id": "C", "name": "Calibrated delivery", "goal": "Adopt Common Rules according to each project's real topology and keep separate repositories coherent.", "exit": "Setup, joined tracking, traceability, plugin lifecycle and release evidence pass."}],
+  "proposal": 36,
+  "title": "Calibrated project setup and workspace tracker",
+  "status": "accepted",
+  "updated": "2026-10-03",
+  "tiers": {
+    "C3": {
+      "tier": "high",
+      "model": "sonnet",
+      "effort": "high",
+      "rule": "Cross-module standard inherited by projects"
+    },
+    "C4": {
+      "tier": "lead",
+      "model": "opus",
+      "effort": "medium",
+      "rule": "Sponsor decisions, project truth and release reconciliation"
+    }
+  },
+  "phases": [
+    {
+      "id": "C",
+      "name": "Calibrated delivery",
+      "goal": "Adopt Common Rules according to each project's real topology and keep separate repositories coherent.",
+      "exit": "Setup, joined tracking, traceability, plugin lifecycle and release evidence pass."
+    }
+  ],
   "items": [
-    {"id": "C-01", "phase": "C", "cx": "C3", "title": "Calibrated repository setup", "what": "Discover, preview, apply and diagnose a repository-specific Common Rules manifest.", "files": ["tools/project_setup.py", "bin/project-setup", "tools/project.py"], "tests": ["tests/test_project_setup.py", "tests/test_project_declaration.py"], "done": "Setup is opt-in, preserves existing declarations and doctor reports named findings.", "depends": [], "status": "in testing", "tier": "high", "model": "sonnet", "tag": "[ruflo · high · sonnet]", "owner": "lead", "parts": [{"id": "C-01.A", "title": "Implement and verify calibrated setup", "share": 100, "status": "in testing", "owner": "lead"}]},
-    {"id": "C-02", "phase": "C", "cx": "C3", "title": "Multi-repository workspace tracker", "what": "Generate one mobile joined view while repositories keep separate commits.", "files": ["tools/workspace_tracker.py", "bin/workspace-tracker"], "tests": ["tests/test_workspace_tracker.py"], "done": "The joined page labels repository, role, feature and revision.", "depends": ["C-01"], "status": "in testing", "tier": "high", "model": "sonnet", "tag": "[ruflo · high · sonnet]", "owner": "lead", "parts": [{"id": "C-02.A", "title": "Implement and verify joined workspace tracking", "share": 100, "status": "in testing", "owner": "lead"}]},
-    {"id": "C-03", "phase": "C", "cx": "C3", "title": "Requirement and file traceability gate", "what": "Refuse broken requirement-to-evidence links and unreviewed no-change claims.", "files": ["tools/tracecheck.py", "bin/tracecheck"], "tests": ["tests/test_tracecheck.py"], "done": "Complete graphs pass and broken paths or unauthorized no-change receipts fail.", "depends": ["C-01"], "status": "in testing", "tier": "high", "model": "sonnet", "tag": "[ruflo · high · sonnet]", "owner": "lead", "parts": [{"id": "C-03.A", "title": "Implement and verify the traceability gate", "share": 100, "status": "in testing", "owner": "lead"}]},
-    {"id": "C-04", "phase": "C", "cx": "C3", "title": "Portable plugin and visible lifecycle skills", "what": "Package setup, routing, visual proposals, verification, repair and handoff as discoverable skills with optional hooks.", "files": ["plugin.json", "hooks/hooks.json", "skills"], "tests": ["tests/test_plugin_package.py"], "done": "Manifest version matches the release; skills state routing; hook paths are portable.", "depends": ["C-01", "C-03"], "status": "in testing", "tier": "high", "model": "sonnet", "tag": "[ruflo · high · sonnet]", "owner": "lead", "parts": [{"id": "C-04.A", "title": "Package and verify the Common Rules tracker plugin", "share": 100, "status": "in testing", "owner": "lead"}]},
-    {"id": "C-05", "phase": "C", "cx": "C4", "title": "Release Common Rules 1.5.0", "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.", "files": ["VERSION", "CHANGELOG.md", "docs/RELEASE-1.5.0.md"], "tests": ["bin/version-check --check", "bin/workflow-stamp --check", "python3 -m unittest discover -s tests -q"], "done": "All gates pass and independent review evidence is recorded before sponsor merge and publication.", "depends": ["C-01", "C-02", "C-03", "C-04"], "status": "in progress", "tier": "lead", "model": "opus", "tag": "[ruflo · lead · opus]", "owner": "lead", "parts": [{"id": "C-05.A", "title": "Complete release verification and independent review", "share": 100, "status": "in progress", "owner": "lead"}]}
+    {
+      "id": "C-01",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Calibrated repository setup",
+      "what": "Discover, preview, apply and diagnose a repository-specific Common Rules manifest.",
+      "files": [
+        "tools/project_setup.py",
+        "bin/project-setup",
+        "tools/project.py"
+      ],
+      "tests": [
+        "tests/test_project_setup.py",
+        "tests/test_project_declaration.py"
+      ],
+      "done": "Setup is opt-in, preserves existing declarations and doctor reports named findings.",
+      "depends": [],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-01.A",
+          "title": "Implement and verify calibrated setup",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; focused setup and declaration suites green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-02",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Multi-repository workspace tracker",
+      "what": "Generate one mobile joined view while repositories keep separate commits.",
+      "files": [
+        "tools/workspace_tracker.py",
+        "bin/workspace-tracker"
+      ],
+      "tests": [
+        "tests/test_workspace_tracker.py"
+      ],
+      "done": "The joined page labels repository, role, feature and revision.",
+      "depends": [
+        "C-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-02.A",
+          "title": "Implement and verify joined workspace tracking",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; joined tracker suite green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-03",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Requirement and file traceability gate",
+      "what": "Refuse broken requirement-to-evidence links and unreviewed no-change claims.",
+      "files": [
+        "tools/tracecheck.py",
+        "bin/tracecheck"
+      ],
+      "tests": [
+        "tests/test_tracecheck.py"
+      ],
+      "done": "Complete graphs pass and broken paths or unauthorized no-change receipts fail.",
+      "depends": [
+        "C-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-03.A",
+          "title": "Implement and verify the traceability gate",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; changed-file tracecheck green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-04",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Portable plugin and visible lifecycle skills",
+      "what": "Package setup, routing, visual proposals, verification, repair and handoff as discoverable skills with optional hooks.",
+      "files": [
+        "plugin.json",
+        "hooks/hooks.json",
+        "skills"
+      ],
+      "tests": [
+        "tests/test_plugin_package.py"
+      ],
+      "done": "Manifest version matches the release; skills state routing; hook paths are portable.",
+      "depends": [
+        "C-01",
+        "C-03"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-04.A",
+          "title": "Package and verify the Common Rules tracker plugin",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; portable plugin suite green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-05",
+      "phase": "C",
+      "cx": "C4",
+      "title": "Release Common Rules 1.5.0",
+      "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
+      "files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.5.0.md"
+      ],
+      "tests": [
+        "bin/version-check --check",
+        "bin/workflow-stamp --check",
+        "python3 -m unittest discover -s tests -q"
+      ],
+      "done": "All gates pass and independent review evidence is recorded before sponsor merge and publication.",
+      "depends": [
+        "C-01",
+        "C-02",
+        "C-03",
+        "C-04"
+      ],
+      "status": "in review",
+      "tier": "lead",
+      "model": "opus",
+      "tag": "[ruflo · lead · opus]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-05.A",
+          "title": "Complete release verification and independent review",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "release candidate ready for independent review",
+          "by": "session:codex",
+          "evidence": "VERSION 1.5.0; version-check and workflow-stamp green; 2029 tests OK",
+          "status": "in review"
+        }
+      ]
+    }
   ],
   "traceability": [
-    {"id": "TR-01", "item": "C-01", "requirement_ids": ["CR36-R01", "CR36-R02", "CR36-R03", "CR36-R04", "CR36-R16", "CR36-R17"], "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements", "architecture_section": "docs/design/36-calibrated-project-setup.md#setup-lifecycle", "implementation_files": ["tools/project_setup.py", "bin/project-setup", "tools/project.py"], "tests_commands": ["python3 -m unittest -q tests.test_project_setup tests.test_project_declaration"], "receipt_or_refusal": "receipt: focused setup and declaration suites", "owner": "lead", "status": "in testing"},
-    {"id": "TR-02", "item": "C-02", "requirement_ids": ["CR36-R05", "CR36-R06", "CR36-R07", "CR36-R08"], "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements", "architecture_section": "docs/design/36-calibrated-project-setup.md#joined-tracker", "implementation_files": ["tools/workspace_tracker.py", "bin/workspace-tracker"], "tests_commands": ["python3 -m unittest -q tests.test_workspace_tracker"], "receipt_or_refusal": "receipt: joined tracker focused suite", "owner": "lead", "status": "in testing"},
-    {"id": "TR-03", "item": "C-03", "requirement_ids": ["CR36-R09", "CR36-R10"], "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements", "architecture_section": "docs/design/36-calibrated-project-setup.md#trace-and-impact-gate", "implementation_files": ["tools/tracecheck.py", "bin/tracecheck"], "tests_commands": ["python3 -m unittest -q tests.test_tracecheck"], "receipt_or_refusal": "receipt: tracecheck focused suite", "owner": "lead", "status": "in testing"},
-    {"id": "TR-04", "item": "C-04", "requirement_ids": ["CR36-R11", "CR36-R12", "CR36-R13", "CR36-R14", "CR36-R15", "CR36-R19"], "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements", "architecture_section": "docs/design/36-calibrated-project-setup.md#plugin-surfaces", "implementation_files": ["plugin.json", "hooks/hooks.json", "skills/setup/SKILL.md", "skills/tracker/SKILL.md", "skills/visual-proposal/SKILL.md"], "tests_commands": ["python3 -m unittest -q tests.test_plugin_package"], "receipt_or_refusal": "receipt: portable plugin package suite", "owner": "lead", "status": "in testing"},
-    {"id": "TR-05", "item": "C-05", "requirement_ids": ["CR36-R18"], "guide_section": "docs/requirements/36-calibrated-project-setup.md#acceptance-evidence", "architecture_section": "docs/design/36-calibrated-project-setup.md#release-boundary", "implementation_files": ["VERSION", "CHANGELOG.md", "docs/RELEASE-1.5.0.md"], "tests_commands": ["bin/version-check --check", "bin/workflow-stamp --check"], "receipt_or_refusal": "receipt pending: full release gate and independent review", "owner": "lead", "status": "in progress"}
+    {
+      "id": "TR-01",
+      "item": "C-01",
+      "requirement_ids": [
+        "CR36-R01",
+        "CR36-R02",
+        "CR36-R03",
+        "CR36-R04",
+        "CR36-R16",
+        "CR36-R17"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#setup-lifecycle",
+      "implementation_files": [
+        "tools/project_setup.py",
+        "bin/project-setup",
+        "tools/project.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_project_setup tests.test_project_declaration"
+      ],
+      "receipt_or_refusal": "receipt: focused setup and declaration suites",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-02",
+      "item": "C-02",
+      "requirement_ids": [
+        "CR36-R05",
+        "CR36-R06",
+        "CR36-R07",
+        "CR36-R08"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#joined-tracker",
+      "implementation_files": [
+        "tools/workspace_tracker.py",
+        "bin/workspace-tracker"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_workspace_tracker"
+      ],
+      "receipt_or_refusal": "receipt: joined tracker focused suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-03",
+      "item": "C-03",
+      "requirement_ids": [
+        "CR36-R09",
+        "CR36-R10"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#trace-and-impact-gate",
+      "implementation_files": [
+        "tools/tracecheck.py",
+        "bin/tracecheck"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracecheck"
+      ],
+      "receipt_or_refusal": "receipt: tracecheck focused suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-04",
+      "item": "C-04",
+      "requirement_ids": [
+        "CR36-R11",
+        "CR36-R12",
+        "CR36-R13",
+        "CR36-R14",
+        "CR36-R15",
+        "CR36-R19"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#plugin-surfaces",
+      "implementation_files": [
+        "plugin.json",
+        "hooks/hooks.json",
+        "skills/setup/SKILL.md",
+        "skills/tracker/SKILL.md",
+        "skills/visual-proposal/SKILL.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_plugin_package"
+      ],
+      "receipt_or_refusal": "receipt: portable plugin package suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-05",
+      "item": "C-05",
+      "requirement_ids": [
+        "CR36-R18"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#acceptance-evidence",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#release-boundary",
+      "implementation_files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.5.0.md"
+      ],
+      "tests_commands": [
+        "bin/version-check --check",
+        "bin/workflow-stamp --check"
+      ],
+      "receipt_or_refusal": "receipt: version and workflow checks green; 2029 tests OK; independent review pending",
+      "owner": "lead",
+      "status": "in review"
+    }
   ],
-  "asks": [{"id": "A-01", "at": "2026-10-03", "kind": "decision", "quote": "Accept proposal 2 and implement common rules to release a new version. Make a goal", "became": "C-01", "state": "became-item", "by": "sponsor", "source": "conversation"}],
-  "proposed_changes": [], "execution": {}
+  "asks": [
+    {
+      "id": "A-01",
+      "at": "2026-10-03",
+      "kind": "decision",
+      "quote": "Accept proposal 2 and implement common rules to release a new version. Make a goal",
+      "became": "C-01",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    }
+  ],
+  "proposed_changes": [],
+  "execution": {}
 }
