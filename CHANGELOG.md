@@ -1,4 +1,8 @@
-# 1.10.0 — Canonical project tracker and proposal issues — 3 October 2026
+# 1.10.1 — Canonical project tracker and proposal issues — 3 October 2026
+
+Version 1.10.0 was an internal candidate. The class-level cold-gate scheduler
+and its timing evidence landed after that marker, so 1.10.1 is the publishable
+candidate rather than rewriting release history.
 
 Common Rules now validates an optional proposal-level GitHub issue contract:
 `issue_repository`, `issue_granularity: proposal`, and

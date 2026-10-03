@@ -1,8 +1,8 @@
-# Common Rules 1.10.0 release candidate
+# Common Rules 1.10.1 release candidate
 
 ## Outcome
 
-Version 1.10.0 adds an optional canonical-project mode without changing older
+Version 1.10.1 adds an optional canonical-project mode without changing older
 projects:
 
 - a configured nested ledger catalogue owns one generated tracker page;

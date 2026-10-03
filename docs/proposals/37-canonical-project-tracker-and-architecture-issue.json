@@ -308,8 +308,8 @@
       "id": "T-06",
       "phase": "T",
       "cx": "C4",
-      "title": "Release Common Rules 1.10.0",
-      "what": "Reconcile manifests, changelog, release notes, tracker evidence, independent review and publication for the optional canonical-tracker feature release.",
+      "title": "Release Common Rules 1.10.1",
+      "what": "Reconcile manifests, changelog, release notes, tracker evidence, independent review and publication for the optional canonical-tracker feature release; 1.10.0 remains the internal candidate before the fast-gate follow-up.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
@@ -321,7 +321,7 @@
         "tests/test_context_budget.py",
         "bin/quiet",
         "tests/test_quiet.py",
-        "docs/RELEASE-1.10.0.md"
+        "docs/RELEASE-1.10.1.md"
       ],
       "tests": [
         "bin/context-budget --json --check",
@@ -331,7 +331,7 @@
         "claude plugin validate .",
         "bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q"
       ],
-      "done": "The 1.10.0 candidate publishes reproducible context-load analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
+      "done": "The 1.10.1 candidate publishes reproducible context-load and test-runtime analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
       "depends": [
         "T-01",
         "T-02",
@@ -358,6 +358,12 @@
           "by": "session:codex",
           "evidence": "Context budget 627 estimated idle tokens; warmup hotspot 124 tests completes in 174.6s versus documented 575s floor; full suite scheduling completes 2,065 tests in 181.6s before named environment/checkpoint findings",
           "status": "in progress"
+        },
+        {
+          "at": "2026-10-03T12:12:28+02:00",
+          "event": "publishable candidate advanced from internal 1.10.0 to 1.10.1",
+          "by": "session:codex",
+          "evidence": "Version gate requires a patch marker because the fast-gate scheduler landed after the 1.10.0 marker; history is preserved rather than rewritten"
         }
       ],
       "parts": [

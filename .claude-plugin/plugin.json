@@ -1,7 +1,7 @@
 {
   "name": "common-rules",
   "displayName": "Common Rules Tracker",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "Calibrated project tracking, visual proposals, lifecycle stages, traceability and coherent multi-repository delivery.",
   "author": {"name": "EisKaffee.ai"},
   "repository": "https://github.com/EisKaffee-ai/Common-Rules",
