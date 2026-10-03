@@ -227,7 +227,8 @@
         "C-01",
         "C-02",
         "C-03",
-        "C-04"
+        "C-04",
+        "C-06"
       ],
       "status": "in review",
       "tier": "lead",
@@ -264,6 +265,47 @@
           "by": "session:codex",
           "evidence": "VERSION 1.6.0; version-check and workflow-stamp green; 2032 tests OK",
           "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-06",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Non-destructive Emberline migration proof",
+      "what": "Prove that source history, files, branches and tags survive consolidation into Common Rules.",
+      "files": [
+        "tools/migration_check.py",
+        "bin/migration-check",
+        "docs/reviews/common-rules-migration-final.md"
+      ],
+      "tests": [
+        "tests/test_migration_check.py",
+        "bin/migration-check --remote"
+      ],
+      "done": "The repeatable read-only gate proves local ancestry and file preservation plus remote branch, tag and candidate agreement.",
+      "depends": [],
+      "status": "in testing",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-06.A",
+          "title": "Implement and verify the migration gate",
+          "share": 100,
+          "status": "in testing",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "local migration proof green",
+          "by": "session:codex",
+          "evidence": "3 required histories are ancestors; all 320 upstream-main files preserved; remote proof pending final publication push",
+          "status": "in testing"
         }
       ]
     }
@@ -345,7 +387,6 @@
         "CR36-R13",
         "CR36-R14",
         "CR36-R15",
-        "CR36-R19",
         "CR36-R20"
       ],
       "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
@@ -387,6 +428,27 @@
       "receipt_or_refusal": "receipt: OpenAI and Claude manifests validated; version and workflow checks green; 2032 tests OK; independent review pending",
       "owner": "lead",
       "status": "in review"
+    },
+    {
+      "id": "TR-06",
+      "item": "C-06",
+      "requirement_ids": [
+        "CR36-R19"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#migration-proof",
+      "implementation_files": [
+        "tools/migration_check.py",
+        "bin/migration-check",
+        "docs/reviews/common-rules-migration-final.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_migration_check",
+        "bin/migration-check --remote"
+      ],
+      "receipt_or_refusal": "receipt: local ancestry and source-file preservation green; remote proof pending final publication push",
+      "owner": "lead",
+      "status": "in testing"
     }
   ],
   "asks": [

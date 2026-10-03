@@ -100,6 +100,24 @@ repository through `.claude-plugin/marketplace.json`. The separate root
 `plugin.json` remains the portable/OpenAI manifest; both manifests carry the
 same name and version and package the same skills and hooks.
 
+## Migration proof
+
+```text
+Emberline main ───────────────┐
+Emberline w10-measured ───────┼──► Common Rules release candidate
+local-only development ───────┘       │
+                                       ├── every source file still present
+source tags ───────────────────────────└── every tag copied to destination
+```
+
+`bin/migration-check` makes consolidation non-destructive and repeatable. The
+local gate proves that the source main branch, published development branch,
+and local-only development history are ancestors of the candidate, and that
+no file from the source main tree disappeared. With `--remote`, it also proves
+that the destination has the source tags and named branches and that the
+published release branch points at the candidate. It never pushes, rewrites,
+deletes, or selects a default branch; those remain explicit sponsor actions.
+
 Official platform references: [plugins](https://learn.chatgpt.com/docs/plugins),
 [skills](https://learn.chatgpt.com/docs/build-skills),
 [plugin packaging](https://developers.openai.com/plugins/build/plugins), and
@@ -108,6 +126,6 @@ Official platform references: [plugins](https://learn.chatgpt.com/docs/plugins),
 ## Release boundary
 
 This release adds contracts and tools. It does not create a two-way issue
-system, merge multiple repositories together, silently install hooks, or
-authorize GitHub writes. Those require explicit project configuration and
-user authority.
+system, merge application repositories together, silently install hooks,
+rewrite the source repository, select a default branch, or authorize GitHub
+writes. Those require explicit project configuration and user authority.

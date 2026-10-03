@@ -66,6 +66,9 @@ new release version or silently upgrade to a development branch.
 The migration preserves the historical Emberline releases. Version 1.4.0 added
 the AGENTS-first installer; install the release at its resolved commit.
 The source history and historical release labels retain their original names.
+Maintainers can verify the non-destructive migration locally with
+`bin/migration-check` and against the configured Git remotes with
+`bin/migration-check --remote`; the command only reads Git state.
 
 
 [**Get started →**](docs/GETTING-STARTED.md) · [Capabilities & boundaries](docs/GETTING-STARTED.md#boundaries) · [User guide](docs/user-guide/) · [Release history](CHANGELOG.md)

@@ -11,6 +11,8 @@ release surface:
   committed repositories and their compatible revision set;
 - `bin/tracecheck` validates requirement-to-file evidence and restricts
   no-change receipts to the lead or sponsor;
+- `bin/migration-check` proves that the Emberline main, published development,
+  local-only history, source files and tags survive the Common Rules cutover;
 - root `plugin.json` for OpenAI, `.claude-plugin/plugin.json` and marketplace
   metadata for Claude Code, shared lifecycle skills and portable trusted-hook
   definitions make the workflow installable and its routing visible;
@@ -35,13 +37,16 @@ workspace hub additionally records its members in
 
 ## Boundaries
 
-This release does not enable two-way issue synchronization, combine Git
-histories, trust hooks automatically, or grant remote-write authority. ChatGPT
-web requires a connected execution environment for local commands and hooks.
+This release does not enable two-way issue synchronization, combine application
+repository histories, rewrite the Emberline source, choose a default branch,
+trust hooks automatically, or grant remote-write authority. ChatGPT web
+requires a connected execution environment for local commands and hooks.
 
 ## Publication checklist
 
 - Proposal 36 and its ledger validate.
+- `bin/migration-check --remote` proves source history, files, branches, tags,
+  and the published release-candidate revision agree.
 - Focused setup, workspace, trace and plugin tests pass.
 - Full tests, workflow stamp, version check and conformance pass.
 - An independent reviewer signs off on this restricted-risk Common Rules
