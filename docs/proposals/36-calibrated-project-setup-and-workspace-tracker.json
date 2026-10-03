@@ -168,7 +168,7 @@
         "C-01",
         "C-03"
       ],
-      "status": "in testing",
+      "status": "in review",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
@@ -178,7 +178,7 @@
           "id": "C-04.A",
           "title": "Package and verify the Common Rules tracker plugin",
           "share": 100,
-          "status": "in testing",
+          "status": "in review",
           "owner": "lead"
         }
       ],
@@ -196,6 +196,13 @@
           "by": "session:codex",
           "evidence": "official Claude plugin, manifest, skills, hooks and marketplace documentation; validator pending full gate",
           "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "OpenAI and Claude compatibility gate green",
+          "by": "session:codex",
+          "evidence": "Claude marketplace and manifest validate; unadopted hooks silent; 2032 tests OK",
+          "status": "in review"
         }
       ]
     },
@@ -222,7 +229,7 @@
         "C-03",
         "C-04"
       ],
-      "status": "in testing",
+      "status": "in review",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -232,7 +239,7 @@
           "id": "C-05.A",
           "title": "Complete release verification and independent review",
           "share": 100,
-          "status": "in testing",
+          "status": "in review",
           "owner": "lead"
         }
       ],
@@ -250,6 +257,13 @@
           "by": "session:codex",
           "evidence": "1.5.0 candidate changed after review; 1.6.0 rerun required",
           "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.6.0 release candidate ready for independent review",
+          "by": "session:codex",
+          "evidence": "VERSION 1.6.0; version-check and workflow-stamp green; 2032 tests OK",
+          "status": "in review"
         }
       ]
     }
@@ -351,7 +365,7 @@
       ],
       "receipt_or_refusal": "receipt: portable plugin package suite",
       "owner": "lead",
-      "status": "in testing"
+      "status": "in review"
     },
     {
       "id": "TR-05",
@@ -370,9 +384,9 @@
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt pending: rerun full gate after Claude compatibility; independent review pending",
+      "receipt_or_refusal": "receipt: OpenAI and Claude manifests validated; version and workflow checks green; 2032 tests OK; independent review pending",
       "owner": "lead",
-      "status": "in testing"
+      "status": "in review"
     }
   ],
   "asks": [
