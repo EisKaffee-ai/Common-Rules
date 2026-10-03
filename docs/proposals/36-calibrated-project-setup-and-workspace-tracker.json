@@ -203,12 +203,12 @@
       "id": "C-05",
       "phase": "C",
       "cx": "C4",
-      "title": "Release Common Rules 1.5.0",
+      "title": "Release Common Rules 1.6.0",
       "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.5.0.md"
+        "docs/RELEASE-1.6.0.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -241,14 +241,14 @@
           "at": "2026-10-03",
           "event": "release candidate ready for independent review",
           "by": "session:codex",
-          "evidence": "VERSION 1.5.0; version-check and workflow-stamp green; 2029 tests OK",
+          "evidence": "VERSION 1.5.0 precursor; version-check and workflow-stamp green; 2029 tests OK",
           "status": "in review"
         },
         {
           "at": "2026-10-03",
           "event": "release gate reopened for Claude compatibility",
           "by": "session:codex",
-          "evidence": "1.5.0 candidate changed after review; rerun required",
+          "evidence": "1.5.0 candidate changed after review; 1.6.0 rerun required",
           "status": "in testing"
         }
       ]
@@ -364,7 +364,7 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.5.0.md"
+        "docs/RELEASE-1.6.0.md"
       ],
       "tests_commands": [
         "bin/version-check --check",

@@ -8,7 +8,7 @@ next steps connected across **Claude Code and OpenAI Codex**.
 
 ![The problem and solution: session context, shared proposals and decisions, and a generated tracker for Claude Code and Codex](docs/assets/product-overview.svg)
 
-[**Get started →**](docs/GETTING-STARTED.md) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.5.0](docs/RELEASE-1.5.0.md)
+[**Get started →**](docs/GETTING-STARTED.md) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.6.0](docs/RELEASE-1.6.0.md)
 
 ## Less catching up. More moving forward.
 
