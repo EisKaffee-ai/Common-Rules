@@ -1,0 +1,20 @@
+{
+  "name": "eiskaffee-common-rules",
+  "interface": {
+    "displayName": "EisKaffee.ai Common Rules"
+  },
+  "plugins": [
+    {
+      "name": "common-rules",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

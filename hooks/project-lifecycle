@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+"""Run plugin lifecycle checks only after a project opts into integration."""
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def adopted(project: Path) -> bool:
+    path = project / ".common-rules.json"
+    if not path.is_file():
+        return False
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return True  # a broken declared project must receive a named finding
+    return isinstance(data, dict) and "integration" in data
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) != 1 or argv[0] not in ("doctor", "tracecheck"):
+        print("project-lifecycle: expected doctor or tracecheck", file=sys.stderr)
+        return 2
+    project = Path.cwd()
+    if not adopted(project):
+        return 0
+    command = ([ROOT / "bin/project-setup", "--project", project, "doctor"]
+               if argv[0] == "doctor" else
+               [ROOT / "bin/tracecheck", "--project", project])
+    return subprocess.run([str(value) for value in command]).returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

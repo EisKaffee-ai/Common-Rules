@@ -1,74 +1,200 @@
 # EisKaffee.ai / Common Rules
 
-### Keep the project moving when the chat changes.
+### One project record for Codex and Claude Code.
 
-Common Rules is an open-source **AI agent memory and project tracker** for
-developer workflows. It keeps session context, proposals, decisions, and
-next steps connected across **Claude Code and OpenAI Codex**.
+Common Rules is an installable project-tracker plugin for AI-assisted delivery.
+It calibrates itself to a new or existing repository, keeps requirements linked
+to implementation and tests, and joins compatible work across repositories
+without forcing them into one commit.
 
-![The problem and solution: session context, shared proposals and decisions, and a generated tracker for Claude Code and Codex](docs/assets/product-overview.svg)
+![Common Rules connects Codex and Claude Code to one calibrated project record, traceability graph, and tracker](docs/assets/product-overview.svg)
 
-[**Get started →**](docs/GETTING-STARTED.md) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.4.0](docs/RELEASE-1.4.1.md)
+[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.9.0](docs/RELEASE-1.9.0.md)
 
-## Less catching up. More moving forward.
+## What you get
 
-Decisions get buried in chats. Context goes stale. Common Rules gives every
-session a shared record — and you a clear view of what happens next.
+- **Calibrated setup** — detects an existing or new project, repository roles,
+  requirements locations, tracker locations, issue-linking policy, and
+  single- or multi-repository topology before writing anything.
+- **Visual proposal loop** — turns an idea into a mobile-friendly decision page
+  and keeps iterating until the sponsor accepts it.
+- **Traceability** — connects requirement → feature → design → files → tests →
+  evidence, and detects when a linked change needs its documentation updated.
+- **One project tracker** — joins separately committed repositories at known,
+  compatible revisions instead of inventing a synthetic cross-repository commit.
+- **Portable lifecycle skills** — the same setup, intake, planning, verification,
+  repair, and handoff language in OpenAI Codex and Claude Code.
 
-## Pick up where the work left off.
+## Install the plugin
 
-**Warm-up** gives a fresh chat its starting context. **Reheat / preheat** brings a running
-chat up to date. Your proposals, decisions, and next steps stay connected.
+![Install Common Rules from the same GitHub repository in Codex or Claude Code, then run calibrated setup](docs/assets/host-setup.svg)
 
-![Separate warm-up and reheat paths for fresh and running sessions](docs/assets/warmup-reheat-hero.svg)
+### OpenAI Codex
 
-## See the whole project. Find the next step.
+Add the repository as a marketplace source:
 
-From proposal to progress, the tracker puts the work where you can inspect it.
+```sh
+codex plugin marketplace add EisKaffee-ai/Common-Rules
+```
 
-![Edited snapshot of the actual Emberline tracker with cleaned sample proposal labels](docs/assets/tracker-overview-edited.png)
+Restart the ChatGPT desktop app, open the **Plugins Directory**, choose the
+**EisKaffee.ai Common Rules** marketplace, and install `common-rules`. Then ask:
 
-## One record. Different ways to see it.
+```text
+Use the Common Rules setup skill to calibrate this project.
+```
 
-Explore proposals in **Tree**, follow work in **Kanban**, inspect cards in
-**Board**, or scan the details in **List**.
+Codex supports repository marketplaces and installs their plugins through the
+Plugins Directory. See the official [OpenAI plugin packaging and marketplace guide](https://developers.openai.com/plugins/build/plugins).
 
-_Edited tracker snapshot: the UI layout and data surface are preserved; proposal
-labels are cleaned for the public story. The live tracker remains available above._
+### Claude Code
 
-## Your agents share context. You keep the decisions.
+Register the same repository and install the plugin:
 
-A shared record supports the workflow; human review still decides what is accepted.
+```sh
+claude plugin marketplace add EisKaffee-ai/Common-Rules
+claude plugin install common-rules@eiskaffee-common-rules
+```
+
+Start Claude Code in the project and run:
+
+```text
+/common-rules:setup
+```
+
+Claude Code namespaces plugin skills and installs them from registered
+marketplaces. See the official [Claude Code marketplace guide](https://code.claude.com/docs/en/plugin-marketplaces).
+
+> Common Rules previews its project manifest first. It writes only after you
+> approve the calibration. Installing the plugin does not automatically trust
+> hooks or grant GitHub write access.
+
+## Choose the skill by intent
+
+You do not have to memorize the catalog. In Codex, describe the outcome in
+plain language and name Common Rules when you want to be explicit. In Claude
+Code, use the namespaced command shown below. The active skill should announce
+what it is doing and keep the tracker stage visible.
+
+![Common Rules skills grouped by orient, decide, deliver, verify, and land](docs/assets/skills-map.svg)
+
+| When you need to… | Common Rules skill | Example request |
+|---|---|---|
+| Adopt a new or existing project | `setup` | “Use Common Rules setup. This is an existing app; preview the manifest before writing.” |
+| Change repositories, roles, or locations | `calibrate` | “Recalibrate: the engine owns business logic and the website owns the interface.” |
+| Turn a request into tracked work | `intake` | “Record this request verbatim, find the related feature, and show the proposed scope.” |
+| Explore a decision visually | `visual-proposal` | “Create a mobile-friendly visual proposal and iterate until I accept it.” |
+| Maintain stages and evidence | `tracker` | “Show every feature that is blocked before implementation and the missing evidence.” |
+| Convert an accepted proposal into buildable work | `plan-and-route` | “Route the accepted proposal into numbered requirements, design, tests, and repository owners.” |
+| Prove the result is ready | `review-and-verify` | “Verify requirement coverage, tests, traceability, and the compatible revision set.” |
+| Fix a failed delivery gate | `repair` | “Tracecheck failed after this code edit; find the narrowest correct repair.” |
+| Release independently committed repositories | `land-handoff` | “Prepare the coherent engine, website, and docs revisions for handoff without combining their commits.” |
+| Load a fresh session | `warmup` | “Warm up from the project record and tell me the active feature and next gate.” |
+| Refresh a running session | `reheat` / `preheat` | “Reheat this session and show only what changed since the last checkpoint.” |
+| Support an older adopted project | `standard` *(legacy)* | “Load the shared contract through the legacy entry point, then show the current setup path.” |
+
+In Claude Code, the direct forms are `/common-rules:setup`,
+`/common-rules:intake`, `/common-rules:visual-proposal`, and so on. Codex can
+select the installed skill from the natural-language requests above. `standard`
+remains available for compatibility; new projects should begin with `setup`.
+
+### Example: one repository
+
+```text
+1. “Set up Common Rules for this existing application.”             → setup
+2. “Track a user-facing export feature.”                             → intake
+3. “Show three visual approaches; keep iterating until accepted.”    → visual-proposal
+4. “Turn the accepted direction into requirements and a build plan.” → plan-and-route
+5. “Verify it and prepare the release handoff.”                       → review-and-verify + land-handoff
+```
+
+### Example: several repositories
+
+```text
+“Calibrate engine as business logic, website as interface, and docs as the
+workspace hub. Keep their commits separate. Track one compatible revision set,
+and require docs impact evidence when an engine requirement-linked file changes.”
+```
+
+Common Rules routes that request through `calibrate`, `tracker`, and
+`review-and-verify`. The result is one joined project view, not one artificial
+commit.
+
+### Example: a traceability failure
+
+```text
+“Requirement CR-42 links engine/payment.py and docs/payment.md. I changed the
+engine file. Check whether the requirement, tests, and documentation must move.”
+```
+
+`tracker` identifies the relationship, `review-and-verify` runs the gate, and
+`repair` proposes the smallest missing update or an explicit owner-reviewed
+no-change receipt. It never deletes the trace just to make the check pass.
+
+## Calibrate each project
+
+The setup skill inspects the repository before it asks questions. It identifies
+what already exists, then asks only for missing choices: business-logic and
+interface repositories, requirements and tracker locations, the workspace hub,
+and whether issue linking is off, manual, or one-way.
+
+```text
+discover → classify → ask only gaps → preview → approve → apply → doctor
+```
+
+The committed `.common-rules.json` contains portable project truth. A workspace
+hub keeps the compatible repository revisions in
+`docs/common-rules/workspace.json`; machine-specific checkout paths stay in the
+ignored `.common-rules/workspace.local.json`.
+
+## Work through one visible lifecycle
+
+Start a fresh session with `/warmup`. Use `/reheat` or `/preheat` when a running
+session needs the latest repository delta. Common Rules makes the active skill
+and lifecycle stage visible instead of requiring you to remember every command.
+
+![Warm-up and reheat use the same Common Rules project record in Codex and Claude Code](docs/assets/warmup-reheat-hero.svg)
+
+Every user-deliverable feature moves through:
+
+```text
+discovery → visual proposal → acceptance → requirements → design
+          → build → test → independent review → release → evidence
+```
+
+![The Common Rules feature lifecycle from discovery and visual proposal through release evidence](docs/assets/delivery-lifecycle.svg)
+
+## Keep separate repositories correct together
+
+Each repository owns its files, ledger, commits, tests, and release. The
+workspace manifest pins a compatible revision set and generates one joined
+tracker. If a requirement-linked file changes, `tracecheck` requires the
+requirement, ledger evidence, or an owner-reviewed no-change receipt to move
+with it.
+
+![Requirements connect to files, tests, and evidence across independently committed repositories](docs/assets/tracker-coherence.svg)
+
+Useful checks from the Common Rules checkout:
+
+```sh
+./bin/project-setup --project /path/to/project doctor
+./bin/tracecheck --project /path/to/project
+./bin/workspace-tracker --project /path/to/workspace-hub --check
+```
 
 ## How a project adopts this
 
-Run `/standard` in the adopting project's chat to review the shared contract,
-then use [`bin/derecord`](bin/derecord) to seed the project's handoff, tracker,
-and hooks without overwriting its existing rules. Start the next session with
-`/warmup` and use `/reheat` or `/preheat` when a running session needs the latest delta.
+New projects should use the setup skill above, review its preview, and apply
+only the locations and topology they accept. Previously adopted projects can
+still run `/standard` to review the shared contract. For the legacy context-only
+path, [`bin/derecord`](bin/derecord) can seed the handoff, tracker, and hooks
+without overwriting existing rules.
 
-## Copy this into a project chat
+Existing projects are not silently upgraded. Human review still accepts
+proposals, resolves ambiguous project ownership, trusts hooks, approves remote
+writes, and decides when a release is ready.
 
-Give a project’s Claude Code or Codex chat this instruction to start an
-adoption review:
-
-```text
-We are adopting EisKaffee.ai / Common Rules from:
-https://github.com/EisKaffee-ai/Common-Rules
-
-Inspect the selected commit and this project's AGENTS.md before installation.
-Preserve project instructions. Install warmup, reheat and preheat context skills
-for Codex and Claude. Configure AGENTS.md, project guidelines and templates as
-the mandatory reading list. Record the exact installed commit; do not invent a
-new release version or silently upgrade to a development branch.
-```
-
-The migration preserves the historical Emberline releases. Version 1.4.0 adds
-the AGENTS-first installer; install the release at its resolved commit.
-The source history and historical release labels retain their original names.
-
-
-[**Get started →**](docs/GETTING-STARTED.md) · [Capabilities & boundaries](docs/GETTING-STARTED.md#boundaries) · [User guide](docs/user-guide/) · [Release history](CHANGELOG.md)
+[**Get started →**](docs/GETTING-STARTED.md) · [Capabilities and boundaries](docs/GETTING-STARTED.md#boundaries) · [User guide](docs/user-guide/) · [Release history](CHANGELOG.md)
 
 ## Attribution
 
@@ -76,6 +202,5 @@ Common Rules is created and maintained by **Aashish Sud (codeDEXTER)**.
 
 ## Licensing
 
-Code is available under [Apache-2.0](LICENSE). Documentation and visual
-assets are available under [CC BY 4.0](LICENSE-DOCS). The Emberline name and
-logo are project marks and are not licensed for implied endorsement.
+Code is available under [Apache-2.0](LICENSE). Documentation and visual assets
+are available under [CC BY 4.0](LICENSE-DOCS).

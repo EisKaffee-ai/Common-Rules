@@ -1,0 +1,12 @@
+{
+  "name": "eiskaffee-common-rules",
+  "description": "EisKaffee.ai Common Rules tracker plugin releases",
+  "owner": {"name": "EisKaffee.ai"},
+  "plugins": [
+    {
+      "name": "common-rules",
+      "source": "./",
+      "description": "Calibrated project tracker, visual proposals, traceability and multi-repository coherence"
+    }
+  ]
+}

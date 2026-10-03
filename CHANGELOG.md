@@ -1,3 +1,40 @@
+# 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
+
+**Standard change (mandatory):** projects can now opt into a calibrated
+`.common-rules.json` integration manifest, visual joined tracking across
+independently committed repositories, deterministic requirement-to-file
+traceability, and the portable Common Rules plugin lifecycle. Setup previews
+before writing and preserves existing declarations; local checkout paths stay
+uncommitted. Added visible setup, calibration, intake, planning, visual
+proposal, review, repair and handoff skills plus optional trusted hooks. No
+project is silently upgraded and no remote-write authority is inferred.
+Common Rules is the tracker plugin and supersedes the separate Emberline AI
+Tracker runtime; migrations preserve ledger IDs and evidence before cutover.
+The same release now includes Claude Code's `.claude-plugin/plugin.json` and
+marketplace catalog, uses the shared Claude/OpenAI plugin-root hook variable,
+and validates both manifests against version 1.9.0. A new read-only
+`migration-check` proves the source main, published development and local-only
+histories are ancestors of the release, no source file disappeared, source
+tags and branches are present at the destination, and the published candidate
+is the reviewed revision. Versions 1.5.0 through 1.7.0 were internal candidates
+and were not published.
+
+The repository landing page now presents Common Rules rather than the legacy
+product identity. It includes current Codex and Claude Code marketplace setup,
+the calibrated first-use path, a complete skill catalog with worked examples,
+and six accessible SVG explanations for the plugin model, installation, skill
+routing, session continuity, delivery lifecycle, traceability and joined
+multi-repository tracking. The companion HTML review surfaces use the same
+current identity and visuals. Added an OpenAI repo marketplace alongside the
+Claude Code marketplace. This documentation and discoverability work is part
+of the same mandatory Common Rules release contract. A reviewer-ready
+completion audit maps all 21 accepted requirements to the authoritative ledger,
+reproducible gates and remaining publication boundary.
+
+Versions 1.8.0 and 1.8.1 were internal candidates. The reviewer-audit
+documentation was added after the 1.8.0 marker, and the mandatory Standard
+change requires a minor release, so 1.9.0 is the publication candidate.
+
 # 1.4.1 — Release verification and installer safety — 29 September 2026
 
 Includes the Common Rules migration prepared as 1.4.0, plus the release-gate corrections and installer containment/shared-state fixes below. Version 1.4.0 was an unreleased candidate; 1.4.1 is the publication candidate after its verification fixes.

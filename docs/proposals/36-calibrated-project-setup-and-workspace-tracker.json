@@ -1,0 +1,648 @@
+{
+  "proposal": 36,
+  "title": "Calibrated project setup and workspace tracker",
+  "status": "accepted",
+  "updated": "2026-10-03",
+  "tiers": {
+    "C3": {
+      "tier": "high",
+      "model": "sonnet",
+      "effort": "high",
+      "rule": "Cross-module standard inherited by projects"
+    },
+    "C4": {
+      "tier": "lead",
+      "model": "opus",
+      "effort": "medium",
+      "rule": "Sponsor decisions, project truth and release reconciliation"
+    }
+  },
+  "phases": [
+    {
+      "id": "C",
+      "name": "Calibrated delivery",
+      "goal": "Adopt Common Rules according to each project's real topology and keep separate repositories coherent.",
+      "exit": "Setup, joined tracking, traceability, plugin lifecycle and release evidence pass."
+    }
+  ],
+  "items": [
+    {
+      "id": "C-01",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Calibrated repository setup",
+      "what": "Discover, preview, apply and diagnose a repository-specific Common Rules manifest.",
+      "files": [
+        "tools/project_setup.py",
+        "bin/project-setup",
+        "tools/project.py"
+      ],
+      "tests": [
+        "tests/test_project_setup.py",
+        "tests/test_project_declaration.py"
+      ],
+      "done": "Setup is opt-in, preserves existing declarations and doctor reports named findings.",
+      "depends": [],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-01.A",
+          "title": "Implement and verify calibrated setup",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; focused setup and declaration suites green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-02",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Multi-repository workspace tracker",
+      "what": "Generate one mobile joined view while repositories keep separate commits.",
+      "files": [
+        "tools/workspace_tracker.py",
+        "bin/workspace-tracker"
+      ],
+      "tests": [
+        "tests/test_workspace_tracker.py"
+      ],
+      "done": "The joined page labels repository, role, feature and revision.",
+      "depends": [
+        "C-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-02.A",
+          "title": "Implement and verify joined workspace tracking",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; joined tracker suite green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-03",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Requirement and file traceability gate",
+      "what": "Refuse broken requirement-to-evidence links and unreviewed no-change claims.",
+      "files": [
+        "tools/tracecheck.py",
+        "bin/tracecheck"
+      ],
+      "tests": [
+        "tests/test_tracecheck.py"
+      ],
+      "done": "Complete graphs pass and broken paths or unauthorized no-change receipts fail.",
+      "depends": [
+        "C-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-03.A",
+          "title": "Implement and verify the traceability gate",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; changed-file tracecheck green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-04",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Portable plugin and visible lifecycle skills",
+      "what": "Package setup, routing, visual proposals, verification, repair and handoff as discoverable skills with optional hooks.",
+      "files": [
+        "plugin.json",
+        "hooks/hooks.json",
+        "skills"
+      ],
+      "tests": [
+        "tests/test_plugin_package.py"
+      ],
+      "done": "Manifest version matches the release; skills state routing; hook paths are portable.",
+      "depends": [
+        "C-01",
+        "C-03"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-04.A",
+          "title": "Package and verify the Common Rules tracker plugin",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "full release gate green",
+          "by": "session:codex",
+          "evidence": "2029 tests OK; portable plugin suite green",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "Claude compatibility added after review",
+          "by": "session:codex",
+          "evidence": "official Claude plugin, manifest, skills, hooks and marketplace documentation; validator pending full gate",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "OpenAI and Claude compatibility gate green",
+          "by": "session:codex",
+          "evidence": "Claude marketplace and manifest validate; unadopted hooks silent; 2032 tests OK",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-05",
+      "phase": "C",
+      "cx": "C4",
+      "title": "Release Common Rules 1.9.0",
+      "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
+      "files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.9.0.md",
+        "docs/reviews/common-rules-1.9.0-completion-audit.md"
+      ],
+      "tests": [
+        "bin/version-check --check",
+        "bin/workflow-stamp --check",
+        "python3 -m unittest discover -s tests -q"
+      ],
+      "done": "All gates pass and independent review evidence is recorded before sponsor merge and publication.",
+      "depends": [
+        "C-01",
+        "C-02",
+        "C-03",
+        "C-04",
+        "C-06",
+        "C-07"
+      ],
+      "status": "in review",
+      "tier": "lead",
+      "model": "opus",
+      "tag": "[ruflo · lead · opus]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-05.A",
+          "title": "Complete release verification and independent review",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "release candidate ready for independent review",
+          "by": "session:codex",
+          "evidence": "VERSION 1.5.0 precursor; version-check and workflow-stamp green; 2029 tests OK",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for Claude compatibility",
+          "by": "session:codex",
+          "evidence": "1.5.0 candidate changed after review; 1.6.0 rerun required",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.6.0 release candidate ready for independent review",
+          "by": "session:codex",
+          "evidence": "VERSION 1.6.0; version-check and workflow-stamp green; 2032 tests OK",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for migration integrity",
+          "by": "session:codex",
+          "evidence": "migration-check added after the 1.6.0 marker; repository policy requires the 1.7.0 minor release",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.7.0 release candidate ready for independent review",
+          "by": "session:codex",
+          "evidence": "VERSION 1.7.0; OpenAI and Claude manifests validate; migration remote proof green; version and workflow checks green; 2035 tests OK",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for the Common Rules landing page",
+          "by": "session:codex",
+          "evidence": "sponsor requested current Common Rules visuals and first-use instructions for Codex and Claude Code; repository policy requires the 1.8.0 minor release",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.8.0 release candidate passed the full gate",
+          "by": "session:codex",
+          "evidence": "commit 7d5053a; VERSION 1.8.0; workflow stamp current; version policy green; 2042 tests OK in 228.0s; independent review and publication pending",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.8.0 final catalog revision passed the full gate",
+          "by": "session:codex",
+          "evidence": "commit 95a1722; VERSION 1.8.0; 2042 tests OK in 186.3s; independent review and public-directory submission pending"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "PR #3 CI required a new release candidate",
+          "by": "session:codex",
+          "evidence": "GitHub Actions run 37102371621: version-check saw changelog changes after the 1.8.0 marker; PR https://github.com/EisKaffee-ai/Common-Rules/pull/3; bump and final gate in progress",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "Common Rules 1.9.0 passed the final local release gate",
+          "by": "session:codex",
+          "evidence": "candidate commits 1d7f898 and 4920996; version policy, workflow stamp, Claude validation and 54 focused tests green; complete suite 2042 tests OK in 307.6s; PR #3 CI rerun pending",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-06",
+      "phase": "C",
+      "cx": "C3",
+      "title": "Non-destructive Emberline migration proof",
+      "what": "Prove that source history, files, branches and tags survive consolidation into Common Rules.",
+      "files": [
+        "tools/migration_check.py",
+        "bin/migration-check",
+        "docs/reviews/common-rules-migration-final.md"
+      ],
+      "tests": [
+        "tests/test_migration_check.py",
+        "bin/migration-check --remote"
+      ],
+      "done": "The repeatable read-only gate proves local ancestry and file preservation plus remote branch, tag and candidate agreement.",
+      "depends": [],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-06.A",
+          "title": "Implement and verify the migration gate",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "local migration proof green",
+          "by": "session:codex",
+          "evidence": "3 required histories are ancestors; all 320 upstream-main files preserved; remote proof pending final publication push",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "local and remote migration proof green",
+          "by": "session:codex",
+          "evidence": "3 histories, 320 source files, 7 source tags and the published release branch verified; 2035-test release gate green",
+          "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-07",
+      "phase": "C",
+      "cx": "C2",
+      "title": "Common Rules landing page and host setup visuals",
+      "what": "Replace the legacy repository presentation with a current visual first-use path for Codex and Claude Code.",
+      "files": [
+        "README.md",
+        ".agents/plugins/marketplace.json",
+        "docs/GETTING-STARTED.md",
+        "docs/user-guide/04-claude-code-and-codex.md",
+        "docs/assets/product-overview.svg",
+        "docs/assets/host-setup.svg",
+        "docs/assets/skills-map.svg",
+        "docs/assets/warmup-reheat-hero.svg",
+        "docs/assets/delivery-lifecycle.svg",
+        "docs/assets/tracker-coherence.svg",
+        "docs/readme-preview.html",
+        "docs/warmup-reheat.html",
+        "docs/public-review.html"
+      ],
+      "tests": [
+        "tests/test_readme_landing.py",
+        "tests/test_plugin_package.py"
+      ],
+      "done": "The GitHub landing page uses only Common Rules identity, visually explains installation, calibration, session continuity, traceability and multi-repository tracking on both hosts, and maps every lifecycle skill to worked examples.",
+      "depends": [
+        "C-04"
+      ],
+      "status": "in review",
+      "tier": "medium",
+      "model": "sonnet",
+      "tag": "[ruflo · medium · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-07.A",
+          "title": "Rewrite and visually verify the cross-host landing page",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "landing page implementation in focused verification",
+          "by": "session:codex",
+          "evidence": "README identity, image, complete skill catalog, examples and host-install tests green; six current Common Rules SVG explainers and three HTML visual surfaces prepared",
+          "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "landing page and skill guide release gate green",
+          "by": "session:codex",
+          "evidence": "commit 7d5053a; 2042 tests OK in 228.0s; 14 focused tests OK; Codex and Claude marketplace manifests validate; six SVGs validate and visual layouts inspected; tracecheck 7 rows green",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "complete installed-skill catalog verified",
+          "by": "session:codex",
+          "evidence": "all 13 installed skills are represented: 11 primary lifecycle skills, preheat alias and standard legacy compatibility; focused 14-test gate green"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "complete 13-skill catalog passed the full release gate",
+          "by": "session:codex",
+          "evidence": "commit 95a1722; all 13 installed skills documented with examples and legacy guidance; 2042 tests OK in 186.3s; workflow stamp and version policy green"
+        }
+      ]
+    }
+  ],
+  "traceability": [
+    {
+      "id": "TR-01",
+      "item": "C-01",
+      "requirement_ids": [
+        "CR36-R01",
+        "CR36-R02",
+        "CR36-R03",
+        "CR36-R04",
+        "CR36-R16",
+        "CR36-R17"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#setup-lifecycle",
+      "implementation_files": [
+        "tools/project_setup.py",
+        "bin/project-setup",
+        "tools/project.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_project_setup tests.test_project_declaration"
+      ],
+      "receipt_or_refusal": "receipt: focused setup and declaration suites",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-02",
+      "item": "C-02",
+      "requirement_ids": [
+        "CR36-R05",
+        "CR36-R06",
+        "CR36-R07",
+        "CR36-R08"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#joined-tracker",
+      "implementation_files": [
+        "tools/workspace_tracker.py",
+        "bin/workspace-tracker"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_workspace_tracker"
+      ],
+      "receipt_or_refusal": "receipt: joined tracker focused suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-03",
+      "item": "C-03",
+      "requirement_ids": [
+        "CR36-R09",
+        "CR36-R10"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#trace-and-impact-gate",
+      "implementation_files": [
+        "tools/tracecheck.py",
+        "bin/tracecheck"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracecheck"
+      ],
+      "receipt_or_refusal": "receipt: tracecheck focused suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-04",
+      "item": "C-04",
+      "requirement_ids": [
+        "CR36-R11",
+        "CR36-R12",
+        "CR36-R13",
+        "CR36-R14",
+        "CR36-R15",
+        "CR36-R20"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#plugin-surfaces",
+      "implementation_files": [
+        "plugin.json",
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json",
+        "hooks/hooks.json",
+        "hooks/project-lifecycle",
+        "skills/setup/SKILL.md",
+        "skills/tracker/SKILL.md",
+        "skills/visual-proposal/SKILL.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_plugin_package"
+      ],
+      "receipt_or_refusal": "receipt: portable plugin package suite",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-05",
+      "item": "C-05",
+      "requirement_ids": [
+        "CR36-R18"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#acceptance-evidence",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#release-boundary",
+      "implementation_files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.9.0.md",
+        "docs/reviews/common-rules-1.9.0-completion-audit.md"
+      ],
+      "tests_commands": [
+        "bin/version-check --check",
+        "bin/workflow-stamp --check"
+      ],
+      "receipt_or_refusal": "receipt: candidate commits 1d7f898 and 4920996; VERSION 1.9.0; version policy, workflow stamp, Claude validation and 54 focused tests green; complete suite 2042 tests OK in 307.6s; independent review and publication pending",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-06",
+      "item": "C-06",
+      "requirement_ids": [
+        "CR36-R19"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#migration-proof",
+      "implementation_files": [
+        "tools/migration_check.py",
+        "bin/migration-check",
+        "docs/reviews/common-rules-migration-final.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_migration_check",
+        "bin/migration-check --remote"
+      ],
+      "receipt_or_refusal": "receipt: 3 histories, 320 source files, 7 source tags and the published release branch verified; independent review pending",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-07",
+      "item": "C-07",
+      "requirement_ids": [
+        "CR36-R21"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#repository-landing-page",
+      "implementation_files": [
+        "README.md",
+        ".agents/plugins/marketplace.json",
+        "docs/GETTING-STARTED.md",
+        "docs/user-guide/04-claude-code-and-codex.md",
+        "docs/assets/product-overview.svg",
+        "docs/assets/host-setup.svg",
+        "docs/assets/skills-map.svg",
+        "docs/assets/warmup-reheat-hero.svg",
+        "docs/assets/delivery-lifecycle.svg",
+        "docs/assets/tracker-coherence.svg",
+        "docs/readme-preview.html",
+        "docs/warmup-reheat.html",
+        "docs/public-review.html"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_readme_landing tests.test_plugin_package"
+      ],
+      "receipt_or_refusal": "receipt: commit 95a1722; all 13 installed skills documented; focused landing/plugin tests green; six SVGs validate and are visually inspected; full release gate 2042 tests OK in 186.3s; independent review pending",
+      "owner": "lead",
+      "status": "in review"
+    }
+  ],
+  "asks": [
+    {
+      "id": "A-01",
+      "at": "2026-10-03",
+      "kind": "decision",
+      "quote": "Accept proposal 2 and implement common rules to release a new version. Make a goal",
+      "became": "C-01",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    },
+    {
+      "id": "A-02",
+      "at": "2026-10-03",
+      "kind": "feature",
+      "quote": "Also update the readme on the first page and the images that are there. They are still old of Emberline. They needs to be updated on how to use this for both codex and cloud.",
+      "became": "C-07",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-03",
+      "kind": "question",
+      "quote": "There are more skills and how the use can use it all. With examples",
+      "became": "C-07",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    }
+  ],
+  "proposed_changes": [],
+  "execution": {}
+}
