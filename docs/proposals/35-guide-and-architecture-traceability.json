@@ -213,9 +213,12 @@
       "kind": "feature",
       "quote": "merge it to main and make a release",
       "became": null,
-      "state": "open",
+      "state": "answered",
       "owner": "lead",
-      "source": "Sponsor conversation 2026-10-03"
+      "source": "Sponsor conversation 2026-10-03",
+      "note": "Merged PR #5 at f6329544d0dd0a3a66c22063978c98a82701a3bd and published Common Rules v1.10.5: https://github.com/EisKaffee-ai/Common-Rules/releases/tag/v1.10.5",
+      "answered_at": "2026-10-03T17:26:58+02:00",
+      "answered_by": "lead"
     }
   ],
   "proposed_changes": [],
