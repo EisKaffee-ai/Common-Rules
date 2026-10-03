@@ -1,6 +1,6 @@
 ---
 name: calibrate
-description: Recalibrate an adopted Common Rules project when repositories, roles, requirement locations, tracker ownership, issue linkage, or delivery constraints change.
+description: Recalibrate Common Rules when repositories, roles, requirement or tracker locations, issue linkage, or delivery constraints change.
 ---
 
 # Common Rules recalibration

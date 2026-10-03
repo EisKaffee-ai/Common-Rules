@@ -1,6 +1,6 @@
 ---
 name: plan-and-route
-description: Plan an accepted Common Rules feature and route its requirements, design, implementation, tests, review and repository ownership before coding.
+description: Route an accepted feature through requirements, design, implementation, tests, review, and repository ownership before coding.
 ---
 
 # Plan and route

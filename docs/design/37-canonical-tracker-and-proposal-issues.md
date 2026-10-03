@@ -145,3 +145,17 @@ The release adds optional proposal-level issue synchronization and canonical
 tracker sections. It does not add two-way synchronization, infer implementation
 from paths, fabricate missing feature rows, copy member ledgers, or authorize a
 local command to impersonate the integrated GitHub plugin.
+
+## Context budget
+
+Both supported hosts use progressive skill loading. The always-discovered
+surface is the skill name, description and (conservatively) path. Full
+`SKILL.md` instructions load only for the selected workflow; references load
+only when that workflow points to them. Hook code runs outside model context
+and contributes only the text it returns.
+
+`bin/context-budget` measures those surfaces independently using a transparent
+UTF-8-bytes/4 token estimate, emits Markdown or JSON, compares a Git revision,
+and fails release verification above the idle discovery budget. The proposal
+issue mutation playbook remains a tracker reference so setup, warmup, and
+ordinary tracker sessions do not pay for it.

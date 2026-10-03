@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Turn new user context, feature requests, defects, questions, or decisions into the correct Common Rules tracker entry before work starts.
+description: Record new context, features, defects, questions, or decisions in the correct Common Rules tracker entry before work starts.
 ---
 
 # Common Rules intake

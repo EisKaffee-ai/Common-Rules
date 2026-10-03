@@ -131,6 +131,47 @@ engine file. Check whether the requirement, tests, and documentation must move.�
 `repair` proposes the smallest missing update or an explicit owner-reviewed
 no-change receipt. It never deletes the trace just to make the check pass.
 
+## Context footprint
+
+### Progressive loading, measured
+
+Common Rules is intentionally a skills-first plugin. Codex initially sees each
+skill's name, description, and path, then loads the full `SKILL.md` only when
+the request selects that workflow. Claude Code follows the same progressive
+pattern: descriptions at session start, full skill content when used. Hooks run
+outside the model context and cost zero context while idle unless they return
+output. See the official [OpenAI skills model](https://developers.openai.com/plugins/concepts/skills)
+and [Claude Code context-cost guide](https://code.claude.com/docs/en/features-overview#understand-context-costs).
+
+<!-- context-budget:start -->
+| Surface | UTF-8 bytes | Estimated tokens | What actually loads |
+|---|---:|---:|---|
+| Idle skill discovery (13 names, descriptions, paths) | 2,505 | 627 | Every session/request |
+| All `SKILL.md` files combined | 24,620 | 6,155 | Not together; only the selected skill is loaded |
+| Optional references | 3,068 | 767 | Only when the selected workflow needs one |
+| Full skill-package ceiling | 27,688 | 6,922 | Comparison ceiling; never the default load |
+| Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |
+<!-- context-budget:end -->
+
+The largest individual workflow is `warmup` at 12,465 bytes, approximately
+3,117 tokens. Its command also reports the project-specific files it reads, so
+that recovery cost remains visible rather than being confused with plugin load.
+The estimate is deliberately simple and reproducible—UTF-8 bytes divided by
+four, rounded up—and is **not process RAM** or model-tokenizer telemetry.
+
+This release shortened discovery descriptions without removing their trigger
+conditions: the conservative discovery estimate fell from 849 to 627 tokens,
+a 26% reduction. Detailed proposal-to-GitHub synchronization instructions live
+in an on-demand tracker reference, so unrelated tracker work does not load
+them.
+
+Reproduce the analysis or enforce the 650-token discovery budget:
+
+```sh
+./bin/context-budget --compare-ref origin/main
+./bin/context-budget --json --check
+```
+
 ## Calibrate each project
 
 The setup skill inspects the repository before it asks questions. It identifies

@@ -1,6 +1,6 @@
 ---
 name: visual-proposal
-description: Create or incrementally improve a mobile-first visual HTML proposal when the user wants to explore, compare, decide, accept, or refine a Common Rules feature.
+description: Create or refine a mobile-first visual HTML proposal to explore, compare, decide, or accept a Common Rules feature.
 ---
 
 # Visual proposal

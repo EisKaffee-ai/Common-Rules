@@ -137,7 +137,7 @@
       "depends": [
         "T-01"
       ],
-      "status": "in progress",
+      "status": "in review",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
@@ -170,6 +170,13 @@
           "by": "session:codex",
           "evidence": "sponsor-selected region removed; goal digest still drives freshness; 102 tracker/history/architecture/workspace tests OK; refreshed real fixture contains no Current goal or goal-contract markup",
           "status": "in progress"
+        },
+        {
+          "at": "2026-10-03T11:19:34+02:00",
+          "event": "canonical tracker and workspace consolidation verified",
+          "by": "session:codex",
+          "evidence": "102 board, architecture, workspace and history tests OK after final integration; five views remain one canonical page",
+          "status": "in review"
         }
       ]
     },
@@ -193,13 +200,21 @@
       "depends": [
         "T-02"
       ],
-      "status": "not started",
+      "status": "in review",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
-      "log": []
+      "log": [
+        {
+          "at": "2026-10-03T11:18:09+02:00",
+          "event": "integrated GitHub plugin workflow packaged and verified",
+          "by": "session:codex",
+          "evidence": "18 plugin, skill, proposal-issue and context-budget tests OK; full-set preflight, integrated provider boundary, explicit write-back and one-way reconciliation are documented",
+          "status": "in review"
+        }
+      ]
     },
     {
       "id": "T-05",
@@ -243,17 +258,22 @@
       "files": [
         "VERSION",
         "CHANGELOG.md",
+        "README.md",
         "plugin.json",
         ".claude-plugin/plugin.json",
+        "bin/context-budget",
+        "tools/context_budget.py",
+        "tests/test_context_budget.py",
         "docs/RELEASE-1.10.0.md"
       ],
       "tests": [
+        "bin/context-budget --json --check",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
         "claude plugin validate .",
         "python3 -m unittest discover -s tests -q"
       ],
-      "done": "The 1.10.0 candidate passes focused and full gates, CI and independent review before merge, tag and public release.",
+      "done": "The 1.10.0 candidate publishes reproducible context-load analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
       "depends": [
         "T-01",
         "T-02",
@@ -267,7 +287,14 @@
       "tag": "[ruflo · lead · opus]",
       "owner": "lead",
       "issue": null,
-      "log": []
+      "log": [
+        {
+          "at": "2026-10-03T11:18:09+02:00",
+          "event": "release scope expanded with measured context budget",
+          "by": "session:codex",
+          "evidence": "A-04 maps to CR37-R22; measured discovery reduced from 849 to 627 estimated tokens and README records methodology and layers"
+        }
+      ]
     }
   ],
   "traceability": [
@@ -289,9 +316,9 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_project_declaration tests.test_project_setup"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "83 focused tests and read-only 27-ledger Docs preview passed",
       "owner": "lead",
-      "status": "in progress"
+      "status": "in review"
     },
     {
       "id": "TR-02",
@@ -315,9 +342,9 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "25 sync tests and complete 27-group/362-checkbox draft fixture passed",
       "owner": "lead",
-      "status": "not started"
+      "status": "in review"
     },
     {
       "id": "TR-03",
@@ -342,9 +369,9 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_tracker_architecture tests.test_workspace_tracker"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "102 canonical board, architecture, workspace and history tests passed",
       "owner": "lead",
-      "status": "not started"
+      "status": "in review"
     },
     {
       "id": "TR-04",
@@ -365,9 +392,9 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "18 plugin, skill, proposal-issue and context-budget tests passed; portable skills validated",
       "owner": "lead",
-      "status": "not started"
+      "status": "in review"
     },
     {
       "id": "TR-05",
@@ -398,17 +425,22 @@
       "id": "TR-06",
       "item": "T-06",
       "requirement_ids": [
-        "CR37-R21"
+        "CR37-R21",
+        "CR37-R22"
       ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#acceptance-evidence",
-      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#release-boundary",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#context-budget",
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
+        "README.md",
+        "bin/context-budget",
+        "tools/context_budget.py",
         "plugin.json",
         ".claude-plugin/plugin.json"
       ],
       "tests_commands": [
+        "bin/context-budget --json --check",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
         "python3 -m unittest discover -s tests -q"

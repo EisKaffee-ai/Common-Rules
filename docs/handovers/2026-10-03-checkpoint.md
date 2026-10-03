@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 11:16
+# Checkpoint — 2026-10-03 11:22
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: d0f719e
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 42f6c07
 
-<!-- ledger-digest: a53dad6574f704cdd205dc87a664afe6209b8eceee23022efbb2dc53e772eaf7 -->
+<!-- ledger-digest: 9bfdd0791c51d197a583c79c6706eab942bda4a74e0d0af9e80ff134566baf12 -->
 
 ## Proposal 19 · Warm-up
 
@@ -224,11 +224,11 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: d0f719e
 
 ## Proposal 37 · Canonical project tracker and architecture issue synchronization
 
-0 done / 1 in progress / 0 blocked / 3 not started / 2 in review
+0 done / 0 in progress / 0 blocked / 2 not started / 4 in review
 
 ### In progress
 
-- T-03 · [ruflo · high · sonnet] · Five-view canonical tracker with workspace coherence · removed the internal goal panel from the public tracker
+- none
 
 ### Blocked, and why
 

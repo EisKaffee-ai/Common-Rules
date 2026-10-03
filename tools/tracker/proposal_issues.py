@@ -14,6 +14,10 @@ from tools.tracker import ledger
 TERMINAL = frozenset(("done", "deferred"))
 
 
+def _ordered(values) -> list[str]:
+    return list(dict.fromkeys(str(value) for value in values if value not in (None, "")))
+
+
 def _revision(root: Path) -> str:
     result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, text=True, capture_output=True)
     return result.stdout.strip() if result.returncode == 0 else "UNVERSIONED"
@@ -153,8 +157,12 @@ def _body(root: Path, ledger_path: Path, data: dict, integration: dict, issue: d
     lines += ["## Implementation, tests and related issues", "",
               *(f"- Implementation: `{entry}`" for entry in sorted(set(implementations)) or ["No implementation link recorded."]),
               *(f"- Test: `{entry}`" for entry in sorted(set(tests)) or ["No test link recorded."])]
-    if issue:
-        lines.append(f"- Related issue: [#{issue['number']}]({issue['url']})")
+    related_values = []
+    for feature in features:
+        refs = feature.get("relatedIssues") or []
+        related_values.extend([refs] if isinstance(refs, str) else refs if isinstance(refs, list) else [])
+    related = _ordered(related_values)
+    lines.extend(f"- Related issue: {ref}" for ref in related)
     lines += ["", "> The canonical ledger is authoritative. GitHub checkbox edits do not update it; reconcile drift with evidence through Common Rules.", ""]
 
     all_terminal = bool(items) and all(row.get("status") in TERMINAL and

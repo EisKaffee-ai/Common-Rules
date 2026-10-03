@@ -79,6 +79,11 @@ commits and the ledger remains authoritative.
 - **CR37-R21 — Release evidence.** Version, changelog, both plugin manifests,
   skills, focused tests, full merge gate and generated artifacts agree before
   the new Common Rules version is published.
+- **CR37-R22 — Measured context budget.** Before publication, the plugin reports
+  idle skill-discovery text separately from invoked skill instructions,
+  optional references, hook output and the full-package ceiling. The README
+  publishes reproducible byte/token estimates, identifies them as context—not
+  process RAM—and a release check caps idle discovery at 650 estimated tokens.
 
 ## Vanilla acceptance fixture
 

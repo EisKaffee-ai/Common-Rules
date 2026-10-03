@@ -36,6 +36,15 @@ parent-project total from appearing as the catalogue's task count. The goal
 contract remains a freshness input and warm-up control but is not rendered as
 a large prose panel in the public tracker.
 
+The release now has a reproducible context-footprint gate. Common Rules keeps
+detailed issue-sync guidance in an on-demand tracker reference and shortens
+skill discovery descriptions while preserving their trigger conditions. The
+conservative idle discovery estimate falls from 849 to 627 tokens (26%); the
+README separates that cost from invoked instructions, optional references,
+hook output and the never-default full-package ceiling. `bin/context-budget
+--json --check` enforces the 650-token discovery budget and explicitly reports
+context estimates rather than process RAM.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

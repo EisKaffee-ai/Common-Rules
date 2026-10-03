@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Calibrate Common Rules for a new or existing repository. Use when adopting, installing, configuring, or diagnosing Common Rules, including single- versus multi-repository topology and tracker locations.
+description: Adopt or diagnose Common Rules in a new or existing single- or multi-repository project, including tracker locations.
 ---
 
 # Common Rules setup
@@ -15,3 +15,10 @@ Inspect the preview, ask only for unresolved business-logic/interface roles,
 requirements or tracker locations, workspace hub and issue-linking mode. Never
 infer remote-write authority. Show the final manifest and apply only after the
 user authorizes adoption. Finish with `project-setup doctor`.
+
+For an optional proposal-level GitHub mirror, collect and preview all four
+fields together: `issue_linking: one-way`, `issue_repository: owner/name`,
+`issue_granularity: proposal`, and
+`issue_sync_direction: ledger-to-github`. Never offer or infer reverse or
+two-way synchronization. These settings describe a plan; they do not authorize
+issue creation. Codex and Claude Code use the same manifest and commands.

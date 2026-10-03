@@ -1,6 +1,6 @@
 ---
 name: standard
-description: The sponsor's mandatory instruction to put this session and its project on the common-rules standard. As of proposal 28, /standard is a shortcut for /warmup, which now queues the same pending work this command used to walk through by hand. Kept only so the command the sponsor types still works; it will be removed next release.
+description: Legacy alias for /warmup. Use when the sponsor asks to put the current session and project on the Common Rules standard.
 ---
 
 # /standard
