@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 13:51
+# Checkpoint — 2026-10-03 16:16
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
+Reason: manual · branch: codex/requirement-traceability-20261003 · HEAD: d940a8a
 
-<!-- ledger-digest: 7f4d1f8e3e96b50804ea6b06db89da65345c438bfa7ca6b4cdc73dcfa0038205 -->
+<!-- ledger-digest: 14aecd7c46e8eb875a222c55eab9ee7d73b8c30d83f45cf8e6b8750e8182eb8d -->
 
 ## Proposal 19 · Warm-up
 
@@ -172,7 +172,7 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
 
 ### In progress
 
-- T-01 · [ruflo · high · sonnet] · Track guide-to-architecture evidence as a first-class map · started
+- T-01 · [ruflo · high · sonnet] · Generate holistic feature traceability and architecture conformance · Sponsor directed Common Rules implementation with an overall view first, feature-by-feature expected-versus-actual architecture conformance, typed code references, test-case IDs and visible test reports.
 
 ### Blocked, and why
 
