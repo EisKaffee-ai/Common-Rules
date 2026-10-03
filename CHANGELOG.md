@@ -1,4 +1,8 @@
-# 1.10.4 — Reviewed holistic traceability — 3 October 2026
+# 1.10.5 — Reviewed holistic traceability — 3 October 2026
+
+Version 1.10.4 was the internal candidate reviewed before the fixed-revision,
+topology, report-content, complete-chain, receipt-reference and safe-link
+hardening below. Version 1.10.5 is the reviewable candidate.
 
 Adds an opt-in, deterministic `bin/traceability` toolchain. Projects keep a
 reviewed manifest and repository-specific scan configuration; Common Rules

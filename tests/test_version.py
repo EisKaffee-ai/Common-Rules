@@ -48,7 +48,7 @@ class TestRealCheckoutVersion(unittest.TestCase):
         after. That is finding 33/R-02's case exactly -- a check that exists
         and fires too late to stop the thing it checks.
         """
-        pinned = "1.10.4\n"
+        pinned = "1.10.5\n"
         actual = (ROOT / "VERSION").read_text(encoding="utf-8")
         self.assertEqual(
             actual, pinned,
