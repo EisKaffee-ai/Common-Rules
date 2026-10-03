@@ -41,6 +41,8 @@ import math
 import re
 from pathlib import Path
 
+from tools import project as PROJECT
+
 # Proposal 26 (C-06): "in review" and "in testing" sit between "in progress"
 # and "done" -- the code is written and it is now elsewhere, waiting on a
 # reviewer or a red-first test to go green. Purely additive: a ledger using
@@ -777,8 +779,23 @@ def readiness(ledger: dict) -> dict | None:
             "receipts": round(receipt, 1), "readiness": round(work + gate + floor + receipt)}
 
 
+def directory(project) -> Path:
+    """The project's declared canonical ledger directory.
+
+    Existing projects keep ``docs/proposals``. A calibrated workspace hub may
+    point ``integration.tracker`` at a nested catalogue; every tracker reader
+    must resolve that same location or a parent project's ledgers can silently
+    replace the canonical totals.
+    """
+    root = Path(project)
+    integration = PROJECT.load(root).get("integration")
+    if isinstance(integration, dict) and isinstance(integration.get("tracker"), str):
+        return root / integration["tracker"]
+    return root / "docs" / "proposals"
+
+
 def find(project) -> list[Path]:
-    """Every ledger under a project's docs/proposals, sorted by number.
+    """Every ledger under a project's configured tracker, sorted by number.
 
     A file named NN-*.json is a ledger only if it is one: a JSON object with an
     `items` list. docs/proposals also holds data files with the same name shape
@@ -788,7 +805,7 @@ def find(project) -> list[Path]:
     that does not parse is kept, so validate can report it: only its contents
     could say it is not a ledger.
     """
-    root = Path(project) / "docs" / "proposals"
+    root = directory(project)
     found = []
     for p in root.glob("[0-9][0-9]*-*.json"):
         try:

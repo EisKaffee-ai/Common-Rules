@@ -4,9 +4,10 @@
 
 The sponsor asked (proposal 22, A-01) for "per project, there should be one
 tracker", readable at a glance: filters across the top and the work shown as
-blocks. So this renders every ledger in DIR/docs/proposals into one page,
+blocks. So this renders every ledger in the declared integration tracker
+(falling back to DIR/docs/proposals) into one page beside those ledgers,
 
-  docs/proposals/tracker/index.html
+  <integration.tracker>/tracker/index.html
 
 beside the per-proposal pages `tracker render` writes, which it never
 touches. The page has, top to bottom: the project's totals; one block per
@@ -75,7 +76,11 @@ def when(at) -> str:
 
 
 def default_out(project: Path) -> Path:
-    return project / "docs" / "proposals" / "tracker" / OUT_NAME
+    return tracker_root(project) / "tracker" / OUT_NAME
+
+
+def tracker_root(project: Path) -> Path:
+    return L.directory(project)
 
 
 def project_name(project: Path) -> str:
@@ -926,6 +931,149 @@ def traceability_section(ledgers: list[tuple[Path, dict]]) -> str:
             f'<tbody>{"".join(rows)}</tbody></table></div></section>')
 
 
+def information_nav() -> str:
+    links = (("overview", "Overview"), ("product-delivery", "Product delivery"),
+             ("architecture", "Architecture"), ("repositories", "Repositories"),
+             ("evidence", "Evidence"))
+    return ('<nav class="information-views" aria-label="Tracker information">' +
+            "".join(f'<button type="button" data-information-view="{anchor}" '
+                    f'aria-pressed="{"true" if anchor == "overview" else "false"}">{label}</button>'
+                    for anchor, label in links) + '</nav>')
+
+
+def _ordered(values) -> list[str]:
+    return list(dict.fromkeys(str(value) for value in values if value not in (None, "")))
+
+
+def architecture_dimensions(ledgers: list[tuple[Path, dict]], lifecycle_total: int) -> str | None:
+    """Human-readable architecture hierarchy for calibrated catalogues."""
+    if not any(isinstance(data.get("features"), list) for _path, data in ledgers):
+        return None
+    layers = {
+        str(data.get("layer") or data.get("title") or "Other").split(" · ", 1)[0]
+        for _path, data in ledgers
+    }
+    feature_ids = {
+        str(feature.get("key") or feature.get("id") or feature.get("name"))
+        for _path, data in ledgers
+        for feature in data.get("features", [])
+        if isinstance(feature, dict) and (feature.get("key") or feature.get("id") or feature.get("name"))
+    }
+
+    def quantity(value: int, singular: str, plural: str | None = None) -> str:
+        return f"{value} {singular if value == 1 else (plural or singular + 's')}"
+
+    return " · ".join((
+        quantity(len(layers), "layer"),
+        quantity(len(ledgers), "architecture group"),
+        quantity(len(feature_ids), "feature"),
+        quantity(lifecycle_total, "lifecycle step"),
+    ))
+
+
+def _architecture_issue(data: dict, repo: str | None) -> tuple[int | None, str | None]:
+    values = [data.get("issue")]
+    values += [feature.get("issue") for feature in data.get("features", []) if isinstance(feature, dict)]
+    values += [item.get("issue") for item in data.get("items", []) if isinstance(item, dict)]
+    for value in values:
+        if isinstance(value, int) and value > 0:
+            return value, f"https://github.com/{repo}/issues/{value}" if repo else None
+        if isinstance(value, dict) and isinstance(value.get("number"), int):
+            repository = value.get("repository") or repo
+            return value["number"], value.get("url") or (
+                f"https://github.com/{repository}/issues/{value['number']}" if repository else None)
+    return None, None
+
+
+def architecture_section(ledgers: list[tuple[Path, dict]], repo: str | None) -> str:
+    """Proposal cards grouped by product layer, with feature drill-down."""
+    layers: dict[str, list[str]] = {}
+    for _path, data in ledgers:
+        layer = str(data.get("title") or "Other").split(" · ", 1)[0]
+        features = [feature for feature in data.get("features", []) if isinstance(feature, dict)]
+        items = L.items(data)
+        complete = sum(1 for item in items if item.get("status") in ("done", "deferred"))
+        approvals = _ordered((feature.get("approval") or {}).get("status") for feature in features)
+        alignments = _ordered((feature.get("alignment") or {}).get("status") for feature in features)
+        owners = _ordered(
+            ref.get("repository") for feature in features for ref in feature.get("affectedCode", [])
+            if isinstance(ref, dict)
+        )
+        blockers = [item.get("title") for item in items if item.get("status") == "blocked"]
+        gaps = _ordered(feature.get("gap") for feature in features)
+        next_item = next((item for item in items if item.get("status") not in ("done", "deferred")), None)
+        issue_number, issue_url = _architecture_issue(data, repo)
+        issue = (f'<a href="{e(issue_url)}">#{e(issue_number)}</a>' if issue_url else
+                 (f'#{e(issue_number)}' if issue_number else "Not linked"))
+        feature_rows = "".join(
+            f'<li><strong>{b(feature.get("key") or feature.get("name"))}</strong>'
+            f'{" · " + e(feature.get("name")) if feature.get("key") and feature.get("name") else ""}'
+            f'{"<p>" + e(feature.get("gap")) + "</p>" if feature.get("gap") else ""}</li>'
+            for feature in features
+        ) or '<li>Scope definition only — detailed features are not defined yet.</li>'
+        gap_html = f'<p class="architecture-gap">{e(" · ".join(gaps))}</p>' if gaps else ""
+        card = (
+            f'<article class="architecture-card" data-layer="{e(layer)}" data-proposal="{e(data.get("proposal"))}">'
+            f'<header><span class="architecture-number">{e(data.get("proposal"))}</span><span>{issue}</span></header>'
+            f'<h3>{b(data.get("title"))}</h3><p class="namespace">{b(data.get("namespace") or "namespace not declared")}</p>'
+            f'<div class="architecture-metrics"><span>{len(features)} features</span>'
+            f'<span>{complete}/{len(items)} rows complete</span></div>'
+            f'<dl><div><dt>Architecture</dt><dd>{e(" / ".join(approvals) or data.get("status") or "unclassified")}</dd></div>'
+            f'<div><dt>Implementation</dt><dd>{e(" / ".join(alignments) or "unclassified")}</dd></div>'
+            f'<div><dt>Repository owners</dt><dd>{e(" · ".join(owners) or "not classified")}</dd></div>'
+            f'<div><dt>Blockers</dt><dd>{e(" · ".join(str(x) for x in blockers) or "none recorded")}</dd></div>'
+            f'<div><dt>Next action</dt><dd>{b(next_item.get("title") if next_item else "Attach final evidence")}</dd></div></dl>'
+            f'{gap_html}'
+            f'<details><summary>Feature traceability · {len(features)}</summary><ul>{feature_rows}</ul>'
+            f'<p><button type="button" class="information-link" data-open-information="evidence">'
+            f'Open evidence and traceability</button></p></details></article>'
+        )
+        layers.setdefault(layer, []).append(card)
+    order = [layer for layer in ("Application", "Runner", "Engine", "Memory", "AI") if layer in layers]
+    order += sorted(layer for layer in layers if layer not in order)
+    groups = "".join(f'<section class="architecture-layer"><h3>{e(layer)}</h3>'
+                     f'<div class="architecture-grid">{"".join(layers[layer])}</div></section>' for layer in order)
+    return ('<section class="info-view architecture" id="architecture" data-information-section="architecture" hidden><h2>Architecture</h2>'
+            '<p class="view-note">One issue per proposal. Expand a card to drill into features and evidence.</p>'
+            f'{groups}</section>')
+
+
+def repositories_section(project: Path | None) -> str:
+    if project is None:
+        return ('<section class="info-view repositories" id="repositories" '
+                'data-information-section="repositories" hidden><h2>Repositories</h2></section>')
+    integration = P.load(project).get("integration") or {}
+    members = []
+    workspace_path = Path(project) / "docs/common-rules/workspace.json"
+    try:
+        workspace = json.loads(workspace_path.read_text())
+        if isinstance(workspace.get("members"), list):
+            members = [member for member in workspace["members"] if isinstance(member, dict)]
+    except (OSError, ValueError):
+        pass
+    if not members and integration:
+        members = [{"repository_id": integration.get("repository_id"), "role": integration.get("role"),
+                    "tracker": integration.get("tracker"), "revision": "current checkout"}]
+    cards = "".join(
+        f'<article class="repository-card" data-repository="{e(member.get("repository_id"))}">'
+        f'<h3>{b(member.get("repository_id"))}</h3><p>{b(member.get("role"))}</p>'
+        f'<dl><div><dt>Revision</dt><dd>{b(member.get("revision") or "unresolved")}</dd></div>'
+        f'<div><dt>Ledger source</dt><dd>{b(member.get("tracker") or "not declared")}</dd></div></dl></article>'
+        for member in members)
+    return ('<section class="info-view repositories" id="repositories" data-information-section="repositories" hidden><h2>Repositories</h2>'
+            '<p class="view-note">Independent commits, joined by declared revisions. Member ledgers remain in their repositories.</p>'
+            f'<div class="repository-grid">{cards}</div></section>')
+
+
+def evidence_section(traceability: str, ledgers: list[tuple[Path, dict]]) -> str:
+    evidence_count = sum(1 for _path, data in ledgers for item in L.items(data)
+                         if any(isinstance(row, dict) and row.get("evidence") for row in item.get("log", [])))
+    return ('<section class="info-view evidence" id="evidence" data-information-section="evidence" hidden><h2>Evidence</h2>'
+            f'<p class="view-note">{e(evidence_count)} lifecycle rows carry evidence. '
+            'Traceability remains a drill-down, not a second tracker.</p>' +
+            (traceability or '<p>No traceability rows recorded yet.</p>') + '</section>')
+
+
 def column_order(status: str, entries: list) -> list:
     """Cards inside a column: newest activity first where there is activity;
     not-started work by newest proposal, then ledger order."""
@@ -1036,9 +1184,16 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         add_counts(task_totals, task_counts)
         proposal_tasks[str(data.get("proposal"))] = task_counts
     updated = max((str(d.get("updated") or "") for _, d in ledgers), default="")
+    ledger_task_total = sum(task_totals.values())
     current_history = history_current(project)
+    # History is committed evidence, while the page may be rendering a newer
+    # working tree. Never let an old or differently scoped history snapshot
+    # replace the current ledger denominator in the header.
+    if current_history and current_history.get("tickets_total") != ledger_task_total:
+        current_history = None
     display_totals = (current_history.get("by_status", {}) if current_history else task_totals)
-    display_total = (current_history.get("tickets_total", 0) if current_history else sum(task_totals.values()))
+    display_total = (current_history.get("tickets_total", 0) if current_history else ledger_task_total)
+    dimension_line = architecture_dimensions(ledgers, display_total)
     status_columns = COLUMNS
     status_line = " / ".join(f"{display_totals.get(s, 0)} {s}" for s in ("done", "in progress", "blocked", "not started"))
     extra_line = [f"{display_totals.get(s, 0)} {s}" for s in ("in review", "in testing", "deferred")
@@ -1080,6 +1235,9 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
     progress = progress_block(project)
     completion_groups_block = completion_groups_section(entries)
     kanban = kanban_section(entries)
+    architecture = architecture_section(ledgers, repo)
+    repositories = repositories_section(Path(project) if project is not None else None)
+    evidence = evidence_section(traceability, ledgers)
 
     attention = ""
     if open_asks or requests:
@@ -1123,7 +1281,7 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
     return (
         "<!doctype html>\n"
         '<meta charset="utf-8">\n'
-        f"<!-- generated by bin/tracker board from every ledger in docs/proposals -- edit the ledgers, not this page -->\n"
+        f"<!-- generated by bin/tracker board from every ledger in the configured tracker directory -- edit the ledgers, not this page -->\n"
         f"<title>{e(title)}</title>\n"
         f'<meta name="ledger-digests" content="{e(digests([p for p, _ in ledgers]))}">\n'
         + goal_meta +
@@ -1133,10 +1291,11 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600'
         '&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">\n'
         f"<style>{CSS}</style>\n"
+        '<noscript><style>[data-information-section][hidden],[data-product-controls][hidden]{display:block!important}</style></noscript>\n'
         '<main class="wrap">'
-        f'<header class="top"><p class="eyebrow">{b(name)} · {len(ledgers)} '
-        f'{"proposal" if len(ledgers) == 1 else "proposals"} · {display_total} '
-        f'{"tracked task" if display_total == 1 else "tracked tasks"} · updated {e(updated)}</p>'
+        f'<header class="top"><p class="eyebrow">{b(name)} · '
+        f'{e(dimension_line) if dimension_line else e(str(len(ledgers)) + (" proposal" if len(ledgers) == 1 else " proposals") + " · " + str(display_total) + (" tracked task" if display_total == 1 else " tracked tasks"))}'
+        f' · updated {e(updated)}</p>'
         f'<h1>Tracker</h1>'
         f'<section class="totals" data-task-total="{display_total}" data-done="{display_totals.get("done", 0)}" data-in-progress="{display_totals.get("in progress", 0)}" '
         f'data-blocked="{display_totals.get("blocked", 0)}" data-not-started="{display_totals.get("not started", 0)}" '
@@ -1144,7 +1303,8 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         f'data-deferred="{display_totals.get("deferred", 0)}">'
         f'<p class="line">{e(status_line)}</p>{mini_bar(display_totals)}</section></header>'
         + goal_contract(goal) +
-        '<div class="filters" role="search">'
+        information_nav() +
+        '<div class="filters" role="search" data-product-controls hidden>'
         '<div class="views" role="group" aria-label="View">'
         '<button type="button" data-view="tree" aria-pressed="true">Tree</button>'
         '<button type="button" data-view="kanban" aria-pressed="false">Kanban</button>'
@@ -1162,11 +1322,10 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         '<p class="pending-rule dim">Pending hides everything already done, at every level, and forces '
         '"Show finished" off while it is on -- turn Pending off to let "Show finished" decide done work again.</p>'
         '</div>'
-        + f'{progress}'
+        + f'<section class="info-view overview" id="overview" data-information-section="overview"><h2>Overview</h2>{progress}{tiles_block}</section>'
+        + '<section class="info-view product-delivery" id="product-delivery" data-information-section="product-delivery" hidden><h2>Product delivery</h2>'
         + (f'<nav class="proposals" aria-label="Proposal scope">{blocks}</nav>' if blocks else "")
-        + f'{tiles_block}'
         + f'<div id="view-tree">{features}{completion_groups_block}</div>'
-        + traceability
         + f'<div id="view-kanban" hidden>{kanban}</div>'
         + '<h2 id="details">Details</h2>'
         + f'{attention}'
@@ -1178,8 +1337,12 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         f'</tr></thead><tbody>{list_rows}</tbody></table></div></div>'
         '<p class="none" id="none" hidden>Nothing matches these filters. <button type="button" id="clear2">Clear filters</button></p>'
         f'{answered_block}'
-        "</main>\n"
-        f"<script>{SCRIPT}</script>\n"
+        '</section>'
+        + architecture
+        + repositories
+        + evidence
+        + "</main>\n"
+        + f"<script>{SCRIPT}</script>\n"
     )
 
 
@@ -1205,17 +1368,17 @@ SCRIPT = asset("board.js")
 def main(argv) -> int:
     ap = argparse.ArgumentParser(prog="tracker board", description=__doc__.splitlines()[0])
     ap.add_argument("--project", type=Path, default=Path.cwd(),
-                    help="the project root, holding docs/proposals (default: the current directory)")
-    ap.add_argument("--out", type=Path, help=f"where to write (default: docs/proposals/tracker/{OUT_NAME})")
+                    help="the project root holding its configured tracker (default: the current directory)")
+    ap.add_argument("--out", type=Path, help=f"where to write (default: <configured tracker>/tracker/{OUT_NAME})")
     ap.add_argument("--name", help="the project's name on the page (default: its main checkout's folder)")
     ap.add_argument("--repo", help="owner/name for issue links (default: the ledgers' git remote)")
     ap.add_argument("--check", action="store_true", help="exit 1 if the page is missing or stale; write nothing")
     args = ap.parse_args(argv)
 
     project = args.project
-    paths = sorted(L.find(project), key=lambda p: p.name)
+    paths = ledger_paths(project)
     if not paths:
-        print(f"tracker board: no ledgers under {project / 'docs' / 'proposals'} -- nothing written",
+        print(f"tracker board: no ledgers under {tracker_root(project)} -- nothing written",
               file=sys.stderr)
         return 2
     out = args.out or default_out(project)

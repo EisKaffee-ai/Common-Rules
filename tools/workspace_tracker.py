@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse, html, json
 from pathlib import Path, PurePosixPath
 
+from tools import project as declaration
+
 
 def _read(path: Path):
     data = json.loads(path.read_text())
@@ -21,6 +23,21 @@ def _local_path(hub: Path, rel: str) -> Path:
 def build(hub: Path, *, check=False) -> tuple[int, str]:
     try:
         workspace = _read(hub / "docs/common-rules/workspace.json")
+        integration = declaration.load(hub).get("integration") or {}
+        if integration.get("issue_granularity") == "proposal":
+            declared_workspace = integration.get("workspace") or {}
+            if workspace.get("workspace_id") != declared_workspace.get("id"):
+                raise ValueError("workspace IDs disagree")
+            if workspace.get("hub_repository_id") != integration.get("repository_id"):
+                raise ValueError("workspace hub repository disagrees with the integration manifest")
+            members = workspace.get("members")
+            if not isinstance(members, list) or not members:
+                raise ValueError("workspace must declare at least one repository member")
+            from tools.tracker import board
+            args = ["--project", str(hub)] + (["--check"] if check else [])
+            code = board.main(args)
+            return code, ("single canonical tracker is current" if code == 0 else
+                          "single canonical tracker is stale or invalid")
         local = _read(hub / ".common-rules/workspace.local.json")
         if workspace.get("workspace_id") != local.get("workspace_id"): raise ValueError("workspace IDs disagree")
         rows = []

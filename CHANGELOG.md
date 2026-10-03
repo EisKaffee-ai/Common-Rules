@@ -18,6 +18,22 @@ its features and every item; `--reconcile` reports remote body/title/state
 drift without changing ledger status. Legacy row-level `tracker sync LEDGER`
 behavior remains available for projects that have not opted in.
 
+The canonical board now follows a configured nested tracker directory and
+writes its single page beside those ledgers. Calibrated catalogues gain five
+mobile-friendly information views—Overview, Product delivery, Architecture,
+Repositories, and Evidence—without removing the established Tree, Kanban,
+Board, and List delivery layouts. Architecture cards group proposals by
+layer, show group issue and lifecycle state, and expand to feature gaps and
+traceability; declared workspace members appear as revision-bound repository
+cards inside the same page rather than as a second public tracker.
+
+Tracker history now replays the same configured nested ledger directory as the
+board and namespaces cached snapshots by that directory. The current header
+also refuses a historical denominator that differs from the current ledgers.
+Architecture catalogues describe their hierarchy explicitly as layers,
+architecture groups, features and lifecycle steps, preventing an unrelated
+parent-project total from appearing as the catalogue's task count.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

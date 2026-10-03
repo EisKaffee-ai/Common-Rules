@@ -137,13 +137,34 @@
       "depends": [
         "T-01"
       ],
-      "status": "not started",
+      "status": "in progress",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
-      "log": []
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "five-view canonical tracker implemented and full catalogue rendered",
+          "by": "session:codex",
+          "evidence": "64 board/workspace tests OK; 27-card fixture rendered at canonical nested path with 5 information views, 4 repository cards, 59 feature drill-downs and layer counts 4/3/7/9/4",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "corrected canonical tracker scope and architecture segmentation",
+          "by": "session:codex",
+          "evidence": "101 focused tests OK; real Docs architecture fixture renders 5 layers, 27 groups, 59 features and 362 lifecycle steps; configured nested history returns 362 rather than parent total 24",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "workspace output consolidated into the canonical page",
+          "by": "session:codex",
+          "evidence": "102 focused tests OK; proposal-mode workspace-tracker renders/checks the canonical configured page and creates no second tracker"
+        }
+      ]
     },
     {
       "id": "T-04",

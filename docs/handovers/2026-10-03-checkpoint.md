@@ -1,12 +1,12 @@
-# Checkpoint — 2026-10-03 10:55
+# Checkpoint — 2026-10-03 11:07
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 28a04c4
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 3098493
 
-<!-- ledger-digest: 97ff09b29179336572778c23eb179c1bd786fc926cf7a50aa62eb00c158d45e8 -->
+<!-- ledger-digest: 1b96d9104b86525aedf0079cc8f3a152091be64521fd8e9b06837a81080b13b3 -->
 
 ## Proposal 19 · Warm-up
 
-18 done / 0 in progress / 0 blocked / 1 not started
+18 done / 0 in progress / 0 blocked / 2 not started
 
 ### In progress
 
@@ -22,11 +22,13 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 28a04c4
 
 ### Next unblocked
 
+- Q-06 · [ruflo · medium · sonnet] · standard item 1 Rules read and implemented: .common-rules-version is absent -- the project has never recorded which rules it follows
 - Q-05 · [ruflo · medium · sonnet] · standard item 2 Migrated: page docs/proposals/tracker/index.html is stale
 
 ### Open work by group
 
 **finish now**
+- Q-06 0%
 - Q-05 0%
 
 ## Proposal 21 · The standard is mandatory
@@ -222,11 +224,11 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 28a04c4
 
 ## Proposal 37 · Canonical project tracker and architecture issue synchronization
 
-0 done / 0 in progress / 0 blocked / 4 not started / 2 in review
+0 done / 1 in progress / 0 blocked / 3 not started / 2 in review
 
 ### In progress
 
-- none
+- T-03 · [ruflo · high · sonnet] · Five-view canonical tracker with workspace coherence · workspace output consolidated into the canonical page
 
 ### Blocked, and why
 
@@ -252,4 +254,4 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 28a04c4
 
 ## Exact next action
 
-Q-05 · [ruflo · medium · sonnet] · standard item 2 Migrated: page docs/proposals/tracker/index.html is stale
+Q-06 · [ruflo · medium · sonnet] · standard item 1 Rules read and implemented: .common-rules-version is absent -- the project has never recorded which rules it follows
