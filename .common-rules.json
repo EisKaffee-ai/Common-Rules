@@ -19,15 +19,15 @@
   "risk_always": "restricted",
   "ruflo_namespace": "patterns",
   "goal": {
-    "outcome": "Release calibrated Common Rules setup, traceability, plugin lifecycle and coherent multi-repository tracking.",
+    "outcome": "Release one canonical project tracker with proposal-level, ledger-to-GitHub architecture issue synchronization.",
     "constraints": [
-      "Native host goals choose the work; ledgers remain the durable record.",
-      "Preserve existing project compatibility and require explicit adoption.",
-      "Repositories commit independently; the workspace revision set proves coherence."
+      "The ledger remains authoritative and GitHub issue changes never silently update it.",
+      "Preserve existing tracker and row-level issue behavior until a project opts into proposal granularity.",
+      "Use the integrated GitHub plugin for issue mutations; keep repositories independently committed."
     ],
     "verification": [
-      "Validate Proposal 36, its tracker and complete traceability graph.",
-      "Run focused setup, workspace, trace and plugin tests plus the full merge gate."
+      "Validate Proposal 37 against the Docs fixture of 27 groups, 59 features and 362 lifecycle rows.",
+      "Pass setup, doctor, tracecheck, tracker, workspace, plugin and full release gates before publication."
     ],
     "updated": "2026-10-03"
   },

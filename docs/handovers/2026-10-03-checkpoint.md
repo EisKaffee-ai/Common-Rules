@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 08:32
+# Checkpoint — 2026-10-03 10:36
 
-Reason: manual · branch: codex/calibrated-setup-release · HEAD: 4920996
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 7ce6ff2
 
-<!-- ledger-digest: a6e0d41481e0bf8ddb88dfc740853c159b6068ec0f6bffbef60c9969f9f6edd0 -->
+<!-- ledger-digest: 0dadc88f390cf680f612bbcecb483ab0c5d857fb0a7b2682b1a43eeac4de3f57 -->
 
 ## Proposal 19 · Warm-up
 
@@ -219,6 +219,36 @@ Reason: manual · branch: codex/calibrated-setup-release · HEAD: 4920996
 - C-05 0% · next C-05.A
 - C-06 0% · next C-06.A
 - C-07 0% · next C-07.A
+
+## Proposal 37 · Canonical project tracker and architecture issue synchronization
+
+0 done / 1 in progress / 0 blocked / 5 not started
+
+### In progress
+
+- T-01 · [ruflo · high · sonnet] · Calibrated canonical tracker manifest and discovery · accepted target manifest and existing Docs catalogue inspected
+
+### Blocked, and why
+
+- none
+
+### Open asks
+
+- none
+
+### Next unblocked
+
+- none
+
+### Open work by group
+
+**finish now**
+- T-01 0%
+- T-02 0%
+- T-03 0%
+- T-04 0%
+- T-05 0%
+- T-06 0%
 
 ## Exact next action
 
