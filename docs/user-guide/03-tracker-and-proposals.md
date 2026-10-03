@@ -110,7 +110,16 @@ Expected workflow nodes and edges conform only when their actual rows are
 `accepted` and point to valid code anchors. A `proposed_ai` workflow row or
 mapping remains visible as a finding and never contributes accepted coverage.
 Test reports name their test-case results, source repository, source revision,
-path, and timestamp; the latest report is shown for each feature.
+path, and timestamp; the latest report is shown for each feature. The referenced
+report is JSON with the same `id` and `results` as its manifest row. For a fixed
+revision, a dirty code or report path is refused instead of being mistaken for
+committed evidence. Every test case in an accepted mapping must have a result
+in the latest report.
+
+Each feature carries the complete chain: requirements, expected and actual
+workflow nodes and edges, code anchors, test cases and reports, issues,
+receipts, and accepted mappings. Receipt `evidence_ids` must resolve to typed
+evidence in that feature. Issue links are limited to HTTP(S).
 
 Build and then enforce the view with:
 

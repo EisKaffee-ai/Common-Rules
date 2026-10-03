@@ -36,7 +36,7 @@
           {"id": "WFN-FIXTURE-END", "code_anchor_ids": ["CODE-FIXTURE-END"], "status": "accepted"}
         ],
         "actual_edges": [
-          {"id": "WFE-FIXTURE-FLOW", "code_anchor_ids": ["CODE-FIXTURE-FILE"], "status": "accepted"}
+          {"id": "WFE-FIXTURE-FLOW", "from": "WFN-FIXTURE-START", "to": "WFN-FIXTURE-END", "code_anchor_ids": ["CODE-FIXTURE-FILE"], "status": "accepted"}
         ]
       },
       "code_anchors": [

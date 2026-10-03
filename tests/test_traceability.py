@@ -29,7 +29,11 @@ class TraceabilityTest(unittest.TestCase):
             encoding="utf-8",
         )
         (self.repo / "reports/latest.json").write_text(
-            json.dumps({"runner": "unittest", "status": "passed"}), encoding="utf-8"
+            json.dumps({
+                "id": "REPORT-PHOTO-IMPORT-20261003",
+                "runner": "unittest",
+                "results": [{"test_case_id": "TEST-PHOTO-IMPORT", "status": "passed"}],
+            }), encoding="utf-8"
         )
         self._git("init", "-q")
         self._git("config", "user.email", "test@example.invalid")
@@ -106,6 +110,8 @@ class TraceabilityTest(unittest.TestCase):
                         "actual_edges": [
                             {
                                 "id": "WFE-IMPORT-STORE",
+                                "from": "WFN-IMPORT",
+                                "to": "WFN-STORE",
                                 "code_anchor_ids": ["CODE-FLOW"],
                                 "status": "accepted",
                             }
@@ -194,6 +200,13 @@ class TraceabilityTest(unittest.TestCase):
             json.dumps(self.manifest, indent=2) + "\n", encoding="utf-8"
         )
 
+    def _rebind_revision(self):
+        self.revision = self._git("rev-parse", "HEAD").stdout.strip()
+        self.manifest["repositories"][0]["revision"] = self.revision
+        for anchor in self.manifest["features"][0]["code_anchors"]:
+            anchor["revision"] = self.revision
+        self.manifest["features"][0]["test_reports"][0]["revision"] = self.revision
+
     def invoke(self, subcommand="check"):
         return subprocess.run(
             [str(COMMAND), subcommand, "--project", str(self.project)],
@@ -249,6 +262,14 @@ class TraceabilityTest(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("WFE-IMPORT-STORE: expected workflow edge has no accepted implementation", result.stdout)
 
+    def test_actual_edge_endpoints_must_match_expected(self):
+        edge = self.manifest["features"][0]["workflow"]["actual_edges"][0]
+        edge["from"], edge["to"] = "WFN-STORE", "WFN-IMPORT"
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("WFE-IMPORT-STORE: actual endpoints do not match expected workflow", result.stdout)
+
     def test_ai_proposed_mapping_never_counts_as_accepted_evidence(self):
         self.manifest["features"][0]["workflow"]["actual_edges"][0]["status"] = "proposed_ai"
         self.manifest["features"][0]["mappings"][0]["status"] = "proposed_ai"
@@ -275,6 +296,80 @@ class TraceabilityTest(unittest.TestCase):
         result = self.invoke()
         self.assertEqual(1, result.returncode)
         self.assertIn("REPORT-PHOTO-IMPORT-20261003: report path is outside repository app", result.stdout)
+
+    def test_fixed_revision_rejects_dirty_code_anchor_and_report(self):
+        with (self.repo / "src/flow.py").open("a", encoding="utf-8") as handle:
+            handle.write("\ndef ghost_symbol():\n    return True\n")
+        (self.repo / "reports/latest.json").write_text("not json", encoding="utf-8")
+        self.manifest["features"][0]["code_anchors"][0]["symbol"] = "ghost_symbol"
+        self._write_manifest()
+        result = self.invoke("build")
+        self.assertEqual(1, result.returncode)
+        self.assertIn("CODE-IMPORT: evidence differs from revision", result.stdout)
+        self.assertIn("REPORT-PHOTO-IMPORT-20261003: evidence differs from revision", result.stdout)
+
+    def test_fixed_revision_rejects_ignored_untracked_report(self):
+        (self.repo / ".gitignore").write_text("reports/ignored.json\n", encoding="utf-8")
+        self._git("add", ".gitignore")
+        self._git("commit", "-qm", "ignore generated report")
+        self._rebind_revision()
+        ignored = self.repo / "reports/ignored.json"
+        ignored.write_text(json.dumps({
+            "id": "REPORT-PHOTO-IMPORT-20261003",
+            "results": [{"test_case_id": "TEST-PHOTO-IMPORT", "status": "passed"}],
+        }), encoding="utf-8")
+        self.manifest["features"][0]["test_reports"][0]["path"] = "reports/ignored.json"
+        self._write_manifest()
+        result = self.invoke("build")
+        self.assertEqual(1, result.returncode)
+        self.assertIn("REPORT-PHOTO-IMPORT-20261003: evidence differs from revision", result.stdout)
+
+    def test_report_results_must_match_revision_bound_report_file(self):
+        (self.repo / "reports/latest.json").write_text("not json", encoding="utf-8")
+        self._git("add", "reports/latest.json")
+        self._git("commit", "-qm", "broken report")
+        self._rebind_revision()
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("REPORT-PHOTO-IMPORT-20261003: report file is not valid JSON", result.stdout)
+
+    def test_latest_report_covers_each_mapped_test_case(self):
+        feature = self.manifest["features"][0]
+        feature["test_cases"].append({
+            "id": "TEST-PHOTO-METADATA",
+            "requirement_ids": ["REQ-PHOTO-IMPORT"],
+            "code_anchor_ids": ["CODE-IMPORT"],
+        })
+        feature["mappings"][0]["test_case_ids"].append("TEST-PHOTO-METADATA")
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("TEST-PHOTO-METADATA: accepted mapping has no result in latest test report", result.stdout)
+
+    def test_feature_requires_complete_typed_evidence_chain(self):
+        self.manifest["features"] = [{"id": "FEAT-EMPTY", "title": "No evidence"}]
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        for layer in ("requirements", "expected workflow nodes", "expected workflow edges",
+                      "actual workflow nodes", "actual workflow edges", "code anchors",
+                      "test cases", "test reports", "issues", "receipts", "mappings"):
+            self.assertIn(f"FEAT-EMPTY: {layer} must be a non-empty list of objects", result.stdout)
+
+    def test_receipt_evidence_ids_must_resolve(self):
+        self.manifest["features"][0]["receipts"][0]["evidence_ids"] = ["REPORT-DOES-NOT-EXIST"]
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("RECEIPT-PHOTO-IMPORT: unknown evidence_ids reference REPORT-DOES-NOT-EXIST", result.stdout)
+
+    def test_issue_url_rejects_unsafe_scheme(self):
+        self.manifest["features"][0]["issues"][0]["url"] = "javascript:alert(1)"
+        self._write_manifest()
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("ISSUE-PHOTO-IMPORT: url must use http or https", result.stdout)
 
     def test_all_configured_repositories_are_scanned(self):
         self.manifest["repositories"].append(

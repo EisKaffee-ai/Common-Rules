@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
+from urllib.parse import urlparse
 
 
 MANIFEST = "docs/common-rules/traceability.json"
@@ -127,6 +128,22 @@ def _scan(root: Path, include: list[str], exclude: list[str]) -> set[str]:
     return files
 
 
+def _evidence_differs(repo: Repository, rel: str) -> bool:
+    """A fixed revision never borrows evidence from a dirty worktree."""
+    if repo.revision == "WORKING" or repo.root is None:
+        return False
+    run = subprocess.run(
+        ["git", "show", f"{repo.revision}:{rel}"],
+        cwd=repo.root, capture_output=True,
+    )
+    if run.returncode != 0:
+        return True
+    try:
+        return (repo.root / rel).read_bytes() != run.stdout
+    except OSError:
+        return True
+
+
 def _record_id(
     findings: list[str], seen: dict[str, str], kind: str, row: dict[str, Any]
 ) -> str | None:
@@ -197,6 +214,8 @@ def _anchor(
     if not path.is_file():
         findings.append(f"{anchor_id}: {repo.id}:{rel} does not exist")
         return "broken", "unknown"
+    if _evidence_differs(repo, rel):
+        findings.append(f"{anchor_id}: evidence differs from revision {repo.revision}")
     modes = [name for name in ("symbol", "region", "whole_file") if row.get(name)]
     if len(modes) != 1:
         findings.append(f"{anchor_id}: choose exactly one of symbol, region, or whole_file")
@@ -295,18 +314,25 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
         before = len(findings)
         feature_id = _record_id(findings, seen, "feature", source) or "feature"
         title = source.get("title") if isinstance(source.get("title"), str) else feature_id
-        requirements = _objects(source.get("requirements"))
+        def required_rows(container: dict[str, Any], key: str, label: str) -> list[dict[str, Any]]:
+            raw = container.get(key)
+            rows = _objects(raw)
+            if not isinstance(raw, list) or not rows or len(rows) != len(raw):
+                findings.append(f"{feature_id}: {label} must be a non-empty list of objects")
+            return rows
+
+        requirements = required_rows(source, "requirements", "requirements")
         workflow = source.get("workflow") if isinstance(source.get("workflow"), dict) else {}
-        expected_nodes = _objects(workflow.get("expected_nodes"))
-        expected_edges = _objects(workflow.get("expected_edges"))
-        actual_nodes = _objects(workflow.get("actual_nodes"))
-        actual_edges = _objects(workflow.get("actual_edges"))
-        anchors = _objects(source.get("code_anchors"))
-        test_cases = _objects(source.get("test_cases"))
-        reports = _objects(source.get("test_reports"))
-        issues = _objects(source.get("issues"))
-        receipts = _objects(source.get("receipts"))
-        mappings = _objects(source.get("mappings"))
+        expected_nodes = required_rows(workflow, "expected_nodes", "expected workflow nodes")
+        expected_edges = required_rows(workflow, "expected_edges", "expected workflow edges")
+        actual_nodes = required_rows(workflow, "actual_nodes", "actual workflow nodes")
+        actual_edges = required_rows(workflow, "actual_edges", "actual workflow edges")
+        anchors = required_rows(source, "code_anchors", "code anchors")
+        test_cases = required_rows(source, "test_cases", "test cases")
+        reports = required_rows(source, "test_reports", "test reports")
+        issues = required_rows(source, "issues", "issues")
+        receipts = required_rows(source, "receipts", "receipts")
+        mappings = required_rows(source, "mappings", "mappings")
 
         ids: dict[str, set[str]] = {}
         for kind, rows in (
@@ -326,6 +352,7 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
         expected_edge_ids = ids["workflow edge"]
         accepted_nodes: set[str] = set()
         accepted_edges: set[str] = set()
+        expected_edges_by_id = {row.get("id"): row for row in expected_edges}
         for kind, rows, valid, accepted in (
             ("node", actual_nodes, expected_node_ids, accepted_nodes),
             ("edge", actual_edges, expected_edge_ids, accepted_edges),
@@ -336,6 +363,11 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
                     findings.append(f"{row_id or 'actual workflow row'}: actual workflow {kind} is not expected")
                     continue
                 _refs(findings, str(row_id), row, "code_anchor_ids", ids["code anchor"])
+                if kind == "edge" and row_id in expected_edges_by_id:
+                    expected = expected_edges_by_id[row_id]
+                    if row.get("from") != expected.get("from") or row.get("to") != expected.get("to"):
+                        findings.append(f"{row_id}: actual endpoints do not match expected workflow")
+                        continue
                 if row.get("status") == "accepted":
                     accepted.add(str(row_id))
                 elif row.get("status") == "proposed_ai":
@@ -373,6 +405,21 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
                     findings.append(f"{row_id}: report path is outside repository {repo.id}")
                 elif not _safe_rel(rel) or rel not in repo.files or report_path is None or not report_path.is_file():
                     findings.append(f"{row_id}: report path is missing from the configured repository scan")
+                else:
+                    if _evidence_differs(repo, rel):
+                        findings.append(f"{row_id}: evidence differs from revision {repo.revision}")
+                    try:
+                        report_data = json.loads(report_path.read_text(encoding="utf-8"))
+                    except (OSError, ValueError, UnicodeError):
+                        findings.append(f"{row_id}: report file is not valid JSON")
+                    else:
+                        if not isinstance(report_data, dict):
+                            findings.append(f"{row_id}: report file root must be an object")
+                        else:
+                            if report_data.get("id") != row.get("id"):
+                                findings.append(f"{row_id}: report file id does not match manifest")
+                            if _canonical(report_data.get("results")) != _canonical(row.get("results")):
+                                findings.append(f"{row_id}: manifest results do not match report file")
             generated = _parse_time(row.get("generated_at"))
             if generated is None:
                 findings.append(f"{row_id}: generated_at must be an ISO timestamp")
@@ -385,6 +432,23 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
                 if result.get("status") not in ("passed", "failed", "skipped"):
                     findings.append(f"{row_id}: test result status must be passed, failed, or skipped")
             report_view.append({**row, "_time": generated})
+
+        evidence_ids = ids["code anchor"] | ids["test case"] | ids["test report"] | ids["issue"]
+        for row in receipts:
+            row_id = str(row.get("id") or "receipt")
+            _refs(findings, row_id, row, "evidence_ids", evidence_ids)
+
+        for row in issues:
+            row_id = str(row.get("id") or "issue")
+            parsed = urlparse(row.get("url") if isinstance(row.get("url"), str) else "")
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                findings.append(f"{row_id}: url must use http or https")
+
+        latest = max(
+            report_view,
+            key=lambda row: row["_time"].timestamp() if row.get("_time") else float("-inf"),
+            default=None,
+        )
 
         accepted_mapping_ids: list[str] = []
         accepted_coverage = {kind: set() for kind in (
@@ -413,12 +477,13 @@ def analyze(project: Path, manifest_path: Path | None = None) -> Analysis:
         for kind in accepted_coverage:
             for missing in sorted(ids[kind] - accepted_coverage[kind]):
                 findings.append(f"{missing}: {kind} has no accepted end-to-end mapping")
-
-        latest = max(
-            report_view,
-            key=lambda row: row["_time"].timestamp() if row.get("_time") else float("-inf"),
-            default=None,
-        )
+        latest_test_ids = {
+            result.get("test_case_id")
+            for result in _objects(latest.get("results") if latest else None)
+            if isinstance(result.get("test_case_id"), str)
+        }
+        for missing in sorted(accepted_coverage["test case"] - latest_test_ids):
+            findings.append(f"{missing}: accepted mapping has no result in latest test report")
         feature_findings = findings[before:]
         features.append({
             "id": feature_id, "title": title, "requirements": requirements,

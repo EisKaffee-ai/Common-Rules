@@ -15,6 +15,11 @@ all states, counts, digests and output, and check mode refuses broken evidence
 or stale generated HTML. There is no runtime AI dependency. Existing projects
 are unchanged until they add a reviewed manifest and invoke the command.
 
+Independent review added fixed-revision dirty-worktree refusal, actual-edge
+topology comparison, report-file/result verification, latest-report coverage,
+complete evidence-chain validation, receipt-reference validation, and safe
+HTTP(S)-only issue links before release.
+
 # 1.10.3 — Canonical project tracker and proposal issues — 3 October 2026
 
 Versions 1.10.0 through 1.10.2 were internal candidates. The class-level

@@ -1,4 +1,7 @@
 {
+  "id": "REPORT-FIXTURE-20261003",
   "runner": "unittest",
-  "status": "passed"
+  "results": [
+    {"test_case_id": "TEST-FIXTURE", "status": "passed"}
+  ]
 }
