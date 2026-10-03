@@ -10,6 +10,7 @@ import argparse
 import json
 import math
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -153,7 +154,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     root = Path(args.project).resolve()
     report = measure_root(root)
-    baseline = measure_git_ref(root, args.compare_ref) if args.compare_ref else None
+    try:
+        baseline = measure_git_ref(root, args.compare_ref) if args.compare_ref else None
+    except subprocess.CalledProcessError:
+        print(f"context-budget: cannot read git ref {args.compare_ref!r}", file=sys.stderr)
+        return 2
     print(json.dumps({"current": report, "baseline": baseline}, indent=2) if args.json else markdown(report, baseline), end="")
     if args.check and report["discovery"]["estimated_tokens"] > args.max_discovery_tokens:
         print(f"context-budget: discovery estimate exceeds {args.max_discovery_tokens} tokens")

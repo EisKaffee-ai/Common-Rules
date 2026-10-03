@@ -38,7 +38,7 @@ proposal-issue procedure is an on-demand tracker reference, and the release
 gate refuses discovery above 650 estimated tokens. Reproduce the receipt with:
 
 ```sh
-./bin/context-budget --compare-ref v1.9.0
+./bin/context-budget --compare-ref 7ce6ff2  # Common Rules 1.9.0
 ./bin/context-budget --json --check
 ```
 

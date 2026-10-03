@@ -168,7 +168,7 @@ them.
 Reproduce the analysis or enforce the 650-token discovery budget:
 
 ```sh
-./bin/context-budget --compare-ref origin/main
+./bin/context-budget --compare-ref 7ce6ff2  # Common Rules 1.9.0
 ./bin/context-budget --json --check
 ```
 

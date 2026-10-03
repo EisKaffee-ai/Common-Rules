@@ -28,6 +28,15 @@ class ContextBudgetTest(unittest.TestCase):
         self.assertIn("current", data)
         self.assertIn("estimated_tokens", data["current"]["discovery"])
 
+    def test_unknown_comparison_ref_is_a_named_refusal(self):
+        result = subprocess.run(
+            [str(ROOT / "bin/context-budget"), "--compare-ref", "not-a-real-ref"],
+            text=True, capture_output=True,
+        )
+        self.assertEqual(2, result.returncode)
+        self.assertIn("cannot read git ref", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
     def test_readme_explains_estimate_not_ram(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         report = measure_root(ROOT)
