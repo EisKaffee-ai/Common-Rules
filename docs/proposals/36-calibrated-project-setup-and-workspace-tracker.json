@@ -232,7 +232,7 @@
         "C-06",
         "C-07"
       ],
-      "status": "in testing",
+      "status": "in review",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -308,6 +308,13 @@
           "by": "session:codex",
           "evidence": "GitHub Actions run 37102371621: version-check saw changelog changes after the 1.8.0 marker; PR https://github.com/EisKaffee-ai/Common-Rules/pull/3; bump and final gate in progress",
           "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "Common Rules 1.9.0 passed the final local release gate",
+          "by": "session:codex",
+          "evidence": "candidate commits 1d7f898 and 4920996; version policy, workflow stamp, Claude validation and 54 focused tests green; complete suite 2042 tests OK in 307.6s; PR #3 CI rerun pending",
+          "status": "in review"
         }
       ]
     },
@@ -548,7 +555,7 @@
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: 1.8.0 precursor gate passed; semantic-version policy requires the 1.9.0 minor candidate after the mandatory changelog update; independent review and publication pending",
+      "receipt_or_refusal": "receipt: candidate commits 1d7f898 and 4920996; VERSION 1.9.0; version policy, workflow stamp, Claude validation and 54 focused tests green; complete suite 2042 tests OK in 307.6s; independent review and publication pending",
       "owner": "lead",
       "status": "in review"
     },

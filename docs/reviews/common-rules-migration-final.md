@@ -40,6 +40,9 @@ merge, select a default branch, create a release, or change either repository.
   tests in 186.3 seconds. The reviewer-audit changelog update required the
   next candidate and a new final gate before publication. Because the change
   is mandatory, semantic-version policy selects 1.9.0.
+- Candidate commits `1d7f898` and `4920996` passed the final local 1.9.0 gate:
+  version policy, workflow stamp and Claude validation were green, followed by
+  2,042 tests in 307.6 seconds. Remote branch and CI confirmation remain.
 
 ## Remaining publication boundary
 
