@@ -45,6 +45,14 @@ hook output and the never-default full-package ceiling. `bin/context-budget
 --json --check` enforces the 650-token discovery budget and explicitly reports
 context estimates rather than process RAM.
 
+The parallel unittest gate now accelerates its first run as well as warmed
+runs. Large files are split by test class before duration data exists, and an
+older coarse cache is refined into class-level timings. The 124-test warmup
+hotspot fell from the previously documented 575-second floor to 174.6 seconds
+on the release host; an all-suite scheduling run reached 2,065 tests in 181.6
+seconds before reporting its named environment/checkpoint findings. Coverage
+and aggregate failure detection are unchanged.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

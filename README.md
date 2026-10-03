@@ -172,6 +172,18 @@ Reproduce the analysis or enforce the 650-token discovery budget:
 ./bin/context-budget --json --check
 ```
 
+### Faster release checks
+
+The full unittest gate uses every available worker without dropping tests.
+Large test files split by class even on a cold checkout, then measured shard
+durations improve later scheduling. In the 1.10.0 release checkout, the
+124-test warmup hotspot fell from the previously documented 575-second floor
+to 174.6 seconds (about 70% faster). Run the same aggregated gate with:
+
+```sh
+./bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q
+```
+
 ## Calibrate each project
 
 The setup skill inspects the repository before it asks questions. It identifies

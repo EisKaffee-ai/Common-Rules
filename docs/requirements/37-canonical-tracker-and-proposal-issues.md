@@ -84,6 +84,10 @@ commits and the ledger remains authoritative.
   optional references, hook output and the full-package ceiling. The README
   publishes reproducible byte/token estimates, identifies them as context—not
   process RAM—and a release check caps idle discovery at 650 estimated tokens.
+- **CR37-R23 — Fast full gate.** The full unittest gate retains every discovered
+  test while sharding large files at class granularity on a cold checkout and
+  reusing measured shard durations later. The release records both total test
+  count and wall time; scheduling changes must preserve the aggregate verdict.
 
 ## Vanilla acceptance fixture
 

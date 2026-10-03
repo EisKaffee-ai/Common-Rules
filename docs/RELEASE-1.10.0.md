@@ -45,6 +45,15 @@ gate refuses discovery above 650 estimated tokens. Reproduce the receipt with:
 Counts use the documented, tokenizer-independent estimate of UTF-8 bytes / 4,
 rounded up. They are not process RAM or provider billing telemetry.
 
+## Test-gate performance
+
+The first parallel run no longer waits for one whole slow file merely to learn
+its duration. Large files are split by test class on a cold checkout and later
+runs reuse measured shard timings. On the release host, all 124 warmup tests
+completed in 174.6 seconds versus the previously documented 575-second floor,
+about 70% faster. The aggregate runner still reports the complete test count,
+failures and errors and preserves the underlying exit code.
+
 ## Acceptance fixture
 
 The read-only EisKaffee Vanilla catalogue contains 27 proposal groups, 59

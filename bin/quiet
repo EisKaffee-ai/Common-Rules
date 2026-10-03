@@ -399,18 +399,42 @@ def _plan_units(files: list[Path], durations: dict, jobs: int) -> list["Unit"]:
     "Too slow" is measured against the only target that matters: the wall
     clock a perfectly balanced run would reach, which is the total known
     work divided by the number of processes. A file above that target is
-    the run's floor, so it is cut into ceil(duration / target) groups. With
-    a cold cache nothing is split -- there is no evidence yet to act on,
-    and the first run writes the timings the next one uses.
+    the run's floor, so it is cut into ceil(duration / target) groups.
+
+    A cold release checkout cannot wait for one full serial-by-file run merely
+    to learn the obvious hotspots. With no timings, a file containing at least
+    eight test classes is split one class per unit. This is a scheduling hint
+    only: every class still runs exactly once, and the measured cache replaces
+    the hint after the first completed run. If an older cache contains coarse
+    multi-class units, one run refines them to class-level timings instead of
+    preserving a known multi-minute floor.
     """
     known = {f: _file_duration(f, durations) for f in files}
     timed = [d for d in known.values() if d > 0]
-    if jobs < 2 or not timed:
+    if jobs < 2:
         return [Unit(f) for f in files]
+    if not timed:
+        units: list[Unit] = []
+        for f in files:
+            classes = _test_classes(f)
+            if len(classes) < 8:
+                units.append(Unit(f))
+                continue
+            units.extend(Unit(f, [c]) for c in classes)
+        return units
     target = sum(timed) / jobs
     units: list[Unit] = []
     for f in files:
         d = known[f]
+        prefix = f"{f.name}::"
+        cached_groups = [k[len(prefix):].split("+") for k in durations if k.startswith(prefix)]
+        if cached_groups and any(len(group) > 1 for group in cached_groups):
+            classes = list(dict.fromkeys(c for group in cached_groups for c in group))
+            units.extend(Unit(f, [c]) for c in classes)
+            continue
+        if cached_groups and all(len(group) == 1 for group in cached_groups):
+            units.extend(Unit(f, group) for group in cached_groups)
+            continue
         if d <= target or target <= 0:
             units.append(Unit(f))
             continue

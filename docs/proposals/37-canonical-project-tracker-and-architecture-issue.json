@@ -76,6 +76,15 @@
           "evidence": "83 focused tests OK; read-only Docs preview selected content/proposal/delivery/docs/proposals with 27 ledgers and complete ledger-to-github proposal contract; Docs git status unchanged",
           "status": "in review"
         }
+      ],
+      "parts": [
+        {
+          "id": "T-01.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
       ]
     },
     {
@@ -111,6 +120,15 @@
           "by": "session:codex",
           "evidence": "25 sync tests OK; read-only 27-ledger fixture plan reports 27 groups, 59 features and 362 checkboxes; Proposal 08 reuses issue #2; digest 675fb35b8cda42e6ae9300c4c0dc7959e427b23e8d280bbbc0d108935545c09d",
           "status": "in review"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-02.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
         }
       ]
     },
@@ -178,6 +196,15 @@
           "evidence": "102 board, architecture, workspace and history tests OK after final integration; five views remain one canonical page",
           "status": "in review"
         }
+      ],
+      "parts": [
+        {
+          "id": "T-03.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
       ]
     },
     {
@@ -214,6 +241,15 @@
           "evidence": "18 plugin, skill, proposal-issue and context-budget tests OK; full-set preflight, integrated provider boundary, explicit write-back and one-way reconciliation are documented",
           "status": "in review"
         }
+      ],
+      "parts": [
+        {
+          "id": "T-04.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
       ]
     },
     {
@@ -241,13 +277,32 @@
         "T-03",
         "T-04"
       ],
-      "status": "not started",
+      "status": "blocked",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
       "owner": "lead",
       "issue": null,
-      "log": []
+      "log": [
+        {
+          "at": "2026-10-03T12:09:50+02:00",
+          "event": "read-only acceptance exposed downstream adoption gap",
+          "by": "session:codex",
+          "evidence": "27 ledgers and one canonical workspace tracker validate; GitHub exposes exactly 27 architecture issues including Proposal 08 issue #2; Docs adoption branch lacks complete issue contract and source ledgers have empty traceability arrays, so doctor/tracecheck cannot pass yet",
+          "status": "blocked"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-05.A",
+          "title": "Real Docs adoption and acceptance receipt",
+          "share": 100,
+          "status": "blocked",
+          "owner": "lead",
+          "risk": "high",
+          "risk_reason": "Depends on independently committed Docs manifest, traceability and build receipt."
+        }
+      ]
     },
     {
       "id": "T-06",
@@ -264,14 +319,17 @@
         "bin/context-budget",
         "tools/context_budget.py",
         "tests/test_context_budget.py",
+        "bin/quiet",
+        "tests/test_quiet.py",
         "docs/RELEASE-1.10.0.md"
       ],
       "tests": [
         "bin/context-budget --json --check",
+        "python3 -m unittest -q tests.test_context_budget tests.test_quiet",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
         "claude plugin validate .",
-        "python3 -m unittest discover -s tests -q"
+        "bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q"
       ],
       "done": "The 1.10.0 candidate publishes reproducible context-load analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
       "depends": [
@@ -281,7 +339,7 @@
         "T-04",
         "T-05"
       ],
-      "status": "not started",
+      "status": "in progress",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -293,6 +351,24 @@
           "event": "release scope expanded with measured context budget",
           "by": "session:codex",
           "evidence": "A-04 maps to CR37-R22; measured discovery reduced from 849 to 627 estimated tokens and README records methodology and layers"
+        },
+        {
+          "at": "2026-10-03T12:09:50+02:00",
+          "event": "release candidate and fast full-gate optimization in progress",
+          "by": "session:codex",
+          "evidence": "Context budget 627 estimated idle tokens; warmup hotspot 124 tests completes in 174.6s versus documented 575s floor; full suite scheduling completes 2,065 tests in 181.6s before named environment/checkpoint findings",
+          "status": "in progress"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-06.A",
+          "title": "Release gates, review and publication",
+          "share": 100,
+          "status": "in progress",
+          "owner": "lead",
+          "risk": "high",
+          "risk_reason": "Version publication changes the shared plugin consumed by all adopters."
         }
       ]
     }
@@ -426,7 +502,8 @@
       "item": "T-06",
       "requirement_ids": [
         "CR37-R21",
-        "CR37-R22"
+        "CR37-R22",
+        "CR37-R23"
       ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#acceptance-evidence",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#context-budget",
@@ -436,11 +513,13 @@
         "README.md",
         "bin/context-budget",
         "tools/context_budget.py",
+        "bin/quiet",
         "plugin.json",
         ".claude-plugin/plugin.json"
       ],
       "tests_commands": [
         "bin/context-budget --json --check",
+        "python3 -m unittest -q tests.test_context_budget tests.test_quiet",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
         "python3 -m unittest discover -s tests -q"
@@ -492,6 +571,17 @@
       "state": "became-item",
       "source": "chat",
       "note": "Release 1.10.0 must include measured context-loading analysis, optimization and README documentation before publication."
+    },
+    {
+      "id": "A-05",
+      "at": "2026-10-03T11:49:21+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "And optimize the test run time. Move fast.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Release 1.10.0 must reduce full-gate wall time without reducing coverage and publish timing evidence."
     }
   ],
   "proposed_changes": [],

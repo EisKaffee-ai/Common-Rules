@@ -159,3 +159,12 @@ UTF-8-bytes/4 token estimate, emits Markdown or JSON, compares a Git revision,
 and fails release verification above the idle discovery budget. The proposal
 issue mutation playbook remains a tracker reference so setup, warmup, and
 ordinary tracker sessions do not pay for it.
+
+## Test gate budget
+
+`bin/quiet --jobs auto` continues to run every unittest but removes the
+slowest-file floor. On a cold checkout, files with at least eight test classes
+become one unit per class; after a completed run, cached durations order proven
+slow units first. Coarse caches from older releases are refined once instead of
+preserving multi-minute groups. The aggregated log remains unittest-shaped, so
+the same exit-code and failure-summary checks decide the gate.

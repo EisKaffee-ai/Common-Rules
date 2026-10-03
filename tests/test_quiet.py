@@ -476,12 +476,30 @@ class TestPlanUnits(unittest.TestCase):
         p.write_text("\n".join(body) + "\n")
         return p
 
-    def test_a_cold_cache_splits_nothing(self):
-        slow = self.write("test_slow.py", ["TestA", "TestB", "TestC", "TestD"])
+    def test_a_cold_cache_splits_large_files_without_a_calibration_run(self):
+        slow = self.write("test_slow.py", [f"Test{n}" for n in range(12)])
         fast = self.write("test_fast.py", ["TestE"])
         units = quiet._plan_units([fast, slow], {}, jobs=4)
-        self.assertEqual([u.classes for u in units], [[], []],
-                         "with no timings there is no evidence to split on")
+        fast_units = [u for u in units if u.path.name == "test_fast.py"]
+        slow_units = [u for u in units if u.path.name == "test_slow.py"]
+        self.assertEqual([u.classes for u in fast_units], [[]])
+        self.assertEqual(12, len(slow_units))
+        got = [c for u in slow_units for c in u.classes]
+        self.assertEqual(sorted(f"Test{n}" for n in range(12)), sorted(got))
+        self.assertEqual(len(got), len(set(got)))
+
+    def test_a_cold_cache_keeps_small_files_whole(self):
+        small = self.write("test_small.py", [f"Test{n}" for n in range(7)])
+        units = quiet._plan_units([small], {}, jobs=4)
+        self.assertEqual([[]], [u.classes for u in units])
+
+    def test_a_coarse_cache_is_refined_to_one_class_per_unit(self):
+        slow = self.write("test_slow.py", ["TestA", "TestB", "TestC", "TestD"])
+        durations = {"test_slow.py::TestA+TestB": 300.0,
+                     "test_slow.py::TestC+TestD": 200.0}
+        units = quiet._plan_units([slow], durations, jobs=4)
+        self.assertEqual([["TestA"], ["TestB"], ["TestC"], ["TestD"]],
+                         [u.classes for u in units])
 
     def test_the_slow_file_is_split_and_the_others_are_not(self):
         slow = self.write("test_slow.py", ["TestA", "TestB", "TestC", "TestD"])
