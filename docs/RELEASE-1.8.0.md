@@ -1,8 +1,8 @@
-# Common Rules 1.7.0 release candidate
+# Common Rules 1.8.0 release candidate
 
 ## Outcome
 
-Version 1.7.0 turns the accepted calibrated-project proposal into an opt-in
+Version 1.8.0 turns the accepted calibrated-project proposal into an opt-in
 release surface:
 
 - `bin/project-setup` discovers, previews, applies and diagnoses a repository
@@ -18,6 +18,9 @@ release surface:
   definitions make the workflow installable and its routing visible;
 - the visual-proposal skill keeps decision artifacts mobile-first and iterates
   them until sponsor acceptance.
+- the Common Rules landing page gives Codex and Claude Code native marketplace
+  setup, maps every lifecycle skill to worked examples, and replaces legacy
+  screenshots with current, accessible SVG explainers.
 
 Common Rules is now the tracker plugin. It supersedes the separate Emberline AI
 Tracker runtime while preserving its ledger data model and migration evidence.

@@ -65,6 +65,13 @@ impact visible as one coherent project.
   Code plugin through `.claude-plugin/plugin.json` and its marketplace,
   discovers the shared skills and hooks from Claude's standard layout, uses
   host-compatible plugin-root variables, and leaves unadopted projects alone.
+- **CR36-R21 — Current landing page.** The repository README uses only the
+  Common Rules identity, explains installation and first use for Codex and
+  Claude Code from the same repository, and replaces legacy screenshots with
+  accessible visuals for calibration, session context, traceability and the
+  joined multi-repository tracker. It catalogs every supported lifecycle skill
+  by user intent and gives practical single-repository, multi-repository and
+  failed-traceability examples without requiring the user to memorize commands.
 
 ## Acceptance evidence
 

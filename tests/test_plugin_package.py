@@ -40,6 +40,15 @@ class PluginPackageTest(unittest.TestCase):
         self.assertEqual("common-rules", entry["name"])
         self.assertEqual("./", entry["source"])
 
+    def test_openai_marketplace_installs_this_plugin(self):
+        market = json.loads((ROOT / ".agents/plugins/marketplace.json").read_text())
+        self.assertEqual("eiskaffee-common-rules", market["name"])
+        self.assertEqual("EisKaffee.ai Common Rules", market["interface"]["displayName"])
+        entry = market["plugins"][0]
+        self.assertEqual("common-rules", entry["name"])
+        self.assertEqual({"source": "local", "path": "./"}, entry["source"])
+        self.assertEqual("AVAILABLE", entry["policy"]["installation"])
+
     def test_hooks_are_noop_until_a_project_adopts_common_rules(self):
         with tempfile.TemporaryDirectory() as td:
             for action in ("doctor", "tracecheck"):

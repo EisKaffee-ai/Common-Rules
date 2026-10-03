@@ -6,12 +6,20 @@ and follow the same operating contract.
 
 ## Adoption path
 
-1. Copy or reference the shared rules from the adopting project.
-2. Seed the handoff, operating, proposal, and checkpoint files with
-   `bin/derecord` where appropriate.
-3. For AGENTS-first context, run `bin/install-agent-context --project PATH`; it installs warmup, reheat and preheat for both hosts without replacing hooks.
-4. Start with `/warmup` and confirm the tracker is valid.
+1. In Codex, add `EisKaffee-ai/Common-Rules` with
+   `codex plugin marketplace add` and install `common-rules` from the desktop
+   Plugins Directory. In Claude Code, use `claude plugin marketplace add`
+   followed by `claude plugin install common-rules@eiskaffee-common-rules`.
+2. Ask Codex to use the Common Rules setup skill, or run
+   `/common-rules:setup` in Claude Code.
+3. Review discovery and the proposed calibration. Confirm requirements,
+   tracker and workspace locations before applying the project manifest.
+4. Start a fresh work session with `/warmup` and confirm the tracker is valid.
 5. Use `/reheat` or `/preheat` when the same session needs a delta.
+
+`bin/install-agent-context --project PATH` remains available for legacy
+AGENTS-first context-only adoption. It does not replace the calibrated plugin
+setup for the full tracker lifecycle.
 
 See [Getting started](../GETTING-STARTED.md) for the short path and
 [`CLAUDE-workflow.md`](../../CLAUDE-workflow.md) for the full contract.

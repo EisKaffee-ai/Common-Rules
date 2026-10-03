@@ -210,12 +210,12 @@
       "id": "C-05",
       "phase": "C",
       "cx": "C4",
-      "title": "Release Common Rules 1.7.0",
+      "title": "Release Common Rules 1.8.0",
       "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.7.0.md"
+        "docs/RELEASE-1.8.0.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -228,9 +228,10 @@
         "C-02",
         "C-03",
         "C-04",
-        "C-06"
+        "C-06",
+        "C-07"
       ],
-      "status": "in review",
+      "status": "in testing",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -240,7 +241,7 @@
           "id": "C-05.A",
           "title": "Complete release verification and independent review",
           "share": 100,
-          "status": "in review",
+          "status": "in testing",
           "owner": "lead"
         }
       ],
@@ -279,6 +280,13 @@
           "by": "session:codex",
           "evidence": "VERSION 1.7.0; OpenAI and Claude manifests validate; migration remote proof green; version and workflow checks green; 2035 tests OK",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for the Common Rules landing page",
+          "by": "session:codex",
+          "evidence": "sponsor requested current Common Rules visuals and first-use instructions for Codex and Claude Code; repository policy requires the 1.8.0 minor release",
+          "status": "in testing"
         }
       ]
     },
@@ -327,6 +335,59 @@
           "by": "session:codex",
           "evidence": "3 histories, 320 source files, 7 source tags and the published release branch verified; 2035-test release gate green",
           "status": "in review"
+        }
+      ]
+    },
+    {
+      "id": "C-07",
+      "phase": "C",
+      "cx": "C2",
+      "title": "Common Rules landing page and host setup visuals",
+      "what": "Replace the legacy repository presentation with a current visual first-use path for Codex and Claude Code.",
+      "files": [
+        "README.md",
+        ".agents/plugins/marketplace.json",
+        "docs/GETTING-STARTED.md",
+        "docs/user-guide/04-claude-code-and-codex.md",
+        "docs/assets/product-overview.svg",
+        "docs/assets/host-setup.svg",
+        "docs/assets/skills-map.svg",
+        "docs/assets/warmup-reheat-hero.svg",
+        "docs/assets/delivery-lifecycle.svg",
+        "docs/assets/tracker-coherence.svg",
+        "docs/readme-preview.html",
+        "docs/warmup-reheat.html",
+        "docs/public-review.html"
+      ],
+      "tests": [
+        "tests/test_readme_landing.py",
+        "tests/test_plugin_package.py"
+      ],
+      "done": "The GitHub landing page uses only Common Rules identity, visually explains installation, calibration, session continuity, traceability and multi-repository tracking on both hosts, and maps every lifecycle skill to worked examples.",
+      "depends": [
+        "C-04"
+      ],
+      "status": "in testing",
+      "tier": "medium",
+      "model": "sonnet",
+      "tag": "[ruflo · medium · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "C-07.A",
+          "title": "Rewrite and visually verify the cross-host landing page",
+          "share": 100,
+          "status": "in testing",
+          "owner": "lead"
+        }
+      ],
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "landing page implementation in focused verification",
+          "by": "session:codex",
+          "evidence": "README identity, image, complete skill catalog, examples and host-install tests green; six current Common Rules SVG explainers and three HTML visual surfaces prepared",
+          "status": "in testing"
         }
       ]
     }
@@ -440,13 +501,13 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.7.0.md"
+        "docs/RELEASE-1.8.0.md"
       ],
       "tests_commands": [
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: OpenAI and Claude manifests validated; migration proof green; version and workflow checks green; 2035 tests OK; independent review pending",
+      "receipt_or_refusal": "receipt: 1.8.0 full release gate pending; independent review pending",
       "owner": "lead",
       "status": "in review"
     },
@@ -470,6 +531,36 @@
       "receipt_or_refusal": "receipt: 3 histories, 320 source files, 7 source tags and the published release branch verified; independent review pending",
       "owner": "lead",
       "status": "in review"
+    },
+    {
+      "id": "TR-07",
+      "item": "C-07",
+      "requirement_ids": [
+        "CR36-R21"
+      ],
+      "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
+      "architecture_section": "docs/design/36-calibrated-project-setup.md#repository-landing-page",
+      "implementation_files": [
+        "README.md",
+        ".agents/plugins/marketplace.json",
+        "docs/GETTING-STARTED.md",
+        "docs/user-guide/04-claude-code-and-codex.md",
+        "docs/assets/product-overview.svg",
+        "docs/assets/host-setup.svg",
+        "docs/assets/skills-map.svg",
+        "docs/assets/warmup-reheat-hero.svg",
+        "docs/assets/delivery-lifecycle.svg",
+        "docs/assets/tracker-coherence.svg",
+        "docs/readme-preview.html",
+        "docs/warmup-reheat.html",
+        "docs/public-review.html"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_readme_landing tests.test_plugin_package"
+      ],
+      "receipt_or_refusal": "receipt: focused README and plugin marketplace suites green; full release gate pending",
+      "owner": "lead",
+      "status": "in testing"
     }
   ],
   "asks": [
@@ -479,6 +570,26 @@
       "kind": "decision",
       "quote": "Accept proposal 2 and implement common rules to release a new version. Make a goal",
       "became": "C-01",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    },
+    {
+      "id": "A-02",
+      "at": "2026-10-03",
+      "kind": "feature",
+      "quote": "Also update the readme on the first page and the images that are there. They are still old of Emberline. They needs to be updated on how to use this for both codex and cloud.",
+      "became": "C-07",
+      "state": "became-item",
+      "by": "sponsor",
+      "source": "conversation"
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-03",
+      "kind": "question",
+      "quote": "There are more skills and how the use can use it all. With examples",
+      "became": "C-07",
       "state": "became-item",
       "by": "sponsor",
       "source": "conversation"

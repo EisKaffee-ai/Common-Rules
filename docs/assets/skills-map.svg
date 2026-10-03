@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1500" role="img" aria-labelledby="title desc">
+  <title id="title">Common Rules mobile-first skill map</title>
+  <desc id="desc">Common Rules groups setup, calibration, session context, decision, delivery, verification, repair, and handoff skills into one vertical workflow for Codex and Claude Code.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#09111f"/><stop offset="1" stop-color="#101d31"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#020617" flood-opacity=".45"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#94a3b8"/></marker>
+    <style>
+      .eyebrow{font:700 18px ui-sans-serif,system-ui;letter-spacing:3px;fill:#67e8f9}.title{font:800 48px ui-sans-serif,system-ui;fill:#f8fafc}.sub{font:400 23px ui-sans-serif,system-ui;fill:#bac7d9}.stage{font:800 18px ui-sans-serif,system-ui;letter-spacing:2px;fill:#09111f}.skill{font:750 25px ui-sans-serif,system-ui;fill:#f8fafc}.hint{font:400 19px ui-sans-serif,system-ui;fill:#aebdd0}.footer{font:700 20px ui-sans-serif,system-ui;fill:#dbeafe}.card{fill:#13233a;stroke:#324968;stroke-width:2}
+    </style>
+  </defs>
+  <rect width="900" height="1500" rx="34" fill="url(#bg)"/>
+  <text x="54" y="66" class="eyebrow">COMMON RULES · SKILLS BY INTENT</text>
+  <text x="54" y="126" class="title">Describe the outcome.</text>
+  <text x="54" y="180" class="title">A skill owns the gate.</text>
+  <text x="54" y="224" class="sub">Natural requests in Codex · direct commands in Claude Code</text>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="274" width="792" height="46" rx="23" fill="#67e8f9"/><text x="450" y="304" text-anchor="middle" class="stage">1 · ORIENT THE SESSION</text>
+    <rect x="54" y="340" width="382" height="130" rx="18" class="card"/><text x="78" y="379" class="skill">setup · calibrate</text><text x="78" y="413" class="hint">Map project shape and locations.</text><text x="78" y="443" class="hint">Preview before writing.</text>
+    <rect x="464" y="340" width="382" height="130" rx="18" class="card"/><text x="488" y="379" class="skill">warmup · reheat</text><text x="488" y="413" class="hint">Load truth or refresh the delta.</text><text x="488" y="443" class="hint">preheat is the reheat alias.</text>
+  </g>
+  <path d="M450 486V520" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="536" width="792" height="46" rx="23" fill="#a78bfa"/><text x="450" y="566" text-anchor="middle" class="stage">2 · FRAME THE DECISION</text>
+    <rect x="54" y="602" width="382" height="130" rx="18" class="card"/><text x="78" y="641" class="skill">intake</text><text x="78" y="675" class="hint">Preserve request and scope.</text><text x="78" y="705" class="hint">Relate it to existing work.</text>
+    <rect x="464" y="602" width="382" height="130" rx="18" class="card"/><text x="488" y="641" class="skill">visual-proposal</text><text x="488" y="675" class="hint">Show choices on a mobile page.</text><text x="488" y="705" class="hint">Iterate until acceptance.</text>
+  </g>
+  <path d="M450 748V782" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="798" width="792" height="46" rx="23" fill="#fbbf24"/><text x="450" y="828" text-anchor="middle" class="stage">3 · PLAN AND DELIVER</text>
+    <rect x="54" y="864" width="382" height="130" rx="18" class="card"/><text x="78" y="903" class="skill">plan-and-route</text><text x="78" y="937" class="hint">Requirements, design, owners.</text><text x="78" y="967" class="hint">Only after acceptance.</text>
+    <rect x="464" y="864" width="382" height="130" rx="18" class="card"/><text x="488" y="903" class="skill">tracker</text><text x="488" y="937" class="hint">Stages, dependencies, evidence.</text><text x="488" y="967" class="hint">One joined view across repos.</text>
+  </g>
+  <path d="M450 1010V1044" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="1060" width="792" height="46" rx="23" fill="#fb7185"/><text x="450" y="1090" text-anchor="middle" class="stage">4 · VERIFY, REPAIR, AND LAND</text>
+    <rect x="54" y="1126" width="246" height="142" rx="18" class="card"/><text x="76" y="1165" class="skill" font-size="22">review-and-verify</text><text x="76" y="1199" class="hint">Tests, trace, review.</text><text x="76" y="1229" class="hint">Prove before release.</text>
+    <rect x="327" y="1126" width="246" height="142" rx="18" class="card"/><text x="349" y="1165" class="skill">repair</text><text x="349" y="1199" class="hint">Fix the failed gate.</text><text x="349" y="1229" class="hint">Keep traceability.</text>
+    <rect x="600" y="1126" width="246" height="142" rx="18" class="card"/><text x="622" y="1165" class="skill">land-handoff</text><text x="622" y="1199" class="hint">Compatible revisions.</text><text x="622" y="1229" class="hint">Separate commits.</text>
+  </g>
+
+  <rect x="54" y="1316" width="792" height="126" rx="22" fill="#0c1728" stroke="#2b405d" stroke-width="2"/>
+  <text x="80" y="1358" class="footer">Codex</text><text x="192" y="1358" class="hint">“Use Common Rules to route this accepted proposal.”</text>
+  <text x="80" y="1405" class="footer">Claude</text><text x="192" y="1405" class="hint">/common-rules:plan-and-route</text>
+</svg>

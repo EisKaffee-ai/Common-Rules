@@ -1,6 +1,6 @@
 # Common Rules migration evidence
 
-Recorded 3 October 2026 for the Common Rules 1.7.0 release candidate.
+Recorded 3 October 2026 for the Common Rules 1.8.0 release candidate.
 
 ## Outcome
 
@@ -11,7 +11,7 @@ local-only development history, the source files, and the historical tags.
 
 ```text
 upstream/main              03e56ee ─┐
-upstream/w10-measured      b8a8b41 ─┼─► Common Rules 1.7.0 candidate
+upstream/w10-measured      b8a8b41 ─┼─► Common Rules 1.8.0 candidate
 local-source/w10-measured  7aefa56 ─┘
 ```
 
@@ -36,10 +36,11 @@ merge, select a default branch, create a release, or change either repository.
   rewriting source refs.
 - `bin/migration-check --remote` verified all 7 source tags and confirmed the
   Common Rules release branch matched the audited candidate.
-- The full 1.7.0 release gate passed 2,035 tests with 20 intentional skips.
+- The 1.7.0 precursor gate passed 2,035 tests with 20 intentional skips; the
+  landing-page change reopens the full gate for the 1.8.0 candidate.
 
 ## Remaining publication boundary
 
-Independent review, sponsor merge, default-branch choice, and the `v1.7.0`
+Independent review, sponsor merge, default-branch choice, and the `v1.8.0`
 release tag remain publication actions. This evidence does not claim that any
 of them has happened.

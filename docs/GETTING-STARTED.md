@@ -3,6 +3,29 @@
 EisKaffee.ai / Common Rules supplies a shared workflow for Claude Code and Codex projects.
 The repository name and existing paths remain `common-rules`.
 
+## Install the plugin
+
+Codex can register this repository as a marketplace source:
+
+```sh
+codex plugin marketplace add EisKaffee-ai/Common-Rules
+```
+
+Restart the ChatGPT desktop app, install `common-rules` from the
+**EisKaffee.ai Common Rules** source in the Plugins Directory, then ask Codex
+to use the Common Rules setup skill.
+
+Claude Code uses the same repository:
+
+```sh
+claude plugin marketplace add EisKaffee-ai/Common-Rules
+claude plugin install common-rules@eiskaffee-common-rules
+```
+
+Run `/common-rules:setup` in the adopting project. On either host, review the
+calibration preview before authorizing the manifest write. Installation does
+not imply hook trust or GitHub write access.
+
 ## Session commands
 
 In an adopting project's chat, use `/warmup` for a fresh session and `/reheat` or `/preheat`
@@ -14,7 +37,10 @@ See the [warm-up skill](../skills/warmup/SKILL.md),
 [preheat alias](../skills/preheat/SKILL.md), and
 [shared workflow](../CLAUDE-workflow.md) for setup and the operating contract.
 
-For AGENTS-first setup on both hosts, run `bin/install-agent-context --project PATH`. This includes the preheat alias and preserves existing rules. Full tracker adoption is a separate check.
+For the legacy AGENTS-first context-only setup on both hosts, run
+`bin/install-agent-context --project PATH`. This includes the preheat alias and
+preserves existing rules. The plugin setup above is the current full tracker
+adoption path.
 
 ## Keep the native goal and repository record aligned
 

@@ -123,6 +123,31 @@ Official platform references: [plugins](https://learn.chatgpt.com/docs/plugins),
 [plugin packaging](https://developers.openai.com/plugins/build/plugins), and
 [hooks](https://learn.chatgpt.com/docs/hooks).
 
+## Repository landing page
+
+The root README is the first-use path, not a migration archive. It names only
+Common Rules and shows six responsive SVG explanations in reading order:
+
+```text
+product model → host installation → skill routing → session continuity
+              → delivery lifecycle → tracker coherence
+```
+
+Codex uses `.agents/plugins/marketplace.json` and the Plugins Directory. Claude
+Code uses `.claude-plugin/marketplace.json` and its CLI or `/plugin` interface.
+Both install the same root plugin and then enter the calibrated setup lifecycle.
+Commands link to the current official host documentation. Historical identity
+and migration details remain in the changelog and release evidence, not on the
+landing page.
+
+The skill catalog is organized by user intent rather than implementation
+internals: orient (`setup`, `calibrate`, `warmup`, `reheat`), decide (`intake`,
+`visual-proposal`), deliver (`plan-and-route`, `tracker`), and verify/land
+(`review-and-verify`, `repair`, `land-handoff`). Each group includes a natural
+Codex request and the corresponding namespaced Claude Code command. Worked
+examples show one repository, a joined multi-repository project and a failed
+traceability gate.
+
 ## Release boundary
 
 This release adds contracts and tools. It does not create a two-way issue

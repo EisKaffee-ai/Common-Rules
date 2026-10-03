@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "common-rules",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "The Common Rules project tracker: calibrated setup, visual proposals, delivery lifecycle, traceability and coherent multi-repository tracking.",
   "author": {"name": "EisKaffee.ai"},
   "repository": "https://github.com/EisKaffee-ai/Common-Rules",
