@@ -87,6 +87,9 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 def main(argv: list[str]) -> int:
+    if "--project" in argv:
+        from tools.tracker import proposal_issues
+        return proposal_issues.main(argv)
     args = _parse_args(argv)
     ledger_path = args.ledger_path
     repo_args = ["--repo", args.repo] if args.repo else []

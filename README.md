@@ -9,7 +9,7 @@ without forcing them into one commit.
 
 ![Common Rules connects Codex and Claude Code to one calibrated project record, traceability graph, and tracker](docs/assets/product-overview.svg)
 
-[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.9.0](docs/RELEASE-1.9.0.md)
+[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.10.3](docs/RELEASE-1.10.3.md)
 
 ## What you get
 
@@ -24,6 +24,9 @@ without forcing them into one commit.
   compatible revisions instead of inventing a synthetic cross-repository commit.
 - **Portable lifecycle skills** — the same setup, intake, planning, verification,
   repair, and handoff language in OpenAI Codex and Claude Code.
+- **Deterministic automation** — shipped Python commands assign generated IDs,
+  calculate totals and digests, update ledgers, render pages, and verify
+  freshness; the AI supplies explicit inputs but never fabricates tracker state.
 
 ## Install the plugin
 
@@ -120,6 +123,22 @@ Common Rules routes that request through `calibrate`, `tracker`, and
 `review-and-verify`. The result is one joined project view, not one artificial
 commit.
 
+### Example: deterministic tracker updates
+
+```sh
+./bin/new-proposal --project /path/to/project "Export originals"
+./bin/tracker ask docs/proposals/NN-export-originals.json \
+  --kind feature --quote "Export the selected originals" --state open
+./bin/tracker board --project /path/to/project
+./bin/tracker board --project /path/to/project --check
+```
+
+The scripts choose generated IDs, validate the ledger before writing, render
+the tracker from source, and fail when the page is stale. An agent may prepare
+the quoted text or command arguments, but it does not type an ID, total,
+digest, issue mapping, or generated HTML into the repository. GitHub assigns
+issue numbers; Common Rules validates and records the returned identity.
+
 ### Example: a traceability failure
 
 ```text
@@ -130,6 +149,68 @@ engine file. Check whether the requirement, tests, and documentation must move.�
 `tracker` identifies the relationship, `review-and-verify` runs the gate, and
 `repair` proposes the smallest missing update or an explicit owner-reviewed
 no-change receipt. It never deletes the trace just to make the check pass.
+
+## Context footprint
+
+### Progressive loading, measured
+
+Common Rules is intentionally a skills-first plugin. Codex initially sees each
+skill's name, description, and path, then loads the full `SKILL.md` only when
+the request selects that workflow. Claude Code follows the same progressive
+pattern: descriptions at session start, full skill content when used. Hooks run
+outside the model context and cost zero context while idle unless they return
+output. See the official [OpenAI skills model](https://developers.openai.com/plugins/concepts/skills)
+and [Claude Code context-cost guide](https://code.claude.com/docs/en/features-overview#understand-context-costs).
+
+<!-- context-budget:start -->
+| Surface | UTF-8 bytes | Estimated tokens | What actually loads |
+|---|---:|---:|---|
+| Idle skill discovery (13 names, descriptions, paths) | 2,505 | 627 | Every session/request |
+| All `SKILL.md` files combined | 25,751 | 6,438 | Not together; only the selected skill is loaded |
+| Optional references | 3,225 | 807 | Only when the selected workflow needs one |
+| Full skill-package ceiling | 28,976 | 7,244 | Comparison ceiling; never the default load |
+| Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |
+<!-- context-budget:end -->
+
+The largest individual workflow is `warmup` at 12,465 bytes, approximately
+3,117 tokens. Its command also reports the project-specific files it reads, so
+that recovery cost remains visible rather than being confused with plugin load.
+The estimate is deliberately simple and reproducible—UTF-8 bytes divided by
+four, rounded up—and is **not process RAM** or model-tokenizer telemetry.
+
+This release shortened discovery descriptions without removing their trigger
+conditions: the conservative discovery estimate fell from 849 to 627 tokens,
+a 26% reduction. Detailed proposal-to-GitHub synchronization instructions live
+in an on-demand tracker reference, so unrelated tracker work does not load
+them.
+
+Reproduce the analysis or enforce the 650-token discovery budget:
+
+```sh
+./bin/context-budget --compare-ref 7ce6ff2  # Common Rules 1.9.0
+./bin/context-budget --json --check
+```
+
+### Faster release checks
+
+The full unittest gate uses every available worker without dropping tests.
+Large test files split by class even on a cold checkout, then measured shard
+durations improve later scheduling. In the 1.10.3 release checkout, the
+124-test warmup hotspot fell from the previously documented 575-second floor
+to 174.6 seconds (about 70% faster). The final release gate completed all 2,088 tests in 189.6 seconds. Run the same aggregated gate with:
+
+```sh
+./bin/quiet --label merge-gate --receipt <receipt.json> --jobs auto -- \
+  python3 -m unittest discover -s tests -q
+./bin/release-evidence --receipt <receipt.json> --write README.md \
+  --write CHANGELOG.md --write docs/RELEASE-1.10.3.md \
+  --ledger docs/proposals/37-canonical-project-tracker-and-architecture-issue.json
+```
+
+`release-evidence` accepts only a digest-verified receipt for the exact full
+merge-gate discovery command. It derives the count and elapsed time from that
+receipt and updates both public documentation and the canonical ledger through
+shipped Python, not copied or calculated by an agent.
 
 ## Calibrate each project
 

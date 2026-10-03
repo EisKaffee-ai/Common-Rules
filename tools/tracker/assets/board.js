@@ -3,6 +3,12 @@
   var $ = function(s, r){ return (r || document).querySelector(s); };
   var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var VIEWS = ["tree", "kanban", "board", "list"];
+  var INFORMATION_VIEWS = ["overview", "product-delivery", "architecture", "repositories", "evidence"];
+  var informationView = "overview";
+  try {
+    var savedInformationView = localStorage.getItem("tracker-information-view");
+    if (INFORMATION_VIEWS.indexOf(savedInformationView) >= 0) informationView = savedInformationView;
+  } catch (e) {}
   // proposal 30, P-11: one filter bar, at the top, governing all four views
   // (Tree/Kanban/Board/List) alike. State (view, every filter, the search
   // text and the Pending toggle) persists per viewer in localStorage --
@@ -37,6 +43,23 @@
         group: state.group, q: state.q, pending: state.pending, showFinished: state.showFinished
       }));
     } catch (e) {}
+  }
+  function applyInformationView(){
+    $$('[data-information-section]').forEach(function(section){
+      section.hidden = section.dataset.informationSection !== informationView;
+    });
+    $$('[data-information-view]').forEach(function(button){
+      button.setAttribute("aria-pressed", button.dataset.informationView === informationView ? "true" : "false");
+    });
+    $$('[data-product-controls]').forEach(function(controls){
+      controls.hidden = informationView !== "product-delivery";
+    });
+  }
+  function openInformationView(name){
+    if (INFORMATION_VIEWS.indexOf(name) < 0) return;
+    informationView = name;
+    try { localStorage.setItem("tracker-information-view", informationView); } catch (e) {}
+    applyInformationView();
   }
   // Pending hides everything terminal (done or deferred), at every level, and always wins
   // over "Show finished" -- the two controls can never disagree because
@@ -257,6 +280,10 @@
   $("#q").addEventListener("input", function(ev){ state.q = ev.target.value.trim().toLowerCase(); persist(); apply(); });
   $$("[data-view]").forEach(function(b){ b.addEventListener("click", function(){
     state.view = b.dataset.view; persist(); apply(); }); });
+  $$("[data-information-view]").forEach(function(b){ b.addEventListener("click", function(){
+    openInformationView(b.dataset.informationView); }); });
+  $$("[data-open-information]").forEach(function(b){ b.addEventListener("click", function(){
+    openInformationView(b.dataset.openInformation); window.scrollTo({top: 0, behavior: "smooth"}); }); });
   $("#clear").addEventListener("click", clear);
   $("#clear2").addEventListener("click", clear);
   // proposal 30, P-13: "pull forward" copies the exact command that clears
@@ -296,5 +323,6 @@
   $("#group").value = state.group;
   if (showFinished) { showFinished.checked = state.showFinished; showFinished.disabled = state.pending; }
   if (pending) pending.checked = state.pending;
+  applyInformationView();
   apply();
 })();

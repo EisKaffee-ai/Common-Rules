@@ -27,14 +27,14 @@ before/after total (which would show 0 net change).
 
 Dates are calendar days in a fixed Europe offset (CET, UTC+1, no DST) --
 deliberately not the system zoneinfo database, so the same commit always
-lands on the same day on every machine this runs on, and the per-commit
-cache (keyed only by sha) never needs to be invalidated because someone's
-laptop crossed a DST boundary differently.
+lands on the same day on every machine this runs on.
 
 Cache: `.cache/tracker-history.json` under the project root, if the
 project's own .gitignore already ignores `.cache` -- else a file under the
 system temp dir, keyed by the repo's absolute path, so nothing lands in the
-repo uninvited. Keyed by commit sha; a rerun only computes new shas.
+repo uninvited. Snapshots are keyed by configured ledger directory and commit
+sha, so two trackers in one repository cannot reuse each other's counts; a
+rerun only computes new directory/sha pairs.
 
 Run:  python3 -m unittest discover -s tests -q
 """
@@ -50,6 +50,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+from tools.tracker import ledger as L
 from tools.tracker import parts as P
 
 # A fixed Europe offset, not a zoneinfo lookup -- see the module docstring.
@@ -71,10 +72,19 @@ def _repo_root(project: Path) -> Path:
     return Path(_git(project, "rev-parse", "--show-toplevel").strip())
 
 
-def _ledger_commits(repo: Path) -> list[tuple[str, datetime.datetime]]:
+def _ledger_directory(project: Path, repo: Path) -> str:
+    """Canonical ledger directory as a repository-relative Git path."""
+    directory = L.directory(project).resolve()
+    try:
+        return directory.relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        raise RuntimeError(f"tracker directory {directory} is outside repository {repo}") from None
+
+
+def _ledger_commits(repo: Path, ledger_dir: str) -> list[tuple[str, datetime.datetime]]:
     """(sha, Europe-local commit datetime), oldest first, for every commit that
-    touched a ledger file directly under docs/proposals."""
-    out = _git(repo, "log", "--format=%H%x1f%cI", "--reverse", "--", f"docs/proposals/{LEDGER_GLOB}")
+    touched a ledger file directly under the configured tracker directory."""
+    out = _git(repo, "log", "--format=%H%x1f%cI", "--reverse", "--", f"{ledger_dir}/{LEDGER_GLOB}")
     commits = []
     for line in out.splitlines():
         line = line.strip()
@@ -86,15 +96,15 @@ def _ledger_commits(repo: Path) -> list[tuple[str, datetime.datetime]]:
     return commits
 
 
-def _ledger_paths_at(repo: Path, sha: str) -> list[str]:
-    """Ledger file names (not full paths) directly under docs/proposals at
+def _ledger_paths_at(repo: Path, sha: str, ledger_dir: str) -> list[str]:
+    """Ledger file names (not full paths) directly under the tracker at
     `sha`, matching the same NN-*.json shape `ledger.find` uses -- a data
     file that happens to share the shape is filtered out below, once its
     contents are read, exactly as `ledger.find` does for the working tree."""
     try:
-        out = _git(repo, "ls-tree", "--name-only", f"{sha}:docs/proposals")
+        out = _git(repo, "ls-tree", "--name-only", f"{sha}:{ledger_dir}")
     except RuntimeError:
-        return []  # docs/proposals did not exist yet at this commit
+        return []  # the configured tracker did not exist yet at this commit
     return [name for name in (line.strip() for line in out.splitlines() if line.strip())
             if fnmatch.fnmatch(name, LEDGER_GLOB)]
 
@@ -113,13 +123,13 @@ def _tickets(node: dict):
             yield from _tickets(part)
 
 
-def _snapshot_at(repo: Path, sha: str) -> list[dict]:
+def _snapshot_at(repo: Path, sha: str, ledger_dir: str) -> list[dict]:
     """Every item across every ledger at `sha`, as
     {"proposal": N, "completion": 0-100, "tickets": [[id, done], ...]}.
     One `git show` per ledger file found at that commit."""
     items = []
-    for name in _ledger_paths_at(repo, sha):
-        path = f"docs/proposals/{name}"
+    for name in _ledger_paths_at(repo, sha, ledger_dir):
+        path = f"{ledger_dir}/{name}"
         try:
             text = _git(repo, "show", f"{sha}:{path}")
             data = json.loads(text)
@@ -209,8 +219,9 @@ def _save_cache(path: Path, cache: dict) -> None:
     tmp.replace(path)
 
 
-def _snapshot_for(repo: Path, sha: str, cache: dict) -> list[dict]:
-    cached = cache.get(sha)
+def _snapshot_for(repo: Path, sha: str, ledger_dir: str, cache: dict) -> list[dict]:
+    cache_key = f"{ledger_dir}\x1f{sha}"
+    cached = cache.get(cache_key)
     # The ticket tuple gained a status field for the stacked chart. Discard
     # pre-status cache entries instead of letting an old cache make the page
     # silently omit its graph.
@@ -220,8 +231,8 @@ def _snapshot_for(repo: Path, sha: str, cache: dict) -> list[dict]:
         for ticket in item.get("tickets", [])
     ):
         return cached
-    snap = _snapshot_at(repo, sha)
-    cache[sha] = snap
+    snap = _snapshot_at(repo, sha, ledger_dir)
+    cache[cache_key] = snap
     return snap
 
 
@@ -265,7 +276,8 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
         raise ValueError("granularity must be 'day' or 'hour'")
     project = Path(project)
     repo = _repo_root(project)
-    commits = _ledger_commits(repo)
+    ledger_dir = _ledger_directory(project, repo)
+    commits = _ledger_commits(repo, ledger_dir)
     if not commits:
         return []
 
@@ -312,9 +324,10 @@ def series(project, since=None, granularity: str = "day") -> list[dict]:
     while current <= end_bucket:
         sha = last_sha_of_bucket.get(current)
         if sha is not None:
-            if sha not in cache:
+            cache_key = f"{ledger_dir}\x1f{sha}"
+            if cache_key not in cache:
                 dirty = True
-            items = _snapshot_for(repo, sha, cache)
+            items = _snapshot_for(repo, sha, ledger_dir, cache)
             summary = _summarize(items)
             ids_all, ids_done = summary.pop("ids_all"), summary.pop("ids_done")
             added_ids = len(ids_all - prev_ids_all)

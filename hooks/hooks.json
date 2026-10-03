@@ -1,6 +1,18 @@
 {
   "hooks": {
-    "SessionStart": [{"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" doctor"}]}],
-    "Stop": [{"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" tracecheck"}]}]
+    "SessionStart": [
+      {"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" doctor"}]},
+      {"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/sessionstart\""}]}
+    ],
+    "PreCompact": [
+      {"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/precompact\""}]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" tracecheck"}]},
+      {"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/stop\""}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "Agent|Task", "hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/posttooluse-agent\""}]}
+    ]
   }
 }

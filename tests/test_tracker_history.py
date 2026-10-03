@@ -262,6 +262,39 @@ class TestHistorySeries(unittest.TestCase):
         data = json.loads(r.stdout)
         self.assertEqual(data[0]["date"], self.day_a.isoformat())
 
+    def test_configured_nested_tracker_history_does_not_use_parent_ledgers(self):
+        nested = self.repo.root / "content" / "proposal" / "delivery"
+        nested_ledgers = nested / "docs" / "proposals"
+        nested_ledgers.mkdir(parents=True)
+        manifest = {
+            "integration": {
+                "repository_id": "docs",
+                "role": "documentation",
+                "requirements": ["docs/architecture"],
+                "tracker": "content/proposal/delivery/docs/proposals",
+                "issue_linking": "one-way",
+                "issue_repository": "EisKaffee-ai/bean-engine",
+                "issue_granularity": "proposal",
+                "issue_sync_direction": "ledger-to-github",
+                "skill_receipts": True,
+            }
+        }
+        (self.repo.root / ".common-rules.json").write_text(json.dumps(manifest))
+        (nested_ledgers / "08-engine-media.json").write_text(json.dumps({
+            "proposal": 8,
+            "title": "Engine · Media",
+            "status": "accepted",
+            "updated": self.today.isoformat(),
+            "items": [item("D-01", "done"), item("I-01", "not started"), item("V-01", "not started")],
+        }))
+        self.repo.git("add", "-A")
+        self.repo.git("commit", "-qm", "add nested architecture tracker")
+
+        rows = history.series(self.repo.root)
+
+        self.assertEqual(rows[-1]["tickets_total"], 3)
+        self.assertEqual(rows[-1]["tickets_done"], 1)
+
 
 class TestHistorySvg(unittest.TestCase):
     def test_two_charts_no_external_urls(self):

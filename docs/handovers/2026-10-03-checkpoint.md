@@ -1,12 +1,12 @@
-# Checkpoint — 2026-10-03 08:32
+# Checkpoint — 2026-10-03 13:51
 
-Reason: manual · branch: codex/calibrated-setup-release · HEAD: 4920996
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
 
-<!-- ledger-digest: a6e0d41481e0bf8ddb88dfc740853c159b6068ec0f6bffbef60c9969f9f6edd0 -->
+<!-- ledger-digest: 7f4d1f8e3e96b50804ea6b06db89da65345c438bfa7ca6b4cdc73dcfa0038205 -->
 
 ## Proposal 19 · Warm-up
 
-18 done / 0 in progress / 0 blocked / 1 not started
+18 done / 0 in progress / 0 blocked / 2 not started
 
 ### In progress
 
@@ -22,11 +22,13 @@ Reason: manual · branch: codex/calibrated-setup-release · HEAD: 4920996
 
 ### Next unblocked
 
+- Q-06 · [ruflo · medium · sonnet] · standard item 1 Rules read and implemented: .common-rules-version is absent -- the project has never recorded which rules it follows
 - Q-05 · [ruflo · medium · sonnet] · standard item 2 Migrated: page docs/proposals/tracker/index.html is stale
 
 ### Open work by group
 
 **finish now**
+- Q-06 0%
 - Q-05 0%
 
 ## Proposal 21 · The standard is mandatory
@@ -220,6 +222,35 @@ Reason: manual · branch: codex/calibrated-setup-release · HEAD: 4920996
 - C-06 0% · next C-06.A
 - C-07 0% · next C-07.A
 
+## Proposal 37 · Canonical project tracker and architecture issue synchronization
+
+1 done / 1 in progress / 0 blocked / 0 not started / 4 in review
+
+### In progress
+
+- T-06 · [ruflo · lead · opus] · Release Common Rules 1.10.3 · machine release receipt refreshed
+
+### Blocked, and why
+
+- none
+
+### Open asks
+
+- none
+
+### Next unblocked
+
+- none
+
+### Open work by group
+
+**finish now**
+- T-01 0% · next T-01.A
+- T-02 0% · next T-02.A
+- T-03 0% · next T-03.A
+- T-04 0% · next T-04.A
+- T-06 0% · next T-06.A
+
 ## Exact next action
 
-Q-05 · [ruflo · medium · sonnet] · standard item 2 Migrated: page docs/proposals/tracker/index.html is stale
+Q-06 · [ruflo · medium · sonnet] · standard item 1 Rules read and implemented: .common-rules-version is absent -- the project has never recorded which rules it follows

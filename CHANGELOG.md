@@ -1,3 +1,97 @@
+# 1.10.3 — Canonical project tracker and proposal issues — 3 October 2026
+
+Versions 1.10.0 through 1.10.2 were internal candidates. The class-level
+cold-gate scheduler landed after the first marker, its final 2,065-test
+evidence landed after the second, and mixed-ledger plus deterministic-plugin
+hardening landed after the third. Version 1.10.3 is the publishable candidate
+rather than rewriting release history.
+
+Common Rules now validates an optional proposal-level GitHub issue contract:
+`issue_repository`, `issue_granularity: proposal`, and
+`issue_sync_direction: ledger-to-github` are declared together with one-way
+issue linking. Reverse or partial contracts are refused. Setup discovers
+nested source-ledger catalogues, excludes generated and vendored copies, and
+prefers the largest real catalogue instead of proposing a duplicate
+`docs/proposals` tracker. Existing manifests without the optional contract
+retain their prior behavior.
+
+An optional `integration.issue_series` now limits proposal issue management to
+one ledger series. This lets a single canonical tracker contain 27 architecture
+ledgers plus later operational ledgers without creating a 28th architecture
+issue: excluded ledgers stay visible as Project Operations, architecture totals
+stay scoped to the selected series, and any excluded ledger carrying an issue
+mapping is refused rather than silently orphaned.
+
+`tracker sync --project` now produces one deterministic, whole-set-validated
+issue plan per proposal without calling GitHub. Generated bodies preserve
+stable item IDs, status-aware checkboxes, repository ownership, evidence,
+gaps, dependencies and revision-bound implementation/test references. A
+narrow `--record` operation assigns one returned issue identity to the group,
+its features and every item; `--reconcile` reports remote body/title/state
+drift without changing ledger status. Legacy row-level `tracker sync LEDGER`
+behavior remains available for projects that have not opted in.
+
+The canonical board now follows a configured nested tracker directory and
+writes its single page beside those ledgers. Calibrated catalogues gain five
+mobile-friendly information views—Overview, Product delivery, Architecture,
+Repositories, and Evidence—without removing the established Tree, Kanban,
+Board, and List delivery layouts. Architecture cards group proposals by
+layer, show group issue and lifecycle state, and expand to feature gaps and
+traceability; declared workspace members appear as revision-bound repository
+cards inside the same page rather than as a second public tracker.
+
+Tracker history now replays the same configured nested ledger directory as the
+board and namespaces cached snapshots by that directory. The current header
+also refuses a historical denominator that differs from the current ledgers.
+Architecture catalogues describe their hierarchy explicitly as layers,
+architecture groups, features and lifecycle steps, preventing an unrelated
+parent-project total from appearing as the catalogue's task count. The goal
+contract remains a freshness input and warm-up control but is not rendered as
+a large prose panel in the public tracker.
+
+The release now has a reproducible context-footprint gate. Common Rules keeps
+detailed issue-sync guidance in an on-demand tracker reference and shortens
+skill discovery descriptions while preserving their trigger conditions. The
+conservative idle discovery estimate falls from 849 to 627 tokens (26%); the
+README separates that cost from invoked instructions, optional references,
+hook output and the never-default full-package ceiling. `bin/context-budget
+--json --check` enforces the 650-token discovery budget and explicitly reports
+context estimates rather than process RAM.
+
+The parallel unittest gate now accelerates its first run as well as warmed
+runs. Large files are split by test class before duration data exists, and an
+older coarse cache is refined into class-level timings. The 124-test warmup
+hotspot fell from the previously documented 575-second floor to 174.6 seconds
+on the release host. After those named environment/checkpoint findings were
+resolved, the final release gate passed all 2,088 tests in 189.6 seconds. Coverage and
+aggregate failure detection are unchanged.
+
+Tracker generation is now an explicit Python-owned boundary. Shipped commands
+assign proposal, ask and finding identifiers; calculate counts, percentages and
+digests; validate and mutate ledger state; generate issue plans; validate
+provider-returned mappings; render pages, history and checkpoints; and check
+freshness. Agents supply explicit inputs and invoke those commands, but do not
+invent generated values or hand-edit ledger JSON or generated tracker HTML.
+
+Release-review hardening makes that boundary transactional and
+cross-repository: proposal issue mapping preflights the complete set, validates
+an atomic ledger write, and refreshes both rendered surfaces; proposal-mode
+workspace checks validate local member checkouts and pinned revisions;
+tracecheck diffs qualified member paths against those revisions; setup doctor
+applies the full declaration contract; and setup parses every checkout argument
+before any file is written. `bin/quiet --receipt` emits a digest-bound machine
+record of the exact gate command and result. The shipped `bin/release-evidence`
+command accepts only the full merge-gate discovery receipt and updates both
+public documents and the canonical ledger rather than relying on agent-authored
+numbers.
+
+The Common Rules plugin repository no longer ships its duplicated
+`.claude/settings.json` or project-local warmup/reheat skill copies. Claude Code
+loads the canonical root skills and portable `hooks/hooks.json`; that manifest
+now includes SessionStart, PreCompact, Stop and Agent/Task PostToolUse lifecycle
+hooks. `derecord` continues to install project-local copies for adopter
+repositories that need the legacy direct-checkout path.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

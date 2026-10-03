@@ -1,6 +1,6 @@
 ---
 name: land-handoff
-description: Prepare independently committed Common Rules repository changes as one coherent, reviewable workspace release and handoff without combining their commits.
+description: Prepare independently committed repositories as one coherent Common Rules release and handoff without combining commits.
 ---
 
 # Land and hand off

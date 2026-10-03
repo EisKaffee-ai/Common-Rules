@@ -1,0 +1,727 @@
+{
+  "proposal": 37,
+  "title": "Canonical project tracker and architecture issue synchronization",
+  "status": "accepted",
+  "updated": "2026-10-03",
+  "tiers": {
+    "C1": {
+      "tier": "low",
+      "model": "haiku",
+      "effort": "low",
+      "rule": "Mechanical, one owned file, fully specified, no design choice"
+    },
+    "C2": {
+      "tier": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "rule": "Bounded implementation or tests, clear spec, one or two owned files and their tests"
+    },
+    "C3": {
+      "tier": "high",
+      "model": "sonnet",
+      "effort": "high",
+      "rule": "Cross-module design; changes a gate or the ledger contract; wrong means every project inherits it"
+    },
+    "C4": {
+      "tier": "lead",
+      "model": "opus",
+      "effort": "low or medium",
+      "rule": "Planning, merging, reconciling, anything in a project's real data, a sponsor decision"
+    }
+  },
+  "phases": [
+    {
+      "id": "T",
+      "name": "Canonical tracker delivery",
+      "goal": "Build the optional canonical tracker and proposal-level issue synchronization contract without changing existing projects.",
+      "exit": "The Docs fixture validates read-only, the plugin release gates pass, and the new version is ready for independent review."
+    }
+  ],
+  "items": [
+    {
+      "id": "T-01",
+      "phase": "T",
+      "cx": "C3",
+      "title": "Calibrated canonical tracker manifest and discovery",
+      "what": "Extend project declarations and setup so configured nested ledger directories and proposal-level issue settings validate without proposing duplicate trackers.",
+      "files": [
+        "tools/project.py",
+        "tools/project_setup.py",
+        "tests/test_project_declaration.py",
+        "tests/test_project_setup.py"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_project_declaration tests.test_project_setup"
+      ],
+      "done": "Setup preview identifies the existing configured ledger directory, the manifest validates the one-way proposal contract, and existing manifests behave unchanged.",
+      "depends": [],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "accepted target manifest and existing Docs catalogue inspected",
+          "by": "session:codex",
+          "evidence": "Docs contains 27 ledgers at content/proposal/delivery/docs/proposals; supplied manifest recorded as A-03; no Docs files changed",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "implementation and real Docs preview verified",
+          "by": "session:codex",
+          "evidence": "83 focused tests OK; read-only Docs preview selected content/proposal/delivery/docs/proposals with 27 ledgers and complete ledger-to-github proposal contract; Docs git status unchanged",
+          "status": "in review"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-01.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ]
+    },
+    {
+      "id": "T-02",
+      "phase": "T",
+      "cx": "C3",
+      "title": "Proposal-level issue draft, link and reconciliation contract",
+      "what": "Generate one validated issue plan per proposal, preserve stable item checkboxes, record a single returned issue identity across the group and report one-way drift.",
+      "files": [
+        "tools/tracker/sync.py",
+        "tools/tracker/proposal_issues.py",
+        "bin/tracker",
+        "tests/test_tracker_sync.py",
+        "tests/test_tracker_proposal_issues.py"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"
+      ],
+      "done": "A complete draft set validates before mutation; issue #2-style mappings are reused; all items map to one group issue; reverse synchronization is refused.",
+      "depends": [
+        "T-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "proposal issue plan, writeback and reconciliation implemented",
+          "by": "session:codex",
+          "evidence": "25 sync tests OK; read-only 27-ledger fixture plan reports 27 groups, 59 features and 362 checkboxes; Proposal 08 reuses issue #2; digest 675fb35b8cda42e6ae9300c4c0dc7959e427b23e8d280bbbc0d108935545c09d",
+          "status": "in review"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-02.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ]
+    },
+    {
+      "id": "T-03",
+      "phase": "T",
+      "cx": "C3",
+      "title": "Five-view canonical tracker with workspace coherence",
+      "what": "Render Overview, Product delivery, Architecture, Repositories and Evidence in one generated page, keeping traceability and workspace output as drill-down/internal data.",
+      "files": [
+        "tools/tracker/board.py",
+        "tools/tracker/assets/board.js",
+        "tools/tracker/assets/board.css",
+        "tools/workspace_tracker.py",
+        "tests/test_tracker_board.py",
+        "tests/test_tracker_board_filters.py",
+        "tests/test_tracker_architecture.py",
+        "tests/test_workspace_tracker.py"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_tracker_board tests.test_tracker_board_filters tests.test_tracker_architecture tests.test_workspace_tracker"
+      ],
+      "done": "The configured canonical page exposes all five views, layer-grouped architecture cards and joined repository status with exact ledger totals and no copied member ledgers.",
+      "depends": [
+        "T-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "five-view canonical tracker implemented and full catalogue rendered",
+          "by": "session:codex",
+          "evidence": "64 board/workspace tests OK; 27-card fixture rendered at canonical nested path with 5 information views, 4 repository cards, 59 feature drill-downs and layer counts 4/3/7/9/4",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "corrected canonical tracker scope and architecture segmentation",
+          "by": "session:codex",
+          "evidence": "101 focused tests OK; real Docs architecture fixture renders 5 layers, 27 groups, 59 features and 362 lifecycle steps; configured nested history returns 362 rather than parent total 24",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "workspace output consolidated into the canonical page",
+          "by": "session:codex",
+          "evidence": "102 focused tests OK; proposal-mode workspace-tracker renders/checks the canonical configured page and creates no second tracker"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "removed the internal goal panel from the public tracker",
+          "by": "session:codex",
+          "evidence": "sponsor-selected region removed; goal digest still drives freshness; 102 tracker/history/architecture/workspace tests OK; refreshed real fixture contains no Current goal or goal-contract markup",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-03T11:19:34+02:00",
+          "event": "canonical tracker and workspace consolidation verified",
+          "by": "session:codex",
+          "evidence": "102 board, architecture, workspace and history tests OK after final integration; five views remain one canonical page",
+          "status": "in review"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-03.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ]
+    },
+    {
+      "id": "T-04",
+      "phase": "T",
+      "cx": "C3",
+      "title": "Integrated GitHub plugin mutation workflow",
+      "what": "Teach the tracker skill to validate all drafts, use the installed GitHub plugin for issue mutations, record returned mappings explicitly and never use the browser UI or infer two-way authority.",
+      "files": [
+        "skills/tracker/SKILL.md",
+        "skills/setup/SKILL.md",
+        "skills/review-and-verify/SKILL.md",
+        "tests/test_plugin_package.py",
+        "tests/test_tracker_skill.py"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"
+      ],
+      "done": "The packaged skill names the provider boundary, full-set preflight, create/update/close/reopen rules, explicit write-back and reconciliation refusal.",
+      "depends": [
+        "T-02"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03T11:18:09+02:00",
+          "event": "integrated GitHub plugin workflow packaged and verified",
+          "by": "session:codex",
+          "evidence": "18 plugin, skill, proposal-issue and context-budget tests OK; full-set preflight, integrated provider boundary, explicit write-back and one-way reconciliation are documented",
+          "status": "in review"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-04.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ]
+    },
+    {
+      "id": "T-05",
+      "phase": "T",
+      "cx": "C4",
+      "title": "Read-only Vanilla/Docs acceptance and issue reconciliation",
+      "what": "Validate the generic implementation against the real Docs catalogue and integrated GitHub plugin state without writing another repository from this session.",
+      "files": [
+        "docs/reviews/37-vanilla-docs-acceptance.md",
+        "docs/requirements/37-canonical-tracker-and-proposal-issues.md",
+        "docs/design/37-canonical-tracker-and-proposal-issues.md"
+      ],
+      "tests": [
+        "bin/project-setup --project /path/to/docs preview",
+        "bin/project-setup --project /path/to/docs doctor",
+        "bin/tracecheck --project /path/to/docs",
+        "bin/tracker validate /path/to/docs/content/proposal/delivery/docs/proposals/*.json",
+        "bin/workspace-tracker --project /path/to/docs --check",
+        "Docs npm test && npm run check && npm run build"
+      ],
+      "done": "Read-only evidence proves 27 groups, 59 features, 362 rows, one canonical tracker and exactly one issue mapping per proposal including Proposal 08 → issue #2; Docs reports its own build receipt.",
+      "depends": [
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
+      "status": "done",
+      "tier": "lead",
+      "model": "opus",
+      "tag": "[ruflo · lead · opus]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03T12:09:50+02:00",
+          "event": "read-only acceptance exposed downstream adoption gap",
+          "by": "session:codex",
+          "evidence": "27 ledgers and one canonical workspace tracker validate; GitHub exposes exactly 27 architecture issues including Proposal 08 issue #2; Docs adoption branch lacks complete issue contract and source ledgers have empty traceability arrays, so doctor/tracecheck cannot pass yet",
+          "status": "blocked"
+        },
+        {
+          "at": "2026-10-03T13:08:57+02:00",
+          "event": "all parts done",
+          "by": "session:codex",
+          "evidence": "",
+          "status": "done"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-05.A",
+          "title": "Real Docs adoption and acceptance receipt",
+          "share": 100,
+          "status": "done",
+          "owner": "lead",
+          "risk": "high",
+          "risk_reason": "Depends on independently committed Docs manifest, traceability and build receipt.",
+          "log": [
+            {
+              "at": "2026-10-03T13:08:57+02:00",
+              "event": "read-only Vanilla/Docs acceptance passed in a disposable checkout",
+              "by": "session:codex",
+              "evidence": "Docs revision 9bf5f0d: setup doctor healthy; issue plan 27 groups, 59 features, 362 items, Proposal 08 -> issue #2, Proposal 28 excluded as Project Operations; tracecheck 2 rows verified with Vanilla checkout mapping; canonical workspace tracker current; npm test 41/41, check and build passed",
+              "status": "done"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T-06",
+      "phase": "T",
+      "cx": "C4",
+      "title": "Release Common Rules 1.10.3",
+      "what": "Reconcile manifests, changelog, release notes, deterministic tracker automation, portable Claude hooks, context/runtime evidence, independent review and publication for the canonical-tracker infrastructure release; 1.10.0 through 1.10.2 remain internal candidates.",
+      "files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "README.md",
+        "plugin.json",
+        ".claude-plugin/plugin.json",
+        "hooks/hooks.json",
+        "bin/conformance",
+        "bin/context-budget",
+        "tools/context_budget.py",
+        "bin/quiet",
+        "bin/tracker",
+        "tools/tracker/trace.py",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py",
+        "docs/RELEASE-1.10.3.md"
+      ],
+      "tests": [
+        "bin/context-budget --json --check",
+        "python3 -m unittest -q tests.test_context_budget tests.test_quiet tests.test_plugin_package tests.test_tracker_trace tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup",
+        "bin/version-check --check",
+        "bin/workflow-stamp --check",
+        "claude plugin validate .",
+        "bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q"
+      ],
+      "done": "The 1.10.3 candidate ships Python-owned generated tracker state, mixed-ledger issue scope, local cross-repository resolution, portable Claude/Codex packaging, reproducible context and runtime analysis, and passes focused/full gates, CI and independent review before merge, tag and public release.",
+      "depends": [
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04",
+        "T-05"
+      ],
+      "status": "in progress",
+      "tier": "lead",
+      "model": "opus",
+      "tag": "[ruflo · lead · opus]",
+      "owner": "lead",
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-03T11:18:09+02:00",
+          "event": "release scope expanded with measured context budget",
+          "by": "session:codex",
+          "evidence": "A-04 maps to CR37-R22; measured discovery reduced from 849 to 627 estimated tokens and README records methodology and layers"
+        },
+        {
+          "at": "2026-10-03T12:09:50+02:00",
+          "event": "release candidate and fast full-gate optimization in progress",
+          "by": "session:codex",
+          "evidence": "Context budget 627 estimated idle tokens; warmup hotspot 124 tests completes in 174.6s versus documented 575s floor; full suite scheduling completes 2,065 tests in 181.6s before named environment/checkpoint findings",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-03T12:12:28+02:00",
+          "event": "publishable candidate advanced from internal 1.10.0 to 1.10.1",
+          "by": "session:codex",
+          "evidence": "Version gate requires a patch marker because the fast-gate scheduler landed after the 1.10.0 marker; history is preserved rather than rewritten"
+        },
+        {
+          "at": "2026-10-03T12:17:04+02:00",
+          "event": "optimized full release gate passed",
+          "by": "session:codex",
+          "evidence": "workflow stamp current; version 1.10.1 agrees; context discovery 627 estimated tokens; all 2,065 tests pass in 189.1s with class-level cold sharding"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release candidate advanced from internal 1.10.1 to 1.10.2 after CI version gate",
+          "by": "session:codex",
+          "evidence": "CI run 37116129292 correctly required a new patch marker because the final 2,065-test evidence commit followed the 1.10.1 marker; history remains intact"
+        },
+        {
+          "at": "2026-10-03T13:08:58+02:00",
+          "event": "release target advanced to 1.10.3 with deterministic tracker automation",
+          "by": "session:codex",
+          "evidence": "A-07 to A-09: removed obsolete plugin-local Claude copies, expanded portable hooks, made generated tracker state Python-owned, and added mixed-ledger plus cross-repository resolution"
+        },
+        {
+          "at": "2026-10-03T13:21:30+02:00",
+          "event": "Common Rules 1.10.3 full release gate passed",
+          "by": "session:codex",
+          "evidence": "Bundled Python 3.12/Pillow runtime with process access: 2,078 tests passed in 176.5s; focused release suite 70 tests passed; version, workflow stamp and 627-token discovery budget agree; disposable Docs acceptance passed 41 tests plus check/build"
+        },
+        {
+          "at": "2026-10-03T13:40:34+02:00",
+          "event": "release-review gaps fixed through deterministic Python boundaries",
+          "by": "session:codex",
+          "evidence": "182 focused tests and the 2,085-test full gate passed; issue write-back, proposal workspace validation, cross-repository diffs, setup doctor, pre-write checkout validation, and generated release evidence are covered"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "machine release receipt refreshed",
+          "by": "bin/release-evidence",
+          "evidence": "full merge gate: 2,088 tests in 189.6 seconds; receipt sha256 78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71",
+          "status": "in progress"
+        }
+      ],
+      "parts": [
+        {
+          "id": "T-06.A",
+          "title": "Release gates, review and publication",
+          "share": 100,
+          "status": "in progress",
+          "owner": "lead",
+          "risk": "high",
+          "risk_reason": "Version publication changes the shared plugin consumed by all adopters."
+        }
+      ],
+      "release_gate": {
+        "status": "OK",
+        "tests": 2088,
+        "seconds": 189.6,
+        "receipt_sha256": "78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71"
+      }
+    }
+  ],
+  "traceability": [
+    {
+      "id": "TR-01",
+      "item": "T-01",
+      "requirement_ids": [
+        "CR37-R01",
+        "CR37-R02",
+        "CR37-R03",
+        "CR37-R20"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#setup-and-discovery",
+      "implementation_files": [
+        "tools/project.py",
+        "tools/project_setup.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_project_declaration tests.test_project_setup"
+      ],
+      "receipt_or_refusal": "83 focused tests and read-only 27-ledger Docs preview passed",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-02",
+      "item": "T-02",
+      "requirement_ids": [
+        "CR37-R05",
+        "CR37-R06",
+        "CR37-R07",
+        "CR37-R08",
+        "CR37-R10",
+        "CR37-R11",
+        "CR37-R12",
+        "CR37-R18"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#proposal-issue-plan",
+      "implementation_files": [
+        "tools/tracker/sync.py",
+        "bin/tracker"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"
+      ],
+      "receipt_or_refusal": "25 sync tests and complete 27-group/362-checkbox draft fixture passed",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-03",
+      "item": "T-03",
+      "requirement_ids": [
+        "CR37-R04",
+        "CR37-R13",
+        "CR37-R14",
+        "CR37-R15",
+        "CR37-R16",
+        "CR37-R17",
+        "CR37-R18",
+        "CR37-R19"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#canonical-tracker-sections",
+      "implementation_files": [
+        "tools/tracker/board.py",
+        "tools/tracker/assets/board.js",
+        "tools/workspace_tracker.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracker_architecture tests.test_workspace_tracker"
+      ],
+      "receipt_or_refusal": "102 canonical board, architecture, workspace and history tests passed",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-04",
+      "item": "T-04",
+      "requirement_ids": [
+        "CR37-R09",
+        "CR37-R10",
+        "CR37-R11",
+        "CR37-R12"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#proposal-issue-plan",
+      "implementation_files": [
+        "skills/tracker/SKILL.md",
+        "skills/setup/SKILL.md",
+        "skills/review-and-verify/SKILL.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"
+      ],
+      "receipt_or_refusal": "18 plugin, skill, proposal-issue and context-budget tests passed; portable skills validated",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-05",
+      "item": "T-05",
+      "requirement_ids": [
+        "CR37-R12",
+        "CR37-R15",
+        "CR37-R16",
+        "CR37-R17",
+        "CR37-R18",
+        "CR37-R19",
+        "CR37-R20",
+        "CR37-R24",
+        "CR37-R26"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#vanilla-acceptance-fixture",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#repository-ownership",
+      "implementation_files": [
+        "docs/requirements/37-canonical-tracker-and-proposal-issues.md",
+        "docs/design/37-canonical-tracker-and-proposal-issues.md",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py"
+      ],
+      "tests_commands": [
+        "read-only Docs and GitHub plugin acceptance suite",
+        "python3 -m unittest -q tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup"
+      ],
+      "receipt_or_refusal": "Read-only disposable Docs checkout at revision 9bf5f0d: 27 architecture groups, 59 features, 362 lifecycle rows, Proposal 08 issue #2, Proposal 28 Project Operations exclusion, 2 traceability rows, canonical workspace tracker, 41 Docs tests, check and build all passed",
+      "owner": "lead",
+      "status": "done"
+    },
+    {
+      "id": "TR-06",
+      "item": "T-06",
+      "requirement_ids": [
+        "CR37-R21",
+        "CR37-R22",
+        "CR37-R23",
+        "CR37-R24",
+        "CR37-R25",
+        "CR37-R26"
+      ],
+      "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#acceptance-evidence",
+      "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#context-budget",
+      "implementation_files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "README.md",
+        "bin/context-budget",
+        "tools/context_budget.py",
+        "bin/quiet",
+        "plugin.json",
+        ".claude-plugin/plugin.json",
+        "hooks/hooks.json",
+        "bin/conformance",
+        "bin/tracker",
+        "tools/tracker/trace.py",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py",
+        "bin/release-evidence",
+        "tools/release_evidence.py"
+      ],
+      "tests_commands": [
+        "bin/context-budget --json --check",
+        "python3 -m unittest -q tests.test_context_budget tests.test_quiet",
+        "bin/version-check --check",
+        "bin/workflow-stamp --check",
+        "python3 -m unittest discover -s tests -q",
+        "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_trace tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup",
+        "python3 -m unittest -q tests.test_release_evidence"
+      ],
+      "receipt_or_refusal": "Machine release receipt: 2,088 full-suite tests pass in 189.6 seconds; sha256 78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71; independent review and CI pending",
+      "owner": "lead",
+      "status": "in progress"
+    }
+  ],
+  "asks": [
+    {
+      "id": "A-01",
+      "at": "2026-10-03",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Update Common Rules to support a single canonical project tracker with\narchitecture-group GitHub issue synchronization.\n\nProject: EisKaffee Vanilla\nWorkspace ID: eiskaffee-vanilla\nHub repository: docs\nIssue repository: EisKaffee-ai/bean-engine\nIssue mutations must use the integrated GitHub plugin, not github.com UI.\n\nCURRENT STATE\n\n- The Docs delivery catalogue contains:\n  - 27 architecture/feature groups\n  - 59 features\n  - 362 lifecycle items\n- The 27 group ledgers already exist under:\n  content/proposal/delivery/docs/proposals/\n- Every feature normally has these lifecycle stages:\n  D — architecture and workflow\n  R — owner approval\n  A — code alignment\n  I — missing implementation\n  U — UI/consumer integration\n  V — verification and evidence\n- The generated website tracker already renders these 27 proposals.\n- docs/architecture/vanilla-traceability.json is a generated traceability\n  dataset. It is not an independent tracker.\n- Bean Engine is the single GitHub issue home for this workspace.\n\nREQUIRED OUTCOME\n\nThere must be exactly one published tracker for the Docs project.\n\nCanonical ledger directory:\ncontent/proposal/delivery/docs/proposals\n\nCanonical tracker:\ncontent/proposal/delivery/docs/proposals/tracker/index.html\n\nThe IceKaffee.ai website must publish this generated tracker from a committed\nDocs revision. It must not maintain a manually edited or separately generated\ncopy.\n\nThe joined repository status for Vanilla, Bean Engine, Docs and UI Assets must\nappear as a section of this tracker rather than as a second public tracker.\nIntermediate generated files may remain internal build artifacts.\n\nGITHUB ISSUE MODEL\n\nCreate exactly one GitHub issue for each of the 27 architecture groups.\n\nIssue granularity: one issue per proposal/group, not one issue per feature and\nnot one issue per lifecycle row.\n\nIssue title format:\n\n[Architecture 08/27] Engine · Media access & rendition\n\nEach issue body must be generated from its owning ledger and contain:\n\n1. Architecture group ID, namespace and layer.\n2. Link to the canonical tracker and architecture source.\n3. Workflow/source revision.\n4. Repository ownership:\n   - Docs — architecture and requirements\n   - Vanilla — application, SDK and UI\n   - Bean Engine — business logic and Runner\n   - UI Assets — shared visual assets\n5. One checklist entry for every ledger item, preserving its item ID.\n6. Current evidence, gaps, dependencies and next action.\n7. Links to implementation files, tests, receipts and related issues.\n\nExample checklist:\n\n## engine.media.preview\n\n- [x] D-01 — Architecture and workflow\n- [x] R-01 — Owner approval\n- [x] A-01 — Code alignment\n- [ ] I-01 — Missing implementation · in progress\n- [ ] U-01 — UI integration\n- [ ] V-01 — Feature completion and evidence\n\nFor groups containing multiple features, repeat the six-stage checklist under\neach feature heading. Therefore a group with two features has 12 checkboxes.\n\nFor groups whose detailed features are not defined yet, create the issue with\nthe existing scope-definition ledger item. Do not invent requirements merely\nto fill the issue.\n\nONE-WAY SYNCHRONIZATION\n\nThe ledger is authoritative.\n\n- Ledger status `done` becomes a checked GitHub checkbox.\n- `deferred` becomes checked only when its reason is included.\n- All other statuses remain unchecked and display their explicit state.\n- Every ledger item in a group links to the same group issue.\n- Ledger updates regenerate the issue body through the integrated GitHub\n  plugin.\n- Manual checkbox edits on GitHub must never silently update the ledger.\n  They require an explicit Common Rules reconciliation with evidence.\n- Close an issue only when all its rows are terminal and completion evidence\n  is attached.\n- Reopen it if an authoritative ledger row is reopened.\n\nAdd support for these optional project settings:\n\nintegration.issue_linking = \"one-way\"\nintegration.issue_repository = \"EisKaffee-ai/bean-engine\"\nintegration.issue_granularity = \"proposal\"\nintegration.issue_sync_direction = \"ledger-to-github\"\n\nDo not implement two-way synchronization.\n\nTRACKER INFORMATION ARCHITECTURE\n\nKeep one page with these main views:\n\n- Overview\n- Product delivery\n- Architecture\n- Repositories\n- Evidence\n\nInside Architecture, group the 27 issues by layer:\n\n- Application: proposals 1, 2, 26, 27\n- Runner: proposals 3–5\n- Engine: proposals 6, 8–11, 14, 15\n- Memory: proposals 7, 12, 13, 20–25\n- AI: proposals 16–19\n\nEach architecture card must show:\n\n- proposal/group number and title;\n- linked GitHub issue;\n- feature count;\n- completed/total checklist rows;\n- architecture approval status;\n- implementation classification;\n- repository owners;\n- blockers and next action.\n\nThe 59-feature traceability matrix should be accessible as a drill-down from\nthese cards, not published as another tracker.\n\nMIGRATION REQUIREMENTS\n\n- Preserve all 27 ledger IDs, 362 lifecycle item IDs, history and evidence.\n- Do not copy member ledgers into Docs.\n- Import any existing Docs tracker coordination rows into the canonical page\n  as Project Operations rather than maintaining another published tracker.\n- Preserve Bean Engine issue #2 as the issue for Proposal 08 rather than\n  creating a duplicate.\n- Generate drafts for the other 26 issues and validate them before creating\n  them.\n- Use the integrated GitHub plugin for issue creation and updates.\n- Never infer “implemented” from a source-path mention.\n- Only revision-bound tests and receipts may complete verification rows.\n\nCOMMON RULES ACCEPTANCE CRITERIA\n\n1. Setup preview identifies the existing 27 ledgers and proposes no duplicate\n   tracker.\n2. The Docs manifest points to the canonical ledger directory.\n3. Issue linking is one-way and names the Bean Engine issue repository.\n4. Exactly 27 architecture group issues exist.\n5. Every lifecycle row maps to exactly one group issue.\n6. Every issue checkbox maps back to a stable ledger item ID.\n7. Tracker totals equal ledger totals and issue checkbox totals.\n8. The website tracker is generated from the committed canonical ledgers.\n9. No second public tracker exists for the project.\n10. Doctor, tracecheck, tracker validation, workspace validation and the Docs\n    build all pass.",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "pasted request",
+      "note": "Accepted scope: implement in Common Rules and release a new plugin version."
+    },
+    {
+      "id": "A-02",
+      "at": "2026-10-03",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "Make a goal, implement the common rules and release a new version of the plugin.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat"
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-03",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "{\n  \"integration\": {\n    \"repository_id\": \"docs\",\n    \"role\": \"documentation\",\n    \"requirements\": [\"docs/architecture\", \"content\", \"templates\"],\n    \"tracker\": \"content/proposal/delivery/docs/proposals\",\n    \"issue_linking\": \"one-way\",\n    \"issue_repository\": \"EisKaffee-ai/bean-engine\",\n    \"issue_granularity\": \"proposal\",\n    \"workspace\": {\n      \"id\": \"eiskaffee-vanilla\",\n      \"role\": \"hub\"\n    }\n  }\n}",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "chat"
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-03",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Also before creating the next release, please optimize, like when this plugin is loaded, how much memory it utilizes in the context. I want those analysis, and that analysis should also be part of the readme.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Release 1.10.0 must include measured context-loading analysis, optimization and README documentation before publication."
+    },
+    {
+      "id": "A-05",
+      "at": "2026-10-03T11:49:21+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "And optimize the test run time. Move fast.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Release 1.10.0 must reduce full-gate wall time without reducing coverage and publish timing evidence."
+    },
+    {
+      "id": "A-06",
+      "at": "2026-10-03T12:46:34+02:00",
+      "by": "sponsor",
+      "kind": "question",
+      "quote": "When can we have the common rules released?",
+      "became": null,
+      "state": "answered",
+      "source": "chat",
+      "note": "Release timing depends on clearing the final Common Rules gate, independent review, and downstream read-only acceptance evidence."
+    },
+    {
+      "id": "A-07",
+      "at": "2026-10-03T12:46:34+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "What is the blocking point? Remove the user-owned files. I don't want to keep any legacy files if they are no longer required, and proceed ahead with the implementation, remove all the blocks.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Remove local-only user edits, retain files proven load-bearing, delete only genuinely obsolete compatibility copies, and continue through release gates."
+    },
+    {
+      "id": "A-08",
+      "at": "2026-10-03T12:54:01+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "And then why is it taking so time? You're not creating a feature. You're just creating this common rule infrastructure. And please make sure that the tracker and all the elements are being managed through Python and not through AI, because I see a lot of problems with the current tracker. So anything that can use tracking should be done through Python scripts, which is repeatable and not through AI.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Treat the work as deterministic Common Rules infrastructure: Python owns tracker state transitions, validation, issue plans, write-back, rendering and freshness checks; agents only supply explicit inputs and invoke the tools."
+    },
+    {
+      "id": "A-09",
+      "at": "2026-10-03T12:55:12+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "Number or anything that's being generated anywhere, that should be through scripts always. And that is part of the plugin that we are shipping. It should not be done through AI regardless.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "All generated identifiers, counts, digests, plans, mappings, summaries, checkpoints and rendered artifacts must be produced or recorded by scripts shipped in the plugin; AI never fabricates or directly writes generated values."
+    }
+  ],
+  "proposed_changes": [],
+  "execution": {
+    "ruflo_route": "P37 routed to coder at high complexity; implementation remains owned by this lead worktree.",
+    "repository_boundary": "Common Rules is writable; Docs, Vanilla, Bean Engine and UI Assets are read-only validation inputs in this session.",
+    "github_boundary": "Issue mutations use the installed GitHub plugin after complete draft validation; browser UI and reverse sync are excluded."
+  }
+}

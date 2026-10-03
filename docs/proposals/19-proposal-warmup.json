@@ -2,7 +2,7 @@
   "proposal": 19,
   "title": "Warm-up",
   "status": "accepted",
-  "updated": "2026-09-18",
+  "updated": "2026-10-03",
   "tiers": {
     "C1": {
       "tier": "low",
@@ -44,6 +44,26 @@
     }
   ],
   "items": [
+    {
+      "id": "Q-06",
+      "phase": "Q",
+      "cx": "C2",
+      "title": "standard item 1 Rules read and implemented: .common-rules-version is absent -- the project has never recorded which rules it follows",
+      "status": "not started",
+      "owner": "lead",
+      "queue_source": "conformance:1",
+      "log": [
+        {
+          "at": "2026-10-03T10:55:56+02:00",
+          "event": "queued by warmup --queue",
+          "by": "warmup",
+          "evidence": ""
+        }
+      ],
+      "tier": "medium",
+      "model": "sonnet",
+      "tag": "[ruflo · medium · sonnet]"
+    },
     {
       "id": "Q-05",
       "phase": "Q",

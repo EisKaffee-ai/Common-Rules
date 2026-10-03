@@ -1,7 +1,9 @@
 """Build one read-only joined tracker from independently committed repositories."""
 from __future__ import annotations
-import argparse, html, json
-from pathlib import Path, PurePosixPath
+import argparse, html, json, subprocess
+from pathlib import Path
+
+from tools import project as declaration
 
 
 def _read(path: Path):
@@ -11,16 +13,73 @@ def _read(path: Path):
 
 
 def _local_path(hub: Path, rel: str) -> Path:
-    p = PurePosixPath(rel)
-    if p.is_absolute() or ".." in p.parts: raise ValueError(f"unsafe local checkout path: {rel}")
-    target = (hub / rel).resolve()
-    if not target.is_relative_to(hub.resolve()): raise ValueError(f"local checkout escapes workspace: {rel}")
+    p = Path(rel).expanduser()
+    if not rel or "\x00" in rel: raise ValueError(f"unsafe local checkout path: {rel}")
+    target = p.resolve() if p.is_absolute() else (hub / p).resolve()
+    if not p.is_absolute() and not target.is_relative_to(hub.resolve()):
+        raise ValueError(f"relative local checkout escapes workspace: {rel}")
+    if not target.is_dir(): raise ValueError(f"local checkout does not exist: {rel}")
     return target
+
+
+def _validated_members(hub: Path, workspace: dict, *, strict: bool) -> list[tuple[dict, Path]]:
+    local = _read(hub / ".common-rules/workspace.local.json")
+    if workspace.get("workspace_id") != local.get("workspace_id"):
+        raise ValueError("workspace IDs disagree")
+    checkouts = local.get("checkouts")
+    if not isinstance(checkouts, dict):
+        raise ValueError("local workspace must declare checkout mappings")
+    members = workspace.get("members")
+    if not isinstance(members, list) or not members:
+        raise ValueError("workspace must declare at least one repository member")
+    seen, resolved = set(), []
+    for member in members:
+        if not isinstance(member, dict):
+            raise ValueError("workspace member must be an object")
+        rid, revision = member.get("repository_id"), member.get("revision")
+        if not isinstance(rid, str) or not rid or rid in seen:
+            raise ValueError("workspace member repository IDs must be non-empty and unique")
+        if not isinstance(revision, str) or not revision:
+            raise ValueError(f"workspace member {rid} must declare a revision")
+        location = checkouts.get(rid)
+        if not isinstance(location, str):
+            raise ValueError(f"local checkout is not mapped for workspace member {rid}")
+        checkout = _local_path(hub, location)
+        if revision == "WORKING" and strict:
+            raise ValueError(f"workspace member {rid} must pin a commit revision for --check")
+        if revision != "WORKING":
+            run = subprocess.run(["git", "rev-parse", "HEAD"], cwd=checkout,
+                                 text=True, capture_output=True)
+            head = run.stdout.strip()
+            if run.returncode or not head.startswith(revision):
+                raise ValueError(f"workspace member {rid} checkout is not at revision {revision}")
+            if strict:
+                dirty = subprocess.run(
+                    ["git", "status", "--porcelain", "--untracked-files=all"], cwd=checkout,
+                    text=True, capture_output=True,
+                )
+                if dirty.returncode or dirty.stdout.strip():
+                    raise ValueError(f"workspace member {rid} checkout is dirty at revision {revision}")
+        seen.add(rid); resolved.append((member, checkout))
+    return resolved
 
 
 def build(hub: Path, *, check=False) -> tuple[int, str]:
     try:
         workspace = _read(hub / "docs/common-rules/workspace.json")
+        integration = declaration.load(hub).get("integration") or {}
+        if integration.get("issue_granularity") == "proposal":
+            declared_workspace = integration.get("workspace") or {}
+            if workspace.get("workspace_id") != declared_workspace.get("id"):
+                raise ValueError("workspace IDs disagree")
+            if workspace.get("hub_repository_id") != integration.get("repository_id"):
+                raise ValueError("workspace hub repository disagrees with the integration manifest")
+            _validated_members(hub, workspace, strict=check)
+            from tools.tracker import board
+            args = ["--project", str(hub)] + (["--check"] if check else [])
+            code = board.main(args)
+            return code, ("single canonical tracker is current" if code == 0 else
+                          "single canonical tracker is stale or invalid")
         local = _read(hub / ".common-rules/workspace.local.json")
         if workspace.get("workspace_id") != local.get("workspace_id"): raise ValueError("workspace IDs disagree")
         rows = []

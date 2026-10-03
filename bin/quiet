@@ -2,7 +2,7 @@
 """quiet -- run a gate, keep its output in a file, print one verdict line
 (common-rules proposal 23, lever L3).
 
-  quiet [--log FILE] [--label NAME] [--jobs N|auto] -- CMD [ARGS...]
+  quiet [--log FILE] [--receipt FILE] [--label NAME] [--jobs N|auto] -- CMD [ARGS...]
 
 Runs CMD directly (no shell). All of its stdout and stderr go to FILE only
 -- never to this process's own stdout. Default FILE is
@@ -399,18 +399,42 @@ def _plan_units(files: list[Path], durations: dict, jobs: int) -> list["Unit"]:
     "Too slow" is measured against the only target that matters: the wall
     clock a perfectly balanced run would reach, which is the total known
     work divided by the number of processes. A file above that target is
-    the run's floor, so it is cut into ceil(duration / target) groups. With
-    a cold cache nothing is split -- there is no evidence yet to act on,
-    and the first run writes the timings the next one uses.
+    the run's floor, so it is cut into ceil(duration / target) groups.
+
+    A cold release checkout cannot wait for one full serial-by-file run merely
+    to learn the obvious hotspots. With no timings, a file containing at least
+    eight test classes is split one class per unit. This is a scheduling hint
+    only: every class still runs exactly once, and the measured cache replaces
+    the hint after the first completed run. If an older cache contains coarse
+    multi-class units, one run refines them to class-level timings instead of
+    preserving a known multi-minute floor.
     """
     known = {f: _file_duration(f, durations) for f in files}
     timed = [d for d in known.values() if d > 0]
-    if jobs < 2 or not timed:
+    if jobs < 2:
         return [Unit(f) for f in files]
+    if not timed:
+        units: list[Unit] = []
+        for f in files:
+            classes = _test_classes(f)
+            if len(classes) < 8:
+                units.append(Unit(f))
+                continue
+            units.extend(Unit(f, [c]) for c in classes)
+        return units
     target = sum(timed) / jobs
     units: list[Unit] = []
     for f in files:
         d = known[f]
+        prefix = f"{f.name}::"
+        cached_groups = [k[len(prefix):].split("+") for k in durations if k.startswith(prefix)]
+        if cached_groups and any(len(group) > 1 for group in cached_groups):
+            classes = list(dict.fromkeys(c for group in cached_groups for c in group))
+            units.extend(Unit(f, [c]) for c in classes)
+            continue
+        if cached_groups and all(len(group) == 1 for group in cached_groups):
+            units.extend(Unit(f, group) for group in cached_groups)
+            continue
         if d <= target or target <= 0:
             units.append(Unit(f))
             continue
@@ -494,6 +518,7 @@ def _run_parallel_discover(python: str, start_dir: str, pattern: str, jobs: int)
 
 def _parse_args(argv):
     log = None
+    receipt = None
     label = None
     jobs = None
     i = 0
@@ -510,6 +535,13 @@ def _parse_args(argv):
                 print("quiet: --log requires a value", file=sys.stderr)
                 raise SystemExit(2)
             log = argv[i + 1]
+            i += 2
+            continue
+        if a == "--receipt":
+            if i + 1 >= len(argv):
+                print("quiet: --receipt requires a value", file=sys.stderr)
+                raise SystemExit(2)
+            receipt = argv[i + 1]
             i += 2
             continue
         if a == "--label":
@@ -541,11 +573,29 @@ def _parse_args(argv):
         print(f"quiet: unknown option {a!r} (expected -- before the command)", file=sys.stderr)
         raise SystemExit(2)
     cmd = argv[i:]
-    return log, label, jobs, cmd
+    return log, receipt, label, jobs, cmd
+
+
+def _write_receipt(path: Path, *, label: str | None, cmd: list[str], log_path: Path,
+                   output: str, ok: bool, wall_seconds: float) -> None:
+    matches = list(re.finditer(r"^Ran (\d+) tests in (\d+(?:\.\d+)?)s$", output, re.MULTILINE))
+    count = int(matches[-1].group(1)) if matches else None
+    test_seconds = float(matches[-1].group(2)) if matches else None
+    record = {
+        "schema": 1, "kind": "common-rules-quiet-gate", "label": label,
+        "status": "OK" if ok else "FAILED", "command": cmd,
+        "tests": count, "test_seconds": test_seconds,
+        "wall_seconds": round(wall_seconds, 3), "log": str(log_path),
+        "log_sha256": hashlib.sha256(output.encode()).hexdigest(),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
 
 
 def main(argv):
-    log, label, jobs, cmd = _parse_args(argv)
+    log, receipt, label, jobs, cmd = _parse_args(argv)
     if not cmd:
         print("quiet: no command given -- usage: quiet [--log FILE] [--label NAME] [--jobs N] -- CMD [ARGS...]",
               file=sys.stderr)
@@ -598,6 +648,13 @@ def main(argv):
         detail = detail[:DETAIL_MAX]
 
     verdict = "OK" if ok else "FAILED"
+    if receipt:
+        try:
+            _write_receipt(Path(receipt), label=label, cmd=cmd, log_path=log_path,
+                           output=output, ok=ok, wall_seconds=elapsed)
+        except OSError as exc:
+            print(f"quiet: could not write receipt: {exc}", file=sys.stderr)
+            return 2
     print(f"quiet: {verdict} · {detail} · {elapsed:.1f}s · log {log_path}")
     return exit_code
 

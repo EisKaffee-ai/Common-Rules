@@ -1,6 +1,6 @@
 ---
 name: warmup
-description: Warm up a FRESH session on the project's standard (common-rules proposal 19, and proposal 28's R-01/R-02). Reads HANDOFF.md, the operating rules, the ledger and the last checkpoint in a fixed order, checks the tools and the standard, queues what is pending, and prints the warm card before any work. Use at the start of a session. A session already running uses /reheat instead ("warm up", "what changed", "refresh the rules").
+description: Warm up a FRESH Common Rules session: read the project record in order, check tools and the standard, queue pending work, and print the warm card. Use /reheat for a running session.
 argument-hint: "one line of context for this session"
 ---
 
