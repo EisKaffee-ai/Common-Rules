@@ -89,9 +89,16 @@ Rules skill is active and why. The visual-proposal skill owns the iterative
 decision artifact. Setup, intake, planning, verification, repair and handoff
 skills own their lifecycle stages.
 
-Hooks are optional local automation and require trust. They use `PLUGIN_ROOT`
-and never assume a checkout path. ChatGPT web receives the skill behaviour but
+Hooks are optional local automation and require trust. The shared hook file
+uses `CLAUDE_PLUGIN_ROOT`, which OpenAI hosts expose as a compatibility alias,
+and never assumes a checkout path. ChatGPT web receives the skill behaviour but
 cannot execute a local hook without a connected local execution environment.
+
+Claude Code reads `.claude-plugin/plugin.json`, discovers `skills/` and
+`hooks/hooks.json` from its standard plugin layout, and can install this
+repository through `.claude-plugin/marketplace.json`. The separate root
+`plugin.json` remains the portable/OpenAI manifest; both manifests carry the
+same name and version and package the same skills and hooks.
 
 Official platform references: [plugins](https://learn.chatgpt.com/docs/plugins),
 [skills](https://learn.chatgpt.com/docs/build-skills),

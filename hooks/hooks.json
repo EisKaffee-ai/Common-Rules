@@ -1,6 +1,6 @@
 {
   "hooks": {
-    "SessionStart": [{"hooks": [{"type": "command", "command": "\"$PLUGIN_ROOT/bin/project-setup\" --project . doctor"}]}],
-    "Stop": [{"hooks": [{"type": "command", "command": "\"$PLUGIN_ROOT/bin/tracecheck\" --project ."}]}]
+    "SessionStart": [{"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" doctor"}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle\" tracecheck"}]}]
   }
 }

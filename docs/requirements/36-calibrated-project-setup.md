@@ -61,6 +61,10 @@ impact visible as one coherent project.
   supersedes the separate Emberline AI Tracker runtime. Migration preserves
   ledger IDs, history and evidence and never overwrites a remote until its
   destination branch is confirmed and the imported ledgers validate.
+- **CR36-R20 — Claude compatibility.** The same release installs as a Claude
+  Code plugin through `.claude-plugin/plugin.json` and its marketplace,
+  discovers the shared skills and hooks from Claude's standard layout, uses
+  host-compatible plugin-root variables, and leaves unadopted projects alone.
 
 ## Acceptance evidence
 

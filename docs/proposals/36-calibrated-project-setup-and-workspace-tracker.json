@@ -168,7 +168,7 @@
         "C-01",
         "C-03"
       ],
-      "status": "in review",
+      "status": "in testing",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
@@ -178,7 +178,7 @@
           "id": "C-04.A",
           "title": "Package and verify the Common Rules tracker plugin",
           "share": 100,
-          "status": "in review",
+          "status": "in testing",
           "owner": "lead"
         }
       ],
@@ -189,6 +189,13 @@
           "by": "session:codex",
           "evidence": "2029 tests OK; portable plugin suite green",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "Claude compatibility added after review",
+          "by": "session:codex",
+          "evidence": "official Claude plugin, manifest, skills, hooks and marketplace documentation; validator pending full gate",
+          "status": "in testing"
         }
       ]
     },
@@ -215,7 +222,7 @@
         "C-03",
         "C-04"
       ],
-      "status": "in review",
+      "status": "in testing",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -225,7 +232,7 @@
           "id": "C-05.A",
           "title": "Complete release verification and independent review",
           "share": 100,
-          "status": "in review",
+          "status": "in testing",
           "owner": "lead"
         }
       ],
@@ -236,6 +243,13 @@
           "by": "session:codex",
           "evidence": "VERSION 1.5.0; version-check and workflow-stamp green; 2029 tests OK",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for Claude compatibility",
+          "by": "session:codex",
+          "evidence": "1.5.0 candidate changed after review; rerun required",
+          "status": "in testing"
         }
       ]
     }
@@ -317,13 +331,17 @@
         "CR36-R13",
         "CR36-R14",
         "CR36-R15",
-        "CR36-R19"
+        "CR36-R19",
+        "CR36-R20"
       ],
       "guide_section": "docs/requirements/36-calibrated-project-setup.md#requirements",
       "architecture_section": "docs/design/36-calibrated-project-setup.md#plugin-surfaces",
       "implementation_files": [
         "plugin.json",
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json",
         "hooks/hooks.json",
+        "hooks/project-lifecycle",
         "skills/setup/SKILL.md",
         "skills/tracker/SKILL.md",
         "skills/visual-proposal/SKILL.md"
@@ -333,7 +351,7 @@
       ],
       "receipt_or_refusal": "receipt: portable plugin package suite",
       "owner": "lead",
-      "status": "in review"
+      "status": "in testing"
     },
     {
       "id": "TR-05",
@@ -352,9 +370,9 @@
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: version and workflow checks green; 2029 tests OK; independent review pending",
+      "receipt_or_refusal": "receipt pending: rerun full gate after Claude compatibility; independent review pending",
       "owner": "lead",
-      "status": "in review"
+      "status": "in testing"
     }
   ],
   "asks": [

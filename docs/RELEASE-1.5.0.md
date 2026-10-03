@@ -11,8 +11,9 @@ release surface:
   committed repositories and their compatible revision set;
 - `bin/tracecheck` validates requirement-to-file evidence and restricts
   no-change receipts to the lead or sponsor;
-- root `plugin.json`, lifecycle skills and portable trusted-hook definitions
-  make the workflow installable and its skill routing visible;
+- root `plugin.json` for OpenAI, `.claude-plugin/plugin.json` and marketplace
+  metadata for Claude Code, shared lifecycle skills and portable trusted-hook
+  definitions make the workflow installable and its routing visible;
 - the visual-proposal skill keeps decision artifacts mobile-first and iterates
   them until sponsor acceptance.
 
@@ -51,3 +52,9 @@ Platform references: [plugins](https://learn.chatgpt.com/docs/plugins),
 [skills](https://learn.chatgpt.com/docs/build-skills),
 [packaging](https://developers.openai.com/plugins/build/plugins), and
 [hooks](https://learn.chatgpt.com/docs/hooks).
+
+Claude compatibility references: [Claude Code plugins](https://code.claude.com/docs/en/plugins),
+[manifest](https://code.claude.com/docs/en/plugins-reference),
+[skills](https://code.claude.com/docs/en/skills),
+[hooks](https://code.claude.com/docs/en/hooks), and
+[marketplaces](https://code.claude.com/docs/en/plugin-marketplaces).

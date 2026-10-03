@@ -10,6 +10,9 @@ proposal, review, repair and handoff skills plus optional trusted hooks. No
 project is silently upgraded and no remote-write authority is inferred.
 Common Rules is the tracker plugin and supersedes the separate Emberline AI
 Tracker runtime; migrations preserve ledger IDs and evidence before cutover.
+The same release now includes Claude Code's `.claude-plugin/plugin.json` and
+marketplace catalog, uses the shared Claude/OpenAI plugin-root hook variable,
+and validates both manifests against version 1.5.0.
 
 # 1.4.1 — Release verification and installer safety — 29 September 2026
 
