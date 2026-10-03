@@ -83,7 +83,7 @@ def proposed(root: Path, args) -> dict:
         "issue_linking": args.issue_linking or integration.get("issue_linking") or "off",
         "skill_receipts": True,
     })
-    for key in ("issue_repository", "issue_granularity", "issue_sync_direction"):
+    for key in ("issue_repository", "issue_granularity", "issue_sync_direction", "issue_series"):
         value = getattr(args, key, None)
         if value is not None:
             integration[key] = value
@@ -99,14 +99,25 @@ def proposed(root: Path, args) -> dict:
     return data
 
 
-def _write(root: Path, data: dict) -> None:
+def _checkout_pairs(values: list[str]) -> dict[str, str]:
+    pairs: dict[str, str] = {}
+    for raw in values:
+        repository_id, sep, location = raw.partition("=")
+        if not sep or not location.strip():
+            raise ValueError(f"--checkout {raw!r} must be REPOSITORY_ID=PATH")
+        pairs[_safe_id(repository_id)] = location.strip()
+    return pairs
+
+
+def _write(root: Path, data: dict, checkouts: dict[str, str] | None = None) -> None:
     (root / ".common-rules.json").write_text(json.dumps(data, indent=2) + "\n")
     ws = data["integration"].get("workspace")
     if not ws: return
     local_path = root / LOCAL
     local_path.parent.mkdir(parents=True, exist_ok=True)
-    local_path.write_text(json.dumps({"workspace_id": ws["id"], "checkouts": {
-        data["integration"]["repository_id"]: "."}}, indent=2) + "\n")
+    local_checkouts = {data["integration"]["repository_id"]: "."}
+    local_checkouts.update(checkouts or {})
+    local_path.write_text(json.dumps({"workspace_id": ws["id"], "checkouts": local_checkouts}, indent=2) + "\n")
     ignore = root / ".gitignore"
     text = ignore.read_text() if ignore.exists() else ""
     if LOCAL not in text.splitlines():
@@ -121,7 +132,7 @@ def _write(root: Path, data: dict) -> None:
 
 
 def doctor(root: Path) -> int:
-    problems = []
+    problems = list(declaration.problems(root))
     try: data = _existing(root)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"✗ {exc}"); return 1
@@ -134,6 +145,7 @@ def doctor(root: Path) -> int:
         if not _inside(root, rel) or not (root / rel).exists(): problems.append(f"tracker path does not exist: {rel}")
         if integration.get("role") not in ROLES: problems.append("role is not recognized")
         if integration.get("issue_linking") not in ISSUES: problems.append("issue_linking is not off, manual or one-way")
+    problems = list(dict.fromkeys(problems))
     for p in problems: print(f"✗ {p}")
     if not problems: print("✓ Common Rules calibration is healthy")
     return 1 if problems else 0
@@ -151,14 +163,21 @@ def main(argv=None) -> int:
         p.add_argument("--issue-repository")
         p.add_argument("--issue-granularity", choices=ISSUE_GRANULARITY)
         p.add_argument("--issue-sync-direction", choices=ISSUE_SYNC_DIRECTIONS)
+        p.add_argument("--issue-series")
         p.add_argument("--workspace-id"); p.add_argument("--workspace-role", choices=WORKSPACE_ROLES)
         p.add_argument("--hub-repository-id")
+        p.add_argument("--checkout", action="append", default=[], metavar="REPOSITORY_ID=PATH")
     sub.add_parser("doctor")
     args = ap.parse_args(argv); root = Path(args.project).resolve()
     if args.command == "doctor": return doctor(root)
-    try: data = proposed(root, args)
+    try:
+        data = proposed(root, args)
+        checkouts = _checkout_pairs(args.checkout)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"project-setup: refused -- {exc}"); return 2
-    if args.command == "apply": _write(root, data)
+    if args.command == "apply":
+        try: _write(root, data, checkouts)
+        except ValueError as exc:
+            print(f"project-setup: refused -- {exc}"); return 2
     print(json.dumps(data, indent=2))
     return 0

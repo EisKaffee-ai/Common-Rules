@@ -47,6 +47,9 @@
   tracker history [--project DIR] [--json] [--since YYYY-MM-DD]
                                        progress over time, from the ledgers'
                                        own git history -- no AI updates    (P30 P-07)
+  tracker trace LEDGER TRACE_ID [--status S] [--receipt TEXT] [--owner O]
+                                       update a validated traceability receipt
+                                       without hand-editing ledger JSON
 
 Each command is a module in tools/tracker/ with a `main(argv) -> int`, so
 commands built in parallel never edit the same file.
@@ -61,7 +64,7 @@ RULES_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RULES_DIR))
 
 COMMANDS = ("validate", "render", "check", "sync", "checkpoint", "import", "published", "board", "set", "ask",
-            "route", "lanes", "stage", "apply-staged", "findings", "rescore", "history")
+            "route", "lanes", "stage", "apply-staged", "findings", "rescore", "history", "trace")
 
 
 def validate(argv):

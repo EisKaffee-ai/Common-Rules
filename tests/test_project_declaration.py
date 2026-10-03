@@ -145,6 +145,7 @@ class TestLoad(Scratch):
             "issue_repository": "EisKaffee-ai/bean-engine",
             "issue_granularity": "proposal",
             "issue_sync_direction": "ledger-to-github",
+            "issue_series": "documentation-delivery",
             "skill_receipts": True,
             "workspace": {"id": "eiskaffee-vanilla", "role": "hub"},
         }
@@ -168,6 +169,8 @@ class TestLoad(Scratch):
              "issue_sync_direction": "ledger-to-github"},
             {"issue_repository": "EisKaffee-ai/bean-engine", "issue_granularity": "proposal",
              "issue_sync_direction": "github-to-ledger"},
+            {"issue_repository": "EisKaffee-ai/bean-engine", "issue_granularity": "proposal",
+             "issue_sync_direction": "ledger-to-github", "issue_series": ""},
         )
         for extra in invalid:
             with self.subTest(extra=extra):

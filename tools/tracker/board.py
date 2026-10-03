@@ -959,6 +959,13 @@ def architecture_dimensions(ledgers: list[tuple[Path, dict]], lifecycle_total: i
     ))
 
 
+def architecture_ledgers(ledgers: list[tuple[Path, dict]], issue_series: str | None) -> list[tuple[Path, dict]]:
+    """The issue-managed architecture subset; other ledgers remain project operations."""
+    if not issue_series:
+        return ledgers
+    return [(path, data) for path, data in ledgers if data.get("series") == issue_series]
+
+
 def _architecture_issue(data: dict, repo: str | None) -> tuple[int | None, str | None]:
     values = [data.get("issue")]
     values += [feature.get("issue") for feature in data.get("features", []) if isinstance(feature, dict)]
@@ -973,11 +980,14 @@ def _architecture_issue(data: dict, repo: str | None) -> tuple[int | None, str |
     return None, None
 
 
-def architecture_section(ledgers: list[tuple[Path, dict]], repo: str | None) -> str:
+def architecture_section(ledgers: list[tuple[Path, dict]], repo: str | None,
+                         issue_series: str | None = None) -> str:
     """Proposal cards grouped by product layer, with feature drill-down."""
     layers: dict[str, list[str]] = {}
     for _path, data in ledgers:
-        layer = str(data.get("title") or "Other").split(" · ", 1)[0]
+        issue_managed = not issue_series or data.get("series") == issue_series
+        layer = (str(data.get("title") or "Other").split(" · ", 1)[0]
+                 if issue_managed else "Project Operations")
         features = [feature for feature in data.get("features", []) if isinstance(feature, dict)]
         items = L.items(data)
         complete = sum(1 for item in items if item.get("status") in ("done", "deferred"))
@@ -992,7 +1002,8 @@ def architecture_section(ledgers: list[tuple[Path, dict]], repo: str | None) -> 
         next_item = next((item for item in items if item.get("status") not in ("done", "deferred")), None)
         issue_number, issue_url = _architecture_issue(data, repo)
         issue = (f'<a href="{e(issue_url)}">#{e(issue_number)}</a>' if issue_url else
-                 (f'#{e(issue_number)}' if issue_number else "Not linked"))
+                 (f'#{e(issue_number)}' if issue_number else
+                  ("Not linked" if issue_managed else "Issue sync excluded")))
         feature_rows = "".join(
             f'<li><strong>{b(feature.get("key") or feature.get("name"))}</strong>'
             f'{" · " + e(feature.get("name")) if feature.get("key") and feature.get("name") else ""}'
@@ -1018,11 +1029,13 @@ def architecture_section(ledgers: list[tuple[Path, dict]], repo: str | None) -> 
         )
         layers.setdefault(layer, []).append(card)
     order = [layer for layer in ("Application", "Runner", "Engine", "Memory", "AI") if layer in layers]
-    order += sorted(layer for layer in layers if layer not in order)
+    order += sorted(layer for layer in layers if layer not in order and layer != "Project Operations")
+    if "Project Operations" in layers:
+        order.append("Project Operations")
     groups = "".join(f'<section class="architecture-layer"><h3>{e(layer)}</h3>'
                      f'<div class="architecture-grid">{"".join(layers[layer])}</div></section>' for layer in order)
     return ('<section class="info-view architecture" id="architecture" data-information-section="architecture" hidden><h2>Architecture</h2>'
-            '<p class="view-note">One issue per proposal. Expand a card to drill into features and evidence.</p>'
+            '<p class="view-note">One issue per configured architecture proposal; project operations stay on this page without creating architecture issues. Expand a card to drill into features and evidence.</p>'
             f'{groups}</section>')
 
 
@@ -1181,7 +1194,11 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         current_history = None
     display_totals = (current_history.get("by_status", {}) if current_history else task_totals)
     display_total = (current_history.get("tickets_total", 0) if current_history else ledger_task_total)
-    dimension_line = architecture_dimensions(ledgers, display_total)
+    integration = (P.load(Path(project)).get("integration") or {}) if project is not None else {}
+    issue_series = integration.get("issue_series")
+    architecture_only = architecture_ledgers(ledgers, issue_series)
+    architecture_total = sum(sum(nested_task_counts(data).values()) for _path, data in architecture_only)
+    dimension_line = architecture_dimensions(architecture_only, architecture_total)
     status_columns = COLUMNS
     status_line = " / ".join(f"{display_totals.get(s, 0)} {s}" for s in ("done", "in progress", "blocked", "not started"))
     extra_line = [f"{display_totals.get(s, 0)} {s}" for s in ("in review", "in testing", "deferred")
@@ -1223,7 +1240,7 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
     progress = progress_block(project)
     completion_groups_block = completion_groups_section(entries)
     kanban = kanban_section(entries)
-    architecture = architecture_section(ledgers, repo)
+    architecture = architecture_section(ledgers, repo, issue_series)
     repositories = repositories_section(Path(project) if project is not None else None)
     evidence = evidence_section(traceability, ledgers)
 

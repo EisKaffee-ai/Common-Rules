@@ -60,13 +60,15 @@ THE TWELVE RULES
      self-consistent sha line alone is only derecord's "may I overwrite"
      test: a forged hook, a hand edit, a hook from an older derecord or one
      naming a copy of the rules does not hold. The fix is to re-run derecord;
-   - `.claude/settings.json` has a SessionStart, a PreCompact and a Stop
-     command for hooks/sessionstart, hooks/precompact and hooks/stop, and a
-     PostToolUse command for hooks/posttooluse-agent. Each command, resolved
-     through symlinks, must be RULES_DIR/hooks/<name>, or hooks/<name> at the
-     top of a checkout sharing RULES_DIR's git common directory (the main
-     checkout, or a worktree of it). A copied hooks/ directory does not hold.
-     The matcher is not checked; derecord corrects it;
+   - an adopter's `.claude/settings.json` has a SessionStart, a PreCompact and
+     a Stop command for hooks/sessionstart, hooks/precompact and hooks/stop,
+     and a PostToolUse command for hooks/posttooluse-agent. Each command,
+     resolved through symlinks, must be RULES_DIR/hooks/<name>, or hooks/<name>
+     at the top of a checkout sharing RULES_DIR's git common directory (the
+     main checkout, or a worktree of it). A copied hooks/ directory does not
+     hold. The matcher is not checked; derecord corrects it. The Common Rules
+     plugin repository itself uses its portable hooks/hooks.json instead of
+     keeping a second, machine-specific .claude/settings.json copy;
    - every line in bin/derecord's IGNORE_LINES (read from derecord, so the
      two cannot drift) is decided by git, never by a verbatim line, which a
      later `!line` undoes: `git check-ignore -v -z --stdin --no-index` shows a `.gitignore` file inside
@@ -659,37 +661,51 @@ def check_installed(ctx: Context) -> Result:
         problems.append("the git pre-commit hook is not the one this common-rules' bin/derecord installs "
                         "(edited by hand, from an older derecord, or naming another rules checkout)")
 
-    settings_path = root / ".claude" / "settings.json"
-    settings = None
-    if not settings_path.is_file():
-        problems.append("no .claude/settings.json")
-    else:
+    if root.resolve() == RULES_DIR.resolve():
+        hooks_path = root / "hooks" / "hooks.json"
         try:
-            settings = json.loads(settings_path.read_text())
-        except (OSError, ValueError):
-            problems.append(".claude/settings.json is not valid JSON")
-    if settings is not None:
-        hooks = settings.get("hooks") if isinstance(settings, dict) else None
-        hooks = hooks if isinstance(hooks, dict) else {}
+            plugin_hooks = json.loads(hooks_path.read_text()).get("hooks", {})
+        except (OSError, ValueError, AttributeError):
+            plugin_hooks = {}
+            problems.append("hooks/hooks.json is not valid plugin hook JSON")
         for event, name in SETTINGS_HOOKS:
-            commands = [h.get("command") for e in (hooks.get(event) or []) if isinstance(e, dict)
+            commands = [h.get("command") for e in (plugin_hooks.get(event) or []) if isinstance(e, dict)
                         for h in (e.get("hooks") or []) if isinstance(h, dict)]
-            ok = False
-            for c in commands:
-                if not isinstance(c, str) or not Path(c.strip()).is_absolute():
-                    continue
-                try:
-                    real = Path(c.strip()).resolve()
-                except (OSError, RuntimeError, ValueError):
-                    continue
-                # Resolved: RULES_DIR/hooks/<name>, or hooks/<name> in a checkout
-                # sharing its git common directory. A copied hooks/ is not ours.
-                if (real.name == name and real.parent.name == "hooks" and real.is_file()
-                        and is_rules_checkout(real.parent.parent)):
-                    ok = True
-                    break
-            if not ok:
-                problems.append(f"no {event} hook running common-rules' hooks/{name}")
+            expected = f'"${{CLAUDE_PLUGIN_ROOT}}/hooks/{name}"'
+            if expected not in commands:
+                problems.append(f"no portable {event} hook running common-rules' hooks/{name}")
+    else:
+        settings_path = root / ".claude" / "settings.json"
+        settings = None
+        if not settings_path.is_file():
+            problems.append("no .claude/settings.json")
+        else:
+            try:
+                settings = json.loads(settings_path.read_text())
+            except (OSError, ValueError):
+                problems.append(".claude/settings.json is not valid JSON")
+        if settings is not None:
+            hooks = settings.get("hooks") if isinstance(settings, dict) else None
+            hooks = hooks if isinstance(hooks, dict) else {}
+            for event, name in SETTINGS_HOOKS:
+                commands = [h.get("command") for e in (hooks.get(event) or []) if isinstance(e, dict)
+                            for h in (e.get("hooks") or []) if isinstance(h, dict)]
+                ok = False
+                for c in commands:
+                    if not isinstance(c, str) or not Path(c.strip()).is_absolute():
+                        continue
+                    try:
+                        real = Path(c.strip()).resolve()
+                    except (OSError, RuntimeError, ValueError):
+                        continue
+                    # Resolved: RULES_DIR/hooks/<name>, or hooks/<name> in a checkout
+                    # sharing its git common directory. A copied hooks/ is not ours.
+                    if (real.name == name and real.parent.name == "hooks" and real.is_file()
+                            and is_rules_checkout(real.parent.parent)):
+                        ok = True
+                        break
+                if not ok:
+                    problems.append(f"no {event} hook running common-rules' hooks/{name}")
 
     lines = derecord_ignore_lines()
     if not lines:

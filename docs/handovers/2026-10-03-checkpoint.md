@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 12:24
+# Checkpoint — 2026-10-03 13:51
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 9a20c15
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
 
-<!-- ledger-digest: 0390712d0fd6d7805550ef03e3b801d655ef729659f4362fb1736663fca43e87 -->
+<!-- ledger-digest: 7f4d1f8e3e96b50804ea6b06db89da65345c438bfa7ca6b4cdc73dcfa0038205 -->
 
 ## Proposal 19 · Warm-up
 
@@ -224,15 +224,15 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 9a20c15
 
 ## Proposal 37 · Canonical project tracker and architecture issue synchronization
 
-0 done / 1 in progress / 1 blocked / 0 not started / 4 in review
+1 done / 1 in progress / 0 blocked / 0 not started / 4 in review
 
 ### In progress
 
-- T-06 · [ruflo · lead · opus] · Release Common Rules 1.10.2 · release candidate advanced from internal 1.10.1 to 1.10.2 after CI version gate
+- T-06 · [ruflo · lead · opus] · Release Common Rules 1.10.3 · machine release receipt refreshed
 
 ### Blocked, and why
 
-- T-05 · 27 ledgers and one canonical workspace tracker validate; GitHub exposes exactly 27 architecture issues including Proposal 08 issue #2; Docs adoption branch lacks complete issue contract and source ledgers have empty traceability arrays, so doctor/tracecheck cannot pass yet
+- none
 
 ### Open asks
 
@@ -249,7 +249,6 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 9a20c15
 - T-02 0% · next T-02.A
 - T-03 0% · next T-03.A
 - T-04 0% · next T-04.A
-- T-05 0% · next T-05.A
 - T-06 0% · next T-06.A
 
 ## Exact next action

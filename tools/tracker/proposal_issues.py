@@ -7,6 +7,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+import datetime
 
 from tools import project as declaration
 from tools.tracker import ledger
@@ -181,6 +182,7 @@ def build_plan(project: Path | str) -> dict:
             integration.get("issue_sync_direction")) != ("one-way", "proposal", "ledger-to-github"):
         raise ValueError("project has not opted into one-way proposal issue synchronization")
     repository = integration["issue_repository"]
+    issue_series = integration.get("issue_series")
     tracker = (root / integration["tracker"]).resolve()
     if not tracker.is_relative_to(root) or not tracker.is_dir():
         raise ValueError("configured tracker is not a directory inside the project")
@@ -188,7 +190,7 @@ def build_plan(project: Path | str) -> dict:
     if not paths:
         raise ValueError("configured tracker contains no proposal ledgers")
 
-    records = []
+    all_records = []
     seen_proposals = set()
     revision = _revision(root)
     owners = _workspace_owners(root, integration)
@@ -202,7 +204,25 @@ def build_plan(project: Path | str) -> dict:
             raise ValueError(f"duplicate proposal number {number}")
         seen_proposals.add(number)
         issue = _group_issue(data, repository)
-        records.append((path, data, issue))
+        all_records.append((path, data, issue))
+
+    excluded = []
+    if issue_series:
+        records = []
+        for path, data, issue in all_records:
+            if data.get("series") == issue_series:
+                records.append((path, data, issue))
+            else:
+                if issue:
+                    raise ValueError(
+                        f"proposal {data.get('proposal')} maps to issue #{issue['number']} but is outside "
+                        f"configured issue series {issue_series}"
+                    )
+                excluded.append({"proposal": data.get("proposal"), "ledger": path.relative_to(root).as_posix()})
+        if not records:
+            raise ValueError(f"configured issue series {issue_series} contains no proposal ledgers")
+    else:
+        records = all_records
 
     issue_owners: dict[int, int] = {}
     for _path, data, issue in records:
@@ -234,7 +254,8 @@ def build_plan(project: Path | str) -> dict:
         "tracker_page": integration["tracker"].rstrip("/") + "/tracker/index.html",
         "source_revision": revision, "groups": groups,
         "preflight": {"groups": len(groups), "features": feature_total,
-                      "items": item_total, "checkboxes": item_total},
+                      "items": item_total, "checkboxes": item_total,
+                      "excluded": excluded},
     }
     canonical = json.dumps(plan, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
     plan["digest"] = hashlib.sha256(canonical).hexdigest()
@@ -257,7 +278,13 @@ def record_mapping(project: Path | str, ledger_path: Path | str, number: int, ur
     expected_url = f"https://github.com/{repository}/issues/{number}"
     if url != expected_url:
         raise ValueError(f"issue URL must be {expected_url}")
+    # Validate the complete issue set before any mutation. A single malformed
+    # proposal must never leave one mapping recorded and the rest un-runnable.
+    build_plan(root)
     data = ledger.load(path)
+    issue_series = integration.get("issue_series")
+    if issue_series and data.get("series") != issue_series:
+        raise ValueError(f"mapping target is outside configured issue series {issue_series}")
     existing = _group_issue(data, repository)
     if existing and existing["number"] != number:
         raise ValueError(f"proposal already maps to issue #{existing['number']}")
@@ -268,7 +295,20 @@ def record_mapping(project: Path | str, ledger_path: Path | str, number: int, ur
             feature["issue"] = identity
     for row in data.get("items", []):
         row["issue"] = number
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    data["updated"] = datetime.date.today().isoformat()
+    problems = ledger.validate(data)
+    if problems:
+        raise ValueError("mapping would make ledger invalid: " + "; ".join(problems))
+    original = path.read_bytes()
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    temporary.replace(path)
+    from tools.tracker import board, render
+    if render.main([str(path)]) != 0 or board.main(["--project", str(root)]) != 0:
+        path.write_bytes(original)
+        render.main([str(path)])
+        board.main(["--project", str(root)])
+        raise ValueError("mapping render failed; ledger was restored")
 
 
 def reconcile(plan: dict, remote: list[dict]) -> list[str]:

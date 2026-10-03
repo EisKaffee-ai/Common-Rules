@@ -37,6 +37,7 @@ class CanonicalArchitectureBoardTest(unittest.TestCase):
             "tracker": "content/proposal/delivery/docs/proposals",
             "issue_linking": "one-way", "issue_repository": "EisKaffee-ai/bean-engine",
             "issue_granularity": "proposal", "issue_sync_direction": "ledger-to-github",
+            "issue_series": "documentation-delivery",
             "skill_receipts": True, "workspace": {"id": "eiskaffee-vanilla", "role": "hub"},
         }}
         (self.root / ".common-rules.json").write_text(json.dumps(manifest))
@@ -52,6 +53,7 @@ class CanonicalArchitectureBoardTest(unittest.TestCase):
                  "url": "https://github.com/EisKaffee-ai/bean-engine/issues/2"}
         data = {
             "proposal": 8, "title": "Engine · Media access & rendition", "namespace": "engine.media",
+            "series": "documentation-delivery",
             "status": "accepted", "updated": "2026-10-03", "tiers": {},
             "phases": [{"id": "D", "name": "Design"}, {"id": "I", "name": "Implementation"}],
             "features": [
@@ -74,6 +76,13 @@ class CanonicalArchitectureBoardTest(unittest.TestCase):
                 "owner": "lead", "status": "in progress"}],
         }
         (self.ledgers / "08-engine-media.json").write_text(json.dumps(data, indent=2) + "\n")
+        operations = {
+            "proposal": 28, "title": "Vanilla · Focused findings", "series": "project-operations",
+            "status": "accepted", "phases": [{"id": "U", "name": "UI"}],
+            "items": [row("U-01", "in progress", "ui.library.timeline", issue=None)],
+            "asks": [], "traceability": [],
+        }
+        (self.ledgers / "28-project-operations.json").write_text(json.dumps(operations, indent=2) + "\n")
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -91,6 +100,8 @@ class CanonicalArchitectureBoardTest(unittest.TestCase):
         self.assertIn("1 layer · 1 architecture group · 2 features · 3 lifecycle steps", text)
         self.assertNotIn("tracked tasks", text)
         self.assertIn('data-layer="Engine"', text)
+        self.assertIn('data-layer="Project Operations"', text)
+        self.assertIn("Issue sync excluded", text)
         self.assertIn("2 features", text)
         self.assertIn("1/3 rows complete", text)
         self.assertIn("accepted / pending", text)

@@ -71,11 +71,14 @@ module does not know is ignored, because later proposals add keys.
       "issue_repository": "owner/repository",
       "issue_granularity": "proposal",
       "issue_sync_direction": "ledger-to-github",
+      "issue_series": "documentation-delivery",
       "workspace": {"id": "product", "role": "member", "hub": "docs"}}
       Proposal 36's calibrated repository identity and optional workspace
-      membership. The three issue_* fields are an optional, indivisible
+      membership. The repository, granularity and direction fields are an optional, indivisible
       proposal-level synchronization contract: the ledger is authoritative
-      and only ledger-to-GitHub flow is supported. Paths remain inside this
+      and only ledger-to-GitHub flow is supported. issue_series optionally
+      limits that contract to one named ledger series while other ledgers stay
+      visible as Project Operations in the same tracker. Paths remain inside this
       repository; machine checkout paths belong in the ignored
       `.common-rules/workspace.local.json`.
 
@@ -262,6 +265,12 @@ def _integration_problems(value) -> list[str]:
             bad.append(f"{FILE}: integration.issue_sync_direction must be ledger-to-github")
         if value.get("issue_linking") != "one-way":
             bad.append(f"{FILE}: proposal issue synchronization requires integration.issue_linking one-way")
+    if "issue_series" in value:
+        series = value.get("issue_series")
+        if not isinstance(series, str) or not series.strip() or not _utf8(series) or not _one_line(series):
+            bad.append(f"{FILE}: integration.issue_series must be non-empty, valid UTF-8 and one line")
+        if not all(key in value for key in issue_keys):
+            bad.append(f"{FILE}: integration.issue_series requires the complete proposal issue contract")
     if value.get("skill_receipts") is not True:
         bad.append(f"{FILE}: integration.skill_receipts must be true")
     workspace = value.get("workspace")

@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
-from tools.context_budget import measure_root
+from tools.context_budget import measure_root, update_marked_table
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -46,6 +47,16 @@ class ContextBudgetTest(unittest.TestCase):
         self.assertIn(f"{report['discovery']['bytes']:,}", readme)
         self.assertIn(f"{report['discovery']['estimated_tokens']:,}", readme)
         self.assertIn(f"{report['full_skill_package_ceiling']['estimated_tokens']:,}", readme)
+
+    def test_marked_tables_are_updated_by_the_measurement_script(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "report.md"
+            path.write_text("before\n<!-- context-budget:start -->\nstale\n<!-- context-budget:end -->\nafter\n")
+            report = measure_root(ROOT)
+            update_marked_table(path, report)
+            text = path.read_text()
+            self.assertIn(f"{report['discovery']['estimated_tokens']:,}", text)
+            self.assertNotIn("stale", text)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
-# Common Rules 1.10.2 release candidate
+# Common Rules 1.10.3 release candidate
 
 ## Outcome
 
-Version 1.10.2 adds an optional canonical-project mode without changing older
+Version 1.10.3 adds an optional canonical-project mode without changing older
 projects:
 
 - a configured nested ledger catalogue owns one generated tracker page;
@@ -15,9 +15,26 @@ projects:
   does not use browser automation, `gh`, hidden HTTP calls, or reverse sync;
 - Codex and Claude Code receive the same portable manifest and lifecycle
   skills.
+- mixed architecture and operational ledger series remain on one page while
+  only the configured architecture series receives GitHub issues;
+- shipped Python commands own every generated tracker identifier, count,
+  digest, mapping, state transition, history row, checkpoint and HTML surface.
 
 Existing row-level issue workflows and manifests without proposal granularity
 retain their current behavior.
+
+Agents may supply explicit source text and invoke the commands. They do not
+invent generated IDs or numbers, directly rewrite ledger JSON, or hand-edit
+generated HTML. External providers assign their own IDs; Common Rules records
+the returned value through a validating Python command.
+
+That write-back preflights the complete issue set, validates an atomic ledger
+write, and regenerates both the proposal and canonical tracker pages. Setup
+doctor applies the full integration contract, and setup validates every local
+checkout argument before writing. Proposal-mode workspace checks resolve every
+mapped member and verify its pinned Git revision; tracecheck diffs qualified
+implementation paths against those revisions instead of checking existence
+alone.
 
 ## Context footprint
 
@@ -25,13 +42,15 @@ The release measures prompt context separately from process memory. Both Codex
 and Claude Code progressively load skills: discovery metadata is visible first,
 then a selected `SKILL.md`, then only the references that workflow needs.
 
-| Surface | Bytes | Estimated tokens | Load behavior |
+<!-- context-budget:start -->
+| Surface | UTF-8 bytes | Estimated tokens | What actually loads |
 |---|---:|---:|---|
-| 13 skill names, descriptions, and paths | 2,505 | 627 | idle discovery |
-| all `SKILL.md` files | 24,620 | 6,155 | one selected skill at a time |
-| optional references | 3,068 | 767 | only when explicitly needed |
-| full skill-package ceiling | 27,688 | 6,922 | never the default load |
-| hook configuration/scripts | — | 0 idle | only returned output enters context |
+| Idle skill discovery (13 names, descriptions, paths) | 2,505 | 627 | Every session/request |
+| All `SKILL.md` files combined | 25,751 | 6,438 | Not together; only the selected skill is loaded |
+| Optional references | 3,225 | 807 | Only when the selected workflow needs one |
+| Full skill-package ceiling | 28,976 | 7,244 | Comparison ceiling; never the default load |
+| Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |
+<!-- context-budget:end -->
 
 The discovery estimate is 26% below 1.9.0 (849 → 627 tokens). The detailed
 proposal-issue procedure is an on-demand tracker reference, and the release
@@ -51,9 +70,12 @@ The first parallel run no longer waits for one whole slow file merely to learn
 its duration. Large files are split by test class on a cold checkout and later
 runs reuse measured shard timings. On the release host, all 124 warmup tests
 completed in 174.6 seconds versus the previously documented 575-second floor,
-about 70% faster. The final release gate passed all 2,065 tests in 189.1
-seconds. The aggregate runner still reports the complete test count, failures
-and errors and preserves the underlying exit code.
+about 70% faster. The final release gate passed all 2,088 tests in 189.6 seconds. The aggregate runner still reports the complete test count, failures
+and errors and preserves the underlying exit code. `bin/quiet --receipt`
+writes a digest-bound machine record of the exact command and result;
+`bin/release-evidence` accepts only the full merge-gate discovery receipt and
+refreshes both public documents and the canonical ledger. Release measurements
+are not entered by an agent.
 
 ## Acceptance fixture
 
@@ -78,7 +100,8 @@ Preview the optional settings before applying them:
     "issue_linking": "one-way",
     "issue_repository": "owner/repository",
     "issue_granularity": "proposal",
-    "issue_sync_direction": "ledger-to-github"
+    "issue_sync_direction": "ledger-to-github",
+    "issue_series": "documentation-delivery"
   }
 }
 ```

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+import datetime
 from pathlib import Path
 
 from tools.tracker import proposal_issues
@@ -24,8 +25,9 @@ def item(item_id: str, status: str, feature: str, *, reason: str | None = None,
     return row
 
 
-def ledger(number: int, title: str, feature: str, rows: list[dict], issue=None) -> dict:
-    return {
+def ledger(number: int, title: str, feature: str, rows: list[dict], issue=None,
+           series: str | None = None) -> dict:
+    data = {
         "proposal": number, "title": title, "namespace": feature.rsplit(".", 1)[0],
         "status": "accepted", "phases": [
             {"id": phase, "name": phase} for phase in sorted({r["phase"] for r in rows})
@@ -37,6 +39,9 @@ def ledger(number: int, title: str, feature: str, rows: list[dict], issue=None) 
                                         "path": "src/feature.py", "evidence": "pinned source"}]}],
         "items": rows, "asks": [], "traceability": [],
     }
+    if series is not None:
+        data["series"] = series
+    return data
 
 
 class ProposalIssueTest(unittest.TestCase):
@@ -121,6 +126,41 @@ class ProposalIssueTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "issue #7 maps to proposals 1 and 2"):
             proposal_issues.build_plan(self.root)
 
+    def test_issue_series_keeps_project_operations_out_of_architecture_plan(self):
+        manifest = json.loads((self.root / ".common-rules.json").read_text())
+        manifest["integration"]["issue_series"] = "documentation-delivery"
+        (self.root / ".common-rules.json").write_text(json.dumps(manifest))
+        issue = {"repository": "EisKaffee-ai/bean-engine", "number": 2,
+                 "url": "https://github.com/EisKaffee-ai/bean-engine/issues/2"}
+        self.write("08-engine-media.json", ledger(
+            8, "Engine · Media access", "engine.media.preview",
+            [item("D-01", "done", "engine.media.preview", evidence="receipt")],
+            issue=issue, series="documentation-delivery"))
+        self.write("28-project-operations.json", ledger(
+            28, "Vanilla · Focused findings", "ui.library.timeline",
+            [item("UI-01", "in progress", "ui.library.timeline")],
+            series="project-operations"))
+
+        plan = proposal_issues.build_plan(self.root)
+
+        self.assertEqual(1, plan["preflight"]["groups"])
+        self.assertEqual([8], [group["proposal"] for group in plan["groups"]])
+        self.assertEqual([28], [row["proposal"] for row in plan["preflight"]["excluded"]])
+        self.assertEqual("[Architecture 08/08] Engine · Media access", plan["groups"][0]["title"])
+
+    def test_issue_series_refuses_a_mapped_project_operations_ledger(self):
+        manifest = json.loads((self.root / ".common-rules.json").read_text())
+        manifest["integration"]["issue_series"] = "documentation-delivery"
+        (self.root / ".common-rules.json").write_text(json.dumps(manifest))
+        issue = {"repository": "EisKaffee-ai/bean-engine", "number": 29,
+                 "url": "https://github.com/EisKaffee-ai/bean-engine/issues/29"}
+        self.write("28-project-operations.json", ledger(
+            28, "Vanilla · Focused findings", "ui.library.timeline",
+            [item("UI-01", "in progress", "ui.library.timeline")],
+            issue=issue, series="project-operations"))
+        with self.assertRaisesRegex(ValueError, "outside configured issue series"):
+            proposal_issues.build_plan(self.root)
+
     def test_record_mapping_assigns_one_identity_to_group_features_and_items(self):
         path = self.write("01-app.json", ledger(1, "Application · Consumer", "application.consumer", [
             item("D-01", "done", "application.consumer", evidence="receipt"),
@@ -135,6 +175,20 @@ class ProposalIssueTest(unittest.TestCase):
         self.assertEqual(31, saved["features"][0]["issue"]["number"])
         self.assertEqual("done", saved["items"][0]["status"])
         self.assertEqual("receipt", saved["items"][0]["log"][0]["evidence"])
+        self.assertEqual(datetime.date.today().isoformat(), saved["updated"])
+        self.assertTrue((self.tracker / "tracker" / path.with_suffix(".html").name).is_file())
+        self.assertTrue((self.tracker / "tracker/index.html").is_file())
+
+    def test_record_mapping_validates_complete_set_before_writing(self):
+        path = self.write("01-app.json", ledger(1, "Application · Consumer", "application.consumer", [
+            item("D-01", "in progress", "application.consumer")]))
+        self.write("02-bad.json", ledger(2, "Application · Broken", "application.broken", [
+            item("D-01", "deferred", "application.broken")]))
+        before = path.read_bytes()
+        with self.assertRaisesRegex(ValueError, "deferred requires"):
+            proposal_issues.record_mapping(
+                self.root, path, 31, "https://github.com/EisKaffee-ai/bean-engine/issues/31")
+        self.assertEqual(before, path.read_bytes())
 
     def test_reconciliation_reports_remote_drift_without_changing_the_ledger(self):
         issue = {"repository": "EisKaffee-ai/bean-engine", "number": 2,

@@ -22,3 +22,10 @@ fields together: `issue_linking: one-way`, `issue_repository: owner/name`,
 `issue_sync_direction: ledger-to-github`. Never offer or infer reverse or
 two-way synchronization. These settings describe a plan; they do not authorize
 issue creation. Codex and Claude Code use the same manifest and commands.
+When the tracker mixes architecture and operational proposal series, calibrate
+`issue_series` to the architecture series; operational ledgers remain on the
+page without receiving architecture issues.
+For a multi-repository workspace, pass every known machine checkout to apply as
+`--checkout repository_id=path`. The Python command stores these locations only
+in the ignored local workspace manifest; never type machine paths into the
+committed manifest or ledger.

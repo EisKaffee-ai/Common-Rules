@@ -88,6 +88,24 @@ commits and the ledger remains authoritative.
   test while sharding large files at class granularity on a cold checkout and
   reusing measured shard durations later. The release records both total test
   count and wall time; scheduling changes must preserve the aggregate verdict.
+- **CR37-R24 — Mixed-ledger issue scope.** A hub may name
+  `integration.issue_series` to limit proposal-level GitHub synchronization to
+  one ledger series. Ledgers outside that series remain visible in the single
+  tracker as Project Operations, are excluded from architecture totals and
+  issue drafts, and are refused if they already carry an issue mapping.
+- **CR37-R25 — Deterministic generated state.** Python commands shipped in the
+  plugin own every generated value and repeatable tracker operation: proposal,
+  ask and finding identifiers; counts and percentages; digests; issue drafts;
+  provider-returned mapping write-back; ledger validation and state
+  transitions; board rendering; history; checkpoints; workspace joins and
+  freshness checks. Agents may supply explicit source text and invoke those
+  commands, but must never invent generated identifiers or numbers, hand-edit
+  generated tracker HTML, or directly rewrite ledger state.
+- **CR37-R26 — Local cross-repository resolution.** Setup accepts explicit
+  `repository_id=checkout` mappings and writes them only to the ignored local
+  workspace manifest. Tracecheck resolves repository-qualified implementation
+  references through that manifest, and workspace validation accepts absolute
+  machine checkout paths without putting them in committed project truth.
 
 ## Vanilla acceptance fixture
 
@@ -100,6 +118,8 @@ The read-only acceptance fixture is the EisKaffee Vanilla Docs workspace:
 - 27 architecture groups, 59 features and 362 lifecycle items;
 - issue repository `EisKaffee-ai/bean-engine`;
 - Bean Engine issue #2 retained for Proposal 08;
+- issue series `documentation-delivery`, so later operational proposals do not
+  create extra architecture issues;
 - five layer groups: Application 1,2,26,27; Runner 3–5; Engine 6,8–11,14,15;
   Memory 7,12,13,20–25; AI 16–19.
 
@@ -111,6 +131,6 @@ GitHub plugin after the full draft set validates.
 
 Focused tests cover manifest validation, recursive discovery, proposal drafts,
 issue mapping, status/checklist rules, drift refusal, tracker sections,
-workspace membership and exact totals. The full merge gate, Docs read-only
-validation, Docs build evidence and GitHub plugin reconciliation must all be
-recorded before release.
+workspace membership, exact totals and deterministic generated-page freshness.
+The full merge gate, Docs read-only validation, Docs build evidence and GitHub
+plugin reconciliation must all be recorded before release.

@@ -2,6 +2,8 @@
 
 Use this mode only when `.common-rules.json` declares `issue_linking: one-way`,
 `issue_granularity: proposal`, and `issue_sync_direction: ledger-to-github`.
+If `issue_series` is set, only that ledger series is issue-managed; excluded
+ledgers remain visible as Project Operations and must not carry issue mappings.
 The ledger is authoritative. This workflow never reads GitHub checkbox state
 back into ledger status.
 

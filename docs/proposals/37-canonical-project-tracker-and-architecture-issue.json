@@ -277,7 +277,7 @@
         "T-03",
         "T-04"
       ],
-      "status": "blocked",
+      "status": "done",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -290,6 +290,13 @@
           "by": "session:codex",
           "evidence": "27 ledgers and one canonical workspace tracker validate; GitHub exposes exactly 27 architecture issues including Proposal 08 issue #2; Docs adoption branch lacks complete issue contract and source ledgers have empty traceability arrays, so doctor/tracecheck cannot pass yet",
           "status": "blocked"
+        },
+        {
+          "at": "2026-10-03T13:08:57+02:00",
+          "event": "all parts done",
+          "by": "session:codex",
+          "evidence": "",
+          "status": "done"
         }
       ],
       "parts": [
@@ -297,10 +304,19 @@
           "id": "T-05.A",
           "title": "Real Docs adoption and acceptance receipt",
           "share": 100,
-          "status": "blocked",
+          "status": "done",
           "owner": "lead",
           "risk": "high",
-          "risk_reason": "Depends on independently committed Docs manifest, traceability and build receipt."
+          "risk_reason": "Depends on independently committed Docs manifest, traceability and build receipt.",
+          "log": [
+            {
+              "at": "2026-10-03T13:08:57+02:00",
+              "event": "read-only Vanilla/Docs acceptance passed in a disposable checkout",
+              "by": "session:codex",
+              "evidence": "Docs revision 9bf5f0d: setup doctor healthy; issue plan 27 groups, 59 features, 362 items, Proposal 08 -> issue #2, Proposal 28 excluded as Project Operations; tracecheck 2 rows verified with Vanilla checkout mapping; canonical workspace tracker current; npm test 41/41, check and build passed",
+              "status": "done"
+            }
+          ]
         }
       ]
     },
@@ -308,30 +324,35 @@
       "id": "T-06",
       "phase": "T",
       "cx": "C4",
-      "title": "Release Common Rules 1.10.2",
-      "what": "Reconcile manifests, changelog, release notes, tracker evidence, independent review and publication for the optional canonical-tracker feature release; 1.10.0 remains the internal candidate before the fast-gate follow-up.",
+      "title": "Release Common Rules 1.10.3",
+      "what": "Reconcile manifests, changelog, release notes, deterministic tracker automation, portable Claude hooks, context/runtime evidence, independent review and publication for the canonical-tracker infrastructure release; 1.10.0 through 1.10.2 remain internal candidates.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
         "README.md",
         "plugin.json",
         ".claude-plugin/plugin.json",
+        "hooks/hooks.json",
+        "bin/conformance",
         "bin/context-budget",
         "tools/context_budget.py",
-        "tests/test_context_budget.py",
         "bin/quiet",
-        "tests/test_quiet.py",
-        "docs/RELEASE-1.10.2.md"
+        "bin/tracker",
+        "tools/tracker/trace.py",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py",
+        "docs/RELEASE-1.10.3.md"
       ],
       "tests": [
         "bin/context-budget --json --check",
-        "python3 -m unittest -q tests.test_context_budget tests.test_quiet",
+        "python3 -m unittest -q tests.test_context_budget tests.test_quiet tests.test_plugin_package tests.test_tracker_trace tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
         "claude plugin validate .",
         "bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q"
       ],
-      "done": "The 1.10.2 candidate publishes reproducible context-load and test-runtime analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
+      "done": "The 1.10.3 candidate ships Python-owned generated tracker state, mixed-ledger issue scope, local cross-repository resolution, portable Claude/Codex packaging, reproducible context and runtime analysis, and passes focused/full gates, CI and independent review before merge, tag and public release.",
       "depends": [
         "T-01",
         "T-02",
@@ -376,6 +397,31 @@
           "event": "release candidate advanced from internal 1.10.1 to 1.10.2 after CI version gate",
           "by": "session:codex",
           "evidence": "CI run 37116129292 correctly required a new patch marker because the final 2,065-test evidence commit followed the 1.10.1 marker; history remains intact"
+        },
+        {
+          "at": "2026-10-03T13:08:58+02:00",
+          "event": "release target advanced to 1.10.3 with deterministic tracker automation",
+          "by": "session:codex",
+          "evidence": "A-07 to A-09: removed obsolete plugin-local Claude copies, expanded portable hooks, made generated tracker state Python-owned, and added mixed-ledger plus cross-repository resolution"
+        },
+        {
+          "at": "2026-10-03T13:21:30+02:00",
+          "event": "Common Rules 1.10.3 full release gate passed",
+          "by": "session:codex",
+          "evidence": "Bundled Python 3.12/Pillow runtime with process access: 2,078 tests passed in 176.5s; focused release suite 70 tests passed; version, workflow stamp and 627-token discovery budget agree; disposable Docs acceptance passed 41 tests plus check/build"
+        },
+        {
+          "at": "2026-10-03T13:40:34+02:00",
+          "event": "release-review gaps fixed through deterministic Python boundaries",
+          "by": "session:codex",
+          "evidence": "182 focused tests and the 2,085-test full gate passed; issue write-back, proposal workspace validation, cross-repository diffs, setup doctor, pre-write checkout validation, and generated release evidence are covered"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "machine release receipt refreshed",
+          "by": "bin/release-evidence",
+          "evidence": "full merge gate: 2,088 tests in 189.6 seconds; receipt sha256 78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71",
+          "status": "in progress"
         }
       ],
       "parts": [
@@ -388,7 +434,13 @@
           "risk": "high",
           "risk_reason": "Version publication changes the shared plugin consumed by all adopters."
         }
-      ]
+      ],
+      "release_gate": {
+        "status": "OK",
+        "tests": 2088,
+        "seconds": 189.6,
+        "receipt_sha256": "78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71"
+      }
     }
   ],
   "traceability": [
@@ -500,20 +552,26 @@
         "CR37-R17",
         "CR37-R18",
         "CR37-R19",
-        "CR37-R20"
+        "CR37-R20",
+        "CR37-R24",
+        "CR37-R26"
       ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#vanilla-acceptance-fixture",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#repository-ownership",
       "implementation_files": [
         "docs/requirements/37-canonical-tracker-and-proposal-issues.md",
-        "docs/design/37-canonical-tracker-and-proposal-issues.md"
+        "docs/design/37-canonical-tracker-and-proposal-issues.md",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py"
       ],
       "tests_commands": [
-        "read-only Docs and GitHub plugin acceptance suite"
+        "read-only Docs and GitHub plugin acceptance suite",
+        "python3 -m unittest -q tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup"
       ],
-      "receipt_or_refusal": "Read-only acceptance verified 27 ledgers, one canonical workspace tracker and exactly 27 GitHub architecture issues including Proposal 08 issue #2; final acceptance is blocked because the independent Docs adoption lacks the complete issue contract, ledger traceability arrays and build receipt",
+      "receipt_or_refusal": "Read-only disposable Docs checkout at revision 9bf5f0d: 27 architecture groups, 59 features, 362 lifecycle rows, Proposal 08 issue #2, Proposal 28 Project Operations exclusion, 2 traceability rows, canonical workspace tracker, 41 Docs tests, check and build all passed",
       "owner": "lead",
-      "status": "blocked"
+      "status": "done"
     },
     {
       "id": "TR-06",
@@ -521,7 +579,10 @@
       "requirement_ids": [
         "CR37-R21",
         "CR37-R22",
-        "CR37-R23"
+        "CR37-R23",
+        "CR37-R24",
+        "CR37-R25",
+        "CR37-R26"
       ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#acceptance-evidence",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#context-budget",
@@ -533,16 +594,27 @@
         "tools/context_budget.py",
         "bin/quiet",
         "plugin.json",
-        ".claude-plugin/plugin.json"
+        ".claude-plugin/plugin.json",
+        "hooks/hooks.json",
+        "bin/conformance",
+        "bin/tracker",
+        "tools/tracker/trace.py",
+        "tools/tracecheck.py",
+        "tools/workspace_tracker.py",
+        "tools/project_setup.py",
+        "bin/release-evidence",
+        "tools/release_evidence.py"
       ],
       "tests_commands": [
         "bin/context-budget --json --check",
         "python3 -m unittest -q tests.test_context_budget tests.test_quiet",
         "bin/version-check --check",
         "bin/workflow-stamp --check",
-        "python3 -m unittest discover -s tests -q"
+        "python3 -m unittest discover -s tests -q",
+        "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_trace tests.test_tracecheck tests.test_workspace_tracker tests.test_project_setup",
+        "python3 -m unittest -q tests.test_release_evidence"
       ],
-      "receipt_or_refusal": "Local 1.10.2 candidate carries the context, version and workflow gates plus the 2,065-test/189.1s receipt; downstream acceptance, replacement CI and independent review remain",
+      "receipt_or_refusal": "Machine release receipt: 2,088 full-suite tests pass in 189.6 seconds; sha256 78908d5610178636c1ea920706e37b95c80d657d25bd7fa09f33009aa36bca71; independent review and CI pending",
       "owner": "lead",
       "status": "in progress"
     }
@@ -600,6 +672,50 @@
       "state": "became-item",
       "source": "chat",
       "note": "Release 1.10.0 must reduce full-gate wall time without reducing coverage and publish timing evidence."
+    },
+    {
+      "id": "A-06",
+      "at": "2026-10-03T12:46:34+02:00",
+      "by": "sponsor",
+      "kind": "question",
+      "quote": "When can we have the common rules released?",
+      "became": null,
+      "state": "answered",
+      "source": "chat",
+      "note": "Release timing depends on clearing the final Common Rules gate, independent review, and downstream read-only acceptance evidence."
+    },
+    {
+      "id": "A-07",
+      "at": "2026-10-03T12:46:34+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "What is the blocking point? Remove the user-owned files. I don't want to keep any legacy files if they are no longer required, and proceed ahead with the implementation, remove all the blocks.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Remove local-only user edits, retain files proven load-bearing, delete only genuinely obsolete compatibility copies, and continue through release gates."
+    },
+    {
+      "id": "A-08",
+      "at": "2026-10-03T12:54:01+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "And then why is it taking so time? You're not creating a feature. You're just creating this common rule infrastructure. And please make sure that the tracker and all the elements are being managed through Python and not through AI, because I see a lot of problems with the current tracker. So anything that can use tracking should be done through Python scripts, which is repeatable and not through AI.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Treat the work as deterministic Common Rules infrastructure: Python owns tracker state transitions, validation, issue plans, write-back, rendering and freshness checks; agents only supply explicit inputs and invoke the tools."
+    },
+    {
+      "id": "A-09",
+      "at": "2026-10-03T12:55:12+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "Number or anything that's being generated anywhere, that should be through scripts always. And that is part of the plugin that we are shipping. It should not be done through AI regardless.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "All generated identifiers, counts, digests, plans, mappings, summaries, checkpoints and rendered artifacts must be produced or recorded by scripts shipped in the plugin; AI never fabricates or directly writes generated values."
     }
   ],
   "proposed_changes": [],

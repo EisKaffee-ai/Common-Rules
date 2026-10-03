@@ -25,6 +25,31 @@ class PluginPackageTest(unittest.TestCase):
         commands = json.dumps(hooks)
         self.assertIn("CLAUDE_PLUGIN_ROOT", commands)
         self.assertNotIn("/Users/", commands)
+        expected = {
+            "SessionStart": (
+                '"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle" doctor',
+                '"${CLAUDE_PLUGIN_ROOT}/hooks/sessionstart"',
+            ),
+            "PreCompact": ('"${CLAUDE_PLUGIN_ROOT}/hooks/precompact"',),
+            "Stop": (
+                '"${CLAUDE_PLUGIN_ROOT}/hooks/project-lifecycle" tracecheck',
+                '"${CLAUDE_PLUGIN_ROOT}/hooks/stop"',
+            ),
+            "PostToolUse": ('"${CLAUDE_PLUGIN_ROOT}/hooks/posttooluse-agent"',),
+        }
+        for event, commands_expected in expected.items():
+            commands_actual = tuple(
+                hook["command"]
+                for entry in hooks["hooks"][event]
+                for hook in entry["hooks"]
+            )
+            self.assertEqual(commands_expected, commands_actual)
+        self.assertEqual("Agent|Task", hooks["hooks"]["PostToolUse"][0]["matcher"])
+
+    def test_plugin_repo_does_not_ship_project_local_claude_copies(self):
+        self.assertFalse((ROOT / ".claude/settings.json").exists())
+        self.assertFalse((ROOT / ".claude/skills/warmup/SKILL.md").exists())
+        self.assertFalse((ROOT / ".claude/skills/reheat/SKILL.md").exists())
 
     def test_claude_manifest_matches_the_portable_release(self):
         portable = json.loads((ROOT / "plugin.json").read_text())

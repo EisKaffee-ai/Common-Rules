@@ -108,6 +108,18 @@ class TestQuiet(unittest.TestCase):
         self.assertTrue(r.stdout.startswith("quiet: OK"), r.stdout)
         self.assertIn("3 tests", r.stdout)
 
+    def test_machine_receipt_binds_command_log_and_measurement(self):
+        receipt = Path(self.tmp.name) / "receipt.json"
+        r, log = self.run_quiet(["--label", "merge-gate", "--receipt", str(receipt)], UNITTEST_OK, 0)
+        self.assertEqual(0, r.returncode)
+        data = json.loads(receipt.read_text())
+        self.assertEqual("common-rules-quiet-gate", data["kind"])
+        self.assertEqual("merge-gate", data["label"])
+        self.assertEqual("OK", data["status"])
+        self.assertEqual(3, data["tests"])
+        self.assertEqual(0.001, data["test_seconds"])
+        self.assertRegex(data["log_sha256"], r"^[0-9a-f]{64}$")
+
     def test_unittest_failed_exit_1(self):
         r, log = self.run_quiet([], UNITTEST_FAILED, 1)
         self.assertEqual(r.returncode, 1)

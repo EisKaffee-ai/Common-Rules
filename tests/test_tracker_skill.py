@@ -13,6 +13,17 @@ class TrackerSkillTest(unittest.TestCase):
         self.assertIn("references/proposal-issue-sync.md", text)
         self.assertIn("integrated GitHub", text)
 
+    def test_tracker_state_and_generated_pages_are_python_owned(self):
+        text = (ROOT / "skills/tracker/SKILL.md").read_text()
+        self.assertIn("Python-owned infrastructure", text)
+        self.assertIn("Never\ninvent generated values", text)
+        self.assertIn("hand-edit ledger JSON", text)
+        self.assertIn("hand-edit generated tracker", text)
+        self.assertIn("External providers assign their own IDs", text)
+        for command in ("bin/new-proposal", "bin/tracker ask", "findings", "stage`/`apply-staged",
+                        "sync", "board", "history", "checkpoint", "trace", "bin/workspace-tracker"):
+            self.assertIn(command, text)
+
     def test_issue_workflow_preflights_before_remote_mutation_and_records_results(self):
         text = (ROOT / "skills/tracker/references/proposal-issue-sync.md").read_text()
         normalized = " ".join(text.split())

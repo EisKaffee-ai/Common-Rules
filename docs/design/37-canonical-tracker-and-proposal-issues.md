@@ -21,6 +21,31 @@ Status: accepted · 2026-10-03
 
 Ledger status flows right. GitHub state never flows left without an explicit,
 evidence-backed reconciliation.
+
+## Deterministic automation boundary
+
+```text
+human or agent supplies an explicit decision
+                    │
+                    ▼
+       bin/tracker / bin/workspace-tracker
+                    │
+                    ▼
+       Python validates → mutates → renders → checks
+                    │
+                    ▼
+      committed ledger + reproducible generated page
+```
+
+The AI is an operator of the contract, not the tracker implementation. It does
+not assign proposal/ask/finding numbers, calculate totals or digests, or edit
+ledger JSON and generated HTML directly. `new-proposal`, `tracker ask`,
+`tracker findings`, `tracker set`, `tracker stage`/`apply-staged`, proposal
+issue planning and mapping, `tracker board`, `tracker checkpoint`, `tracker
+history`, and `workspace-tracker` own their respective values and state
+transitions. GitHub assigns its own issue number; `tracker sync --record`
+validates and writes the provider-returned identity. Generated pages carry
+source digests and `--check` fails after any hand edit or stale source change.
 ```
 
 ## Manifest extension
@@ -36,15 +61,16 @@ evidence-backed reconciliation.
     "issue_repository": "EisKaffee-ai/bean-engine",
     "issue_granularity": "proposal",
     "issue_sync_direction": "ledger-to-github",
+    "issue_series": "documentation-delivery",
     "workspace": {"id": "eiskaffee-vanilla", "role": "hub"},
     "skill_receipts": true
   }
 }
 ```
 
-The three new keys are optional. When `issue_granularity` is `proposal`, all
-four issue fields form one contract and invalid combinations fail early.
-Existing manifests remain valid.
+The repository, granularity and direction keys are optional as one contract.
+`issue_series` is an optional selector inside that contract. Existing manifests
+remain valid.
 
 ## Setup and discovery
 
@@ -76,6 +102,13 @@ mappings, and create or update only the delta. Plugin results are written back
 through a narrow Common Rules command that assigns one issue identity to the
 proposal and every item. The legacy row-level `tracker sync LEDGER` flow stays
 available for projects that did not opt in.
+
+When `issue_series` is configured, the plan includes only ledgers in that
+series and names every excluded ledger in preflight output. An excluded ledger
+that already carries an issue identity is a configuration error, not silently
+orphaned state. The canonical page still renders excluded ledgers under
+Project Operations; its architecture dimensions count only the selected
+series.
 
 ## Generated body
 
@@ -125,6 +158,14 @@ The board reads the configured ledger directory rather than assuming
 `docs/proposals`. Workspace information is rendered into the same HTML file;
 `workspace-tracker` may still create an internal intermediate fragment for
 validation, but it is not another public page.
+
+Machine checkout locations are supplied to `project-setup apply` as repeated
+`--checkout repository_id=path` values. The command writes them only to the
+ignored `.common-rules/workspace.local.json`. A trace path such as
+`vanilla:flutter_photovault/lib/presentation/library_screen.dart` resolves
+against the declared Vanilla checkout; an absent mapping, unsafe relative path,
+or missing file is a named tracecheck failure. The committed manifest and
+workspace revision file remain portable.
 
 ## Repository ownership
 

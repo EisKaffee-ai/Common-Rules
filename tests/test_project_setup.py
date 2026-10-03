@@ -59,12 +59,14 @@ class ProjectSetupTest(unittest.TestCase):
             "--issue-repository", "EisKaffee-ai/bean-engine",
             "--issue-granularity", "proposal",
             "--issue-sync-direction", "ledger-to-github",
+            "--issue-series", "documentation-delivery",
         )
         self.assertEqual(0, result.returncode, result.stderr)
         integration = json.loads(result.stdout)["integration"]
         self.assertEqual("EisKaffee-ai/bean-engine", integration["issue_repository"])
         self.assertEqual("proposal", integration["issue_granularity"])
         self.assertEqual("ledger-to-github", integration["issue_sync_direction"])
+        self.assertEqual("documentation-delivery", integration["issue_series"])
 
     def test_preview_refuses_an_incomplete_or_reverse_issue_contract(self):
         incomplete = self.invoke(
@@ -102,6 +104,27 @@ class ProjectSetupTest(unittest.TestCase):
         self.assertTrue((self.project / ".common-rules/workspace.local.json").exists())
         self.assertIn(".common-rules/workspace.local.json", (self.project / ".gitignore").read_text())
 
+    def test_workspace_hub_records_explicit_member_checkout_locally(self):
+        member = self.project / "vanilla"
+        member.mkdir()
+        result = self.invoke("apply", "--repository-id", "docs", "--role", "documentation",
+                             "--workspace-id", "product", "--workspace-role", "hub",
+                             "--checkout", f"vanilla={member}")
+        self.assertEqual(0, result.returncode, result.stderr)
+        local = json.loads((self.project / ".common-rules/workspace.local.json").read_text())
+        self.assertEqual(str(member), local["checkouts"]["vanilla"])
+
+    def test_apply_refuses_bad_checkout_before_writing_any_manifest(self):
+        manifest = self.project / ".common-rules.json"
+        manifest.write_text('{"keep": "original"}\n')
+        before = manifest.read_bytes()
+        result = self.invoke("apply", "--repository-id", "docs", "--role", "documentation",
+                             "--workspace-id", "product", "--workspace-role", "hub",
+                             "--checkout", "not-a-pair")
+        self.assertEqual(2, result.returncode)
+        self.assertEqual(before, manifest.read_bytes())
+        self.assertFalse((self.project / ".common-rules/workspace.local.json").exists())
+
     def test_doctor_names_invalid_or_missing_paths(self):
         declaration = {"integration": {"repository_id": "engine", "role": "business-logic",
                                         "requirements": ["missing"], "tracker": "also-missing",
@@ -111,6 +134,16 @@ class ProjectSetupTest(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("requirements path does not exist", result.stdout)
         self.assertIn("tracker path does not exist", result.stdout)
+
+    def test_doctor_refuses_incomplete_proposal_issue_contract(self):
+        declaration = {"integration": {"repository_id": "docs", "role": "documentation",
+            "requirements": ["docs/requirements"], "tracker": "docs/proposals",
+            "issue_linking": "one-way", "issue_series": "documentation-delivery",
+            "skill_receipts": True}}
+        (self.project / ".common-rules.json").write_text(json.dumps(declaration))
+        result = self.invoke("doctor")
+        self.assertEqual(1, result.returncode)
+        self.assertIn("requires the complete proposal issue contract", result.stdout)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 """quiet -- run a gate, keep its output in a file, print one verdict line
 (common-rules proposal 23, lever L3).
 
-  quiet [--log FILE] [--label NAME] [--jobs N|auto] -- CMD [ARGS...]
+  quiet [--log FILE] [--receipt FILE] [--label NAME] [--jobs N|auto] -- CMD [ARGS...]
 
 Runs CMD directly (no shell). All of its stdout and stderr go to FILE only
 -- never to this process's own stdout. Default FILE is
@@ -518,6 +518,7 @@ def _run_parallel_discover(python: str, start_dir: str, pattern: str, jobs: int)
 
 def _parse_args(argv):
     log = None
+    receipt = None
     label = None
     jobs = None
     i = 0
@@ -534,6 +535,13 @@ def _parse_args(argv):
                 print("quiet: --log requires a value", file=sys.stderr)
                 raise SystemExit(2)
             log = argv[i + 1]
+            i += 2
+            continue
+        if a == "--receipt":
+            if i + 1 >= len(argv):
+                print("quiet: --receipt requires a value", file=sys.stderr)
+                raise SystemExit(2)
+            receipt = argv[i + 1]
             i += 2
             continue
         if a == "--label":
@@ -565,11 +573,29 @@ def _parse_args(argv):
         print(f"quiet: unknown option {a!r} (expected -- before the command)", file=sys.stderr)
         raise SystemExit(2)
     cmd = argv[i:]
-    return log, label, jobs, cmd
+    return log, receipt, label, jobs, cmd
+
+
+def _write_receipt(path: Path, *, label: str | None, cmd: list[str], log_path: Path,
+                   output: str, ok: bool, wall_seconds: float) -> None:
+    matches = list(re.finditer(r"^Ran (\d+) tests in (\d+(?:\.\d+)?)s$", output, re.MULTILINE))
+    count = int(matches[-1].group(1)) if matches else None
+    test_seconds = float(matches[-1].group(2)) if matches else None
+    record = {
+        "schema": 1, "kind": "common-rules-quiet-gate", "label": label,
+        "status": "OK" if ok else "FAILED", "command": cmd,
+        "tests": count, "test_seconds": test_seconds,
+        "wall_seconds": round(wall_seconds, 3), "log": str(log_path),
+        "log_sha256": hashlib.sha256(output.encode()).hexdigest(),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
 
 
 def main(argv):
-    log, label, jobs, cmd = _parse_args(argv)
+    log, receipt, label, jobs, cmd = _parse_args(argv)
     if not cmd:
         print("quiet: no command given -- usage: quiet [--log FILE] [--label NAME] [--jobs N] -- CMD [ARGS...]",
               file=sys.stderr)
@@ -622,6 +648,13 @@ def main(argv):
         detail = detail[:DETAIL_MAX]
 
     verdict = "OK" if ok else "FAILED"
+    if receipt:
+        try:
+            _write_receipt(Path(receipt), label=label, cmd=cmd, log_path=log_path,
+                           output=output, ok=ok, wall_seconds=elapsed)
+        except OSError as exc:
+            print(f"quiet: could not write receipt: {exc}", file=sys.stderr)
+            return 2
     print(f"quiet: {verdict} · {detail} · {elapsed:.1f}s · log {log_path}")
     return exit_code
 

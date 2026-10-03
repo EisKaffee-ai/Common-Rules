@@ -144,6 +144,34 @@ def markdown(report: dict[str, object], baseline: dict[str, object] | None = Non
     return "\n".join(lines) + "\n"
 
 
+def embedded_table(report: dict[str, object]) -> str:
+    discovery = report["discovery"]
+    on_demand = report["on_demand"]
+    references = report["references"]
+    ceiling = report["full_skill_package_ceiling"]
+    return "\n".join([
+        "| Surface | UTF-8 bytes | Estimated tokens | What actually loads |",
+        "|---|---:|---:|---|",
+        f"| Idle skill discovery ({discovery['skills']} names, descriptions, paths) | {discovery['bytes']:,} | {discovery['estimated_tokens']:,} | Every session/request |",
+        f"| All `SKILL.md` files combined | {on_demand['skill_instruction_bytes']:,} | {on_demand['skill_instruction_estimated_tokens']:,} | Not together; only the selected skill is loaded |",
+        f"| Optional references | {references['bytes']:,} | {references['estimated_tokens']:,} | Only when the selected workflow needs one |",
+        f"| Full skill-package ceiling | {ceiling['bytes']:,} | {ceiling['estimated_tokens']:,} | Comparison ceiling; never the default load |",
+        "| Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |",
+    ])
+
+
+def update_marked_table(path: Path, report: dict[str, object]) -> None:
+    start = "<!-- context-budget:start -->"
+    end = "<!-- context-budget:end -->"
+    text = path.read_text(encoding="utf-8")
+    if text.count(start) != 1 or text.count(end) != 1 or text.index(start) > text.index(end):
+        raise ValueError(f"{path}: expected one ordered {start} / {end} marker pair")
+    before, rest = text.split(start, 1)
+    _old, after = rest.split(end, 1)
+    path.write_text(before + start + "\n" + embedded_table(report) + "\n" + end + after,
+                    encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="measure Common Rules context footprint")
     parser.add_argument("--project", default=str(Path(__file__).resolve().parent.parent))
@@ -151,6 +179,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--max-discovery-tokens", type=int, default=650)
+    parser.add_argument("--update-markdown", action="append", default=[], metavar="PATH",
+                        help="replace the marked context-budget table in PATH")
     args = parser.parse_args(argv)
     root = Path(args.project).resolve()
     report = measure_root(root)
@@ -158,6 +188,12 @@ def main(argv: list[str] | None = None) -> int:
         baseline = measure_git_ref(root, args.compare_ref) if args.compare_ref else None
     except subprocess.CalledProcessError:
         print(f"context-budget: cannot read git ref {args.compare_ref!r}", file=sys.stderr)
+        return 2
+    try:
+        for path in args.update_markdown:
+            update_marked_table(Path(path), report)
+    except (OSError, ValueError) as exc:
+        print(f"context-budget: {exc}", file=sys.stderr)
         return 2
     print(json.dumps({"current": report, "baseline": baseline}, indent=2) if args.json else markdown(report, baseline), end="")
     if args.check and report["discovery"]["estimated_tokens"] > args.max_discovery_tokens:

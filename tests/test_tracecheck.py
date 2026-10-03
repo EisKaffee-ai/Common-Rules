@@ -50,6 +50,110 @@ class TracecheckTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("1 traceability row", result.stdout)
 
+    def test_repository_qualified_file_uses_local_checkout_mapping(self):
+        member = self.project / "vanilla"
+        target = member / "lib/feature.py"
+        target.parent.mkdir(parents=True)
+        target.write_text("VALUE = 1\n")
+        local = self.project / ".common-rules/workspace.local.json"
+        local.parent.mkdir()
+        local.write_text(json.dumps({"workspace_id": "photos", "checkouts": {"vanilla": str(member)}}))
+        path = self.project / "docs/proposals/01-feature.json"
+        data = ledger()
+        data["traceability"][0]["implementation_files"] = ["vanilla:lib/feature.py"]
+        path.write_text(json.dumps(data))
+        result = self.invoke()
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_repository_qualified_implementation_directory_is_valid(self):
+        member = self.project / "vanilla"
+        target = member / "lib/work_tray"
+        target.mkdir(parents=True)
+        local = self.project / ".common-rules/workspace.local.json"
+        local.parent.mkdir()
+        local.write_text(json.dumps({"workspace_id": "photos", "checkouts": {"vanilla": str(member)}}))
+        path = self.project / "docs/proposals/01-feature.json"
+        data = ledger()
+        data["traceability"][0]["implementation_files"] = ["vanilla:lib/work_tray/"]
+        path.write_text(json.dumps(data))
+        result = self.invoke()
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_repository_qualified_file_without_mapping_is_refused(self):
+        path = self.project / "docs/proposals/01-feature.json"
+        data = ledger()
+        data["traceability"][0]["implementation_files"] = ["vanilla:lib/feature.py"]
+        path.write_text(json.dumps(data))
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("repository checkout is not mapped for vanilla:lib/feature.py", result.stdout)
+
+    def test_repository_qualified_change_uses_declared_member_revision(self):
+        member = self.project / "vanilla"
+        target = member / "lib/feature.py"
+        target.parent.mkdir(parents=True)
+        target.write_text("VALUE = 1\n")
+        subprocess.run(["git", "init", "-q"], cwd=member, check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=member, check=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=member, check=True)
+        subprocess.run(["git", "add", "."], cwd=member, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=member, check=True)
+        revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=member, check=True,
+                                  text=True, capture_output=True).stdout.strip()
+        local = self.project / ".common-rules/workspace.local.json"
+        local.parent.mkdir()
+        local.write_text(json.dumps({"workspace_id": "photos", "checkouts": {"vanilla": str(member)}}))
+        workspace = self.project / "docs/common-rules/workspace.json"
+        workspace.parent.mkdir(parents=True, exist_ok=True)
+        workspace.write_text(json.dumps({"workspace_id": "photos", "members": [{
+            "repository_id": "vanilla", "revision": revision}]}))
+        path = self.project / "docs/proposals/01-feature.json"
+        data = ledger()
+        data["traceability"][0]["implementation_files"] = ["vanilla:lib/feature.py"]
+        path.write_text(json.dumps(data))
+        target.write_text("VALUE = 2\n")
+        result = self.invoke()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("vanilla:lib/feature.py changed without requirement", result.stdout)
+        data["traceability"][0]["receipt_or_refusal"] = "no-change: reviewed compatible"
+        path.write_text(json.dumps(data))
+        self.assertEqual(0, self.invoke().returncode)
+
+    def test_hook_mode_accepts_hub_ledger_update_for_member_change(self):
+        member_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(member_tmp.cleanup)
+        member = Path(member_tmp.name)
+        target = member / "lib/feature.py"
+        target.parent.mkdir(parents=True); target.write_text("VALUE = 1\n")
+        subprocess.run(["git", "init", "-q"], cwd=member, check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=member, check=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=member, check=True)
+        subprocess.run(["git", "add", "."], cwd=member, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=member, check=True)
+        member_revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=member, check=True,
+                                         text=True, capture_output=True).stdout.strip()
+        path = self.project / "docs/proposals/01-feature.json"
+        data = ledger(); data["traceability"][0]["implementation_files"] = ["vanilla:lib/feature.py"]
+        path.write_text(json.dumps(data))
+        local = self.project / ".common-rules/workspace.local.json"
+        local.parent.mkdir(); local.write_text(json.dumps({"workspace_id": "photos", "checkouts": {
+            "engine": ".", "vanilla": str(member)}}))
+        workspace = self.project / "docs/common-rules/workspace.json"
+        workspace.parent.mkdir(parents=True, exist_ok=True)
+        workspace.write_text(json.dumps({"workspace_id": "photos", "members": [
+            {"repository_id": "engine", "revision": "WORKING"},
+            {"repository_id": "vanilla", "revision": member_revision}]}))
+        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=self.project, check=True)
+        subprocess.run(["git", "add", "."], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=self.project, check=True)
+        target.write_text("VALUE = 2\n")
+        self.assertEqual(1, self.invoke().returncode)
+        data["traceability"][0]["receipt_or_refusal"] = "receipt: member and requirement reviewed"
+        path.write_text(json.dumps(data))
+        self.assertEqual(0, self.invoke().returncode)
+
     def test_missing_linked_file_fails_by_name(self):
         (self.project / "src/feature.py").unlink()
         result = self.invoke()
