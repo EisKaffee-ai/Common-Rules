@@ -231,7 +231,7 @@
         "C-06",
         "C-07"
       ],
-      "status": "in testing",
+      "status": "in review",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -241,7 +241,7 @@
           "id": "C-05.A",
           "title": "Complete release verification and independent review",
           "share": 100,
-          "status": "in testing",
+          "status": "in review",
           "owner": "lead"
         }
       ],
@@ -287,6 +287,13 @@
           "by": "session:codex",
           "evidence": "sponsor requested current Common Rules visuals and first-use instructions for Codex and Claude Code; repository policy requires the 1.8.0 minor release",
           "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.8.0 release candidate passed the full gate",
+          "by": "session:codex",
+          "evidence": "commit 7d5053a; VERSION 1.8.0; workflow stamp current; version policy green; 2042 tests OK in 228.0s; independent review and publication pending",
+          "status": "in review"
         }
       ]
     },
@@ -367,7 +374,7 @@
       "depends": [
         "C-04"
       ],
-      "status": "in testing",
+      "status": "in review",
       "tier": "medium",
       "model": "sonnet",
       "tag": "[ruflo · medium · sonnet]",
@@ -377,7 +384,7 @@
           "id": "C-07.A",
           "title": "Rewrite and visually verify the cross-host landing page",
           "share": 100,
-          "status": "in testing",
+          "status": "in review",
           "owner": "lead"
         }
       ],
@@ -388,6 +395,13 @@
           "by": "session:codex",
           "evidence": "README identity, image, complete skill catalog, examples and host-install tests green; six current Common Rules SVG explainers and three HTML visual surfaces prepared",
           "status": "in testing"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "landing page and skill guide release gate green",
+          "by": "session:codex",
+          "evidence": "commit 7d5053a; 2042 tests OK in 228.0s; 14 focused tests OK; Codex and Claude marketplace manifests validate; six SVGs validate and visual layouts inspected; tracecheck 7 rows green",
+          "status": "in review"
         }
       ]
     }
@@ -558,9 +572,9 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_readme_landing tests.test_plugin_package"
       ],
-      "receipt_or_refusal": "receipt: focused README and plugin marketplace suites green; full release gate pending",
+      "receipt_or_refusal": "receipt: commit 7d5053a; focused landing/plugin tests green; six SVGs validate and are visually inspected; full release gate 2042 tests OK in 228.0s; independent review pending",
       "owner": "lead",
-      "status": "in testing"
+      "status": "in review"
     }
   ],
   "asks": [

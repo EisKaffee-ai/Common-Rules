@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 07:24
+# Checkpoint — 2026-10-03 07:58
 
-Reason: manual · branch: codex/calibrated-setup-release · HEAD: 8678679
+Reason: manual · branch: codex/calibrated-setup-release · HEAD: 7d5053a
 
-<!-- ledger-digest: b78eaa10b24209750f1a8b355ff3ad00cc7c042e2fff7099806653919c1b1ca8 -->
+<!-- ledger-digest: c63ee316b57cba332f1b2fb3001bbadb0b1e5ccd4a6177e5950c5ac2fc2e518b -->
 
 ## Proposal 19 · Warm-up
 
@@ -191,7 +191,7 @@ Reason: manual · branch: codex/calibrated-setup-release · HEAD: 8678679
 
 ## Proposal 36 · Calibrated project setup and workspace tracker
 
-0 done / 0 in progress / 0 blocked / 0 not started / 5 in review / 2 in testing
+0 done / 0 in progress / 0 blocked / 0 not started / 7 in review
 
 ### In progress
 
