@@ -294,6 +294,12 @@
           "by": "session:codex",
           "evidence": "commit 7d5053a; VERSION 1.8.0; workflow stamp current; version policy green; 2042 tests OK in 228.0s; independent review and publication pending",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "1.8.0 final catalog revision passed the full gate",
+          "by": "session:codex",
+          "evidence": "commit 95a1722; VERSION 1.8.0; 2042 tests OK in 186.3s; independent review and public-directory submission pending"
         }
       ]
     },
@@ -408,6 +414,12 @@
           "event": "complete installed-skill catalog verified",
           "by": "session:codex",
           "evidence": "all 13 installed skills are represented: 11 primary lifecycle skills, preheat alias and standard legacy compatibility; focused 14-test gate green"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "complete 13-skill catalog passed the full release gate",
+          "by": "session:codex",
+          "evidence": "commit 95a1722; all 13 installed skills documented with examples and legacy guidance; 2042 tests OK in 186.3s; workflow stamp and version policy green"
         }
       ]
     }
@@ -527,7 +539,7 @@
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: 1.8.0 full release gate pending; independent review pending",
+      "receipt_or_refusal": "receipt: commit 95a1722; VERSION 1.8.0; workflow stamp and version policy green; 2042 tests OK in 186.3s; independent review and publication pending",
       "owner": "lead",
       "status": "in review"
     },
@@ -578,7 +590,7 @@
       "tests_commands": [
         "python3 -m unittest -q tests.test_readme_landing tests.test_plugin_package"
       ],
-      "receipt_or_refusal": "receipt: commit 7d5053a; focused landing/plugin tests green; six SVGs validate and are visually inspected; full release gate 2042 tests OK in 228.0s; independent review pending",
+      "receipt_or_refusal": "receipt: commit 95a1722; all 13 installed skills documented; focused landing/plugin tests green; six SVGs validate and are visually inspected; full release gate 2042 tests OK in 186.3s; independent review pending",
       "owner": "lead",
       "status": "in review"
     }
