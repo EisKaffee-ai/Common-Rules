@@ -205,6 +205,17 @@
       "became": "T-01",
       "state": "became-item",
       "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-08",
+      "at": "2026-10-03T17:18:16+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "merge it to main and make a release",
+      "became": null,
+      "state": "open",
+      "owner": "lead",
+      "source": "Sponsor conversation 2026-10-03"
     }
   ],
   "proposed_changes": [],
