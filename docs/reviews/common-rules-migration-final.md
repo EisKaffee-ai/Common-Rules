@@ -34,7 +34,9 @@ merge, select a default branch, create a release, or change either repository.
   preserved in the candidate ancestry.
 - Historical source tags were copied to the Common Rules destination without
   rewriting source refs.
-- The Common Rules release branch is published for independent review.
+- `bin/migration-check --remote` verified all 7 source tags and confirmed the
+  Common Rules release branch matched the audited candidate.
+- The full 1.7.0 release gate passed 2,035 tests with 20 intentional skips.
 
 ## Remaining publication boundary
 
