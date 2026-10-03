@@ -402,6 +402,12 @@
           "by": "session:codex",
           "evidence": "commit 7d5053a; 2042 tests OK in 228.0s; 14 focused tests OK; Codex and Claude marketplace manifests validate; six SVGs validate and visual layouts inspected; tracecheck 7 rows green",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "complete installed-skill catalog verified",
+          "by": "session:codex",
+          "evidence": "all 13 installed skills are represented: 11 primary lifecycle skills, preheat alias and standard legacy compatibility; focused 14-test gate green"
         }
       ]
     }

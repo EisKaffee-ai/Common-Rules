@@ -38,7 +38,7 @@ class ReadmeLandingTest(unittest.TestCase):
         expected = {
             "docs/assets/product-overview.svg": ("Codex", "Claude Code", "Common Rules"),
             "docs/assets/host-setup.svg": ("Codex", "Claude Code", "/common-rules:setup"),
-            "docs/assets/skills-map.svg": ("setup", "visual-proposal", "tracker", "repair", "land-handoff"),
+            "docs/assets/skills-map.svg": ("setup", "visual-proposal", "tracker", "repair", "land-handoff", "standard"),
             "docs/assets/warmup-reheat-hero.svg": ("warmup", "reheat", "Common Rules"),
             "docs/assets/delivery-lifecycle.svg": ("visual proposal", "requirements", "independent review", "release", "evidence"),
             "docs/assets/tracker-coherence.svg": ("requirements", "files", "tests"),
@@ -62,6 +62,7 @@ class ReadmeLandingTest(unittest.TestCase):
             "warmup",
             "reheat",
             "preheat",
+            "standard",
         )
         for skill in skills:
             self.assertIn(f"`{skill}`", self.readme)

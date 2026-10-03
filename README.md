@@ -91,10 +91,12 @@ what it is doing and keep the tracker stage visible.
 | Release independently committed repositories | `land-handoff` | “Prepare the coherent engine, website, and docs revisions for handoff without combining their commits.” |
 | Load a fresh session | `warmup` | “Warm up from the project record and tell me the active feature and next gate.” |
 | Refresh a running session | `reheat` / `preheat` | “Reheat this session and show only what changed since the last checkpoint.” |
+| Support an older adopted project | `standard` *(legacy)* | “Load the shared contract through the legacy entry point, then show the current setup path.” |
 
 In Claude Code, the direct forms are `/common-rules:setup`,
 `/common-rules:intake`, `/common-rules:visual-proposal`, and so on. Codex can
-select the installed skill from the natural-language requests above.
+select the installed skill from the natural-language requests above. `standard`
+remains available for compatibility; new projects should begin with `setup`.
 
 ### Example: one repository
 
@@ -182,11 +184,11 @@ Useful checks from the Common Rules checkout:
 
 ## How a project adopts this
 
-Run `/standard` in the adopting project's chat to review the shared contract.
-For the legacy context-only path, [`bin/derecord`](bin/derecord) can seed the
-handoff, tracker, and hooks without overwriting existing rules. For the current
-calibrated plugin path, use the setup skill above, review its preview, and apply
-only the locations and topology you accept.
+New projects should use the setup skill above, review its preview, and apply
+only the locations and topology they accept. Previously adopted projects can
+still run `/standard` to review the shared contract. For the legacy context-only
+path, [`bin/derecord`](bin/derecord) can seed the handoff, tracker, and hooks
+without overwriting existing rules.
 
 Existing projects are not silently upgraded. Human review still accepts
 proposals, resolves ambiguous project ownership, trusts hooks, approves remote

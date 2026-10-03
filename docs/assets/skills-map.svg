@@ -18,7 +18,7 @@
   <g filter="url(#shadow)">
     <rect x="54" y="274" width="792" height="46" rx="23" fill="#67e8f9"/><text x="450" y="304" text-anchor="middle" class="stage">1 · ORIENT THE SESSION</text>
     <rect x="54" y="340" width="382" height="130" rx="18" class="card"/><text x="78" y="379" class="skill">setup · calibrate</text><text x="78" y="413" class="hint">Map project shape and locations.</text><text x="78" y="443" class="hint">Preview before writing.</text>
-    <rect x="464" y="340" width="382" height="130" rx="18" class="card"/><text x="488" y="379" class="skill">warmup · reheat</text><text x="488" y="413" class="hint">Load truth or refresh the delta.</text><text x="488" y="443" class="hint">preheat is the reheat alias.</text>
+    <rect x="464" y="340" width="382" height="130" rx="18" class="card"/><text x="488" y="379" class="skill">warmup · reheat</text><text x="488" y="413" class="hint">Load truth or refresh the delta.</text><text x="488" y="443" class="hint">preheat alias · standard legacy.</text>
   </g>
   <path d="M450 486V520" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
 
