@@ -9,7 +9,7 @@ without forcing them into one commit.
 
 ![Common Rules connects Codex and Claude Code to one calibrated project record, traceability graph, and tracker](docs/assets/product-overview.svg)
 
-[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.10.1](docs/RELEASE-1.10.1.md)
+[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.10.2](docs/RELEASE-1.10.2.md)
 
 ## What you get
 
@@ -176,7 +176,7 @@ Reproduce the analysis or enforce the 650-token discovery budget:
 
 The full unittest gate uses every available worker without dropping tests.
 Large test files split by class even on a cold checkout, then measured shard
-durations improve later scheduling. In the 1.10.1 release checkout, the
+durations improve later scheduling. In the 1.10.2 release checkout, the
 124-test warmup hotspot fell from the previously documented 575-second floor
 to 174.6 seconds (about 70% faster). The final release gate completed all
 2,065 tests in 189.1 seconds. Run the same aggregated gate with:

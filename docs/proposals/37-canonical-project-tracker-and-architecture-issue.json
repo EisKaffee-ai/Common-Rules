@@ -308,7 +308,7 @@
       "id": "T-06",
       "phase": "T",
       "cx": "C4",
-      "title": "Release Common Rules 1.10.1",
+      "title": "Release Common Rules 1.10.2",
       "what": "Reconcile manifests, changelog, release notes, tracker evidence, independent review and publication for the optional canonical-tracker feature release; 1.10.0 remains the internal candidate before the fast-gate follow-up.",
       "files": [
         "VERSION",
@@ -321,7 +321,7 @@
         "tests/test_context_budget.py",
         "bin/quiet",
         "tests/test_quiet.py",
-        "docs/RELEASE-1.10.1.md"
+        "docs/RELEASE-1.10.2.md"
       ],
       "tests": [
         "bin/context-budget --json --check",
@@ -331,7 +331,7 @@
         "claude plugin validate .",
         "bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q"
       ],
-      "done": "The 1.10.1 candidate publishes reproducible context-load and test-runtime analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
+      "done": "The 1.10.2 candidate publishes reproducible context-load and test-runtime analysis, stays within the idle discovery budget, and passes focused/full gates, CI and independent review before merge, tag and public release.",
       "depends": [
         "T-01",
         "T-02",
@@ -370,6 +370,12 @@
           "event": "optimized full release gate passed",
           "by": "session:codex",
           "evidence": "workflow stamp current; version 1.10.1 agrees; context discovery 627 estimated tokens; all 2,065 tests pass in 189.1s with class-level cold sharding"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release candidate advanced from internal 1.10.1 to 1.10.2 after CI version gate",
+          "by": "session:codex",
+          "evidence": "CI run 37116129292 correctly required a new patch marker because the final 2,065-test evidence commit followed the 1.10.1 marker; history remains intact"
         }
       ],
       "parts": [
@@ -536,7 +542,7 @@
         "bin/workflow-stamp --check",
         "python3 -m unittest discover -s tests -q"
       ],
-      "receipt_or_refusal": "Local 1.10.1 candidate passes context, version and workflow gates plus all 2,065 tests in 189.1s; downstream acceptance, CI and independent review remain",
+      "receipt_or_refusal": "Local 1.10.2 candidate carries the context, version and workflow gates plus the 2,065-test/189.1s receipt; downstream acceptance, replacement CI and independent review remain",
       "owner": "lead",
       "status": "in progress"
     }
