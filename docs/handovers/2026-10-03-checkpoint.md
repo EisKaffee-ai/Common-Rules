@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 10:49
+# Checkpoint — 2026-10-03 10:55
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 2e083df
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 28a04c4
 
-<!-- ledger-digest: f0d795d9d7e33303b66bb6de31d6b7902ba3ae35c44eb92ac739cf728f50b9eb -->
+<!-- ledger-digest: 97ff09b29179336572778c23eb179c1bd786fc926cf7a50aa62eb00c158d45e8 -->
 
 ## Proposal 19 · Warm-up
 
@@ -222,7 +222,7 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 2e083df
 
 ## Proposal 37 · Canonical project tracker and architecture issue synchronization
 
-0 done / 0 in progress / 0 blocked / 5 not started / 1 in review
+0 done / 0 in progress / 0 blocked / 4 not started / 2 in review
 
 ### In progress
 

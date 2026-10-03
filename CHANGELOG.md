@@ -9,6 +9,15 @@ prefers the largest real catalogue instead of proposing a duplicate
 `docs/proposals` tracker. Existing manifests without the optional contract
 retain their prior behavior.
 
+`tracker sync --project` now produces one deterministic, whole-set-validated
+issue plan per proposal without calling GitHub. Generated bodies preserve
+stable item IDs, status-aware checkboxes, repository ownership, evidence,
+gaps, dependencies and revision-bound implementation/test references. A
+narrow `--record` operation assigns one returned issue identity to the group,
+its features and every item; `--reconcile` reports remote body/title/state
+drift without changing ledger status. Legacy row-level `tracker sync LEDGER`
+behavior remains available for projects that have not opted in.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

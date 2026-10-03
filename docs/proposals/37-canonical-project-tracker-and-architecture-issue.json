@@ -98,13 +98,21 @@
       "depends": [
         "T-01"
       ],
-      "status": "not started",
+      "status": "in review",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
       "owner": "lead",
       "issue": null,
-      "log": []
+      "log": [
+        {
+          "at": "2026-10-03",
+          "event": "proposal issue plan, writeback and reconciliation implemented",
+          "by": "session:codex",
+          "evidence": "25 sync tests OK; read-only 27-ledger fixture plan reports 27 groups, 59 features and 362 checkboxes; Proposal 08 reuses issue #2; digest 675fb35b8cda42e6ae9300c4c0dc7959e427b23e8d280bbbc0d108935545c09d",
+          "status": "in review"
+        }
+      ]
     },
     {
       "id": "T-03",
