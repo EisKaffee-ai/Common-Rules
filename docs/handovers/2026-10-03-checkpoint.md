@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 08:06
+# Checkpoint — 2026-10-03 08:09
 
-Reason: manual · branch: codex/calibrated-setup-release · HEAD: 95a1722
+Reason: manual · branch: codex/calibrated-setup-release · HEAD: eff3b61
 
-<!-- ledger-digest: 862d99b0b0dbc4d85e5e7b5b2f304cefb46f9772700b54693281fc28237da7a1 -->
+<!-- ledger-digest: e300628baf6ca1a18b267b4f8ce929b7afe4873a099cbcd8737e08c634a22295 -->
 
 ## Proposal 19 · Warm-up
 

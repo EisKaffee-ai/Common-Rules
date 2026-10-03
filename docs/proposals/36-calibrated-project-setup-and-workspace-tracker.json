@@ -215,7 +215,8 @@
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.0.md"
+        "docs/RELEASE-1.8.0.md",
+        "docs/reviews/common-rules-1.8.0-completion-audit.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -533,7 +534,8 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.0.md"
+        "docs/RELEASE-1.8.0.md",
+        "docs/reviews/common-rules-1.8.0-completion-audit.md"
       ],
       "tests_commands": [
         "bin/version-check --check",

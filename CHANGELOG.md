@@ -27,7 +27,9 @@ routing, session continuity, delivery lifecycle, traceability and joined
 multi-repository tracking. The companion HTML review surfaces use the same
 current identity and visuals. Added an OpenAI repo marketplace alongside the
 Claude Code marketplace. This documentation and discoverability work is part
-of the same mandatory Common Rules release contract.
+of the same mandatory Common Rules release contract. A reviewer-ready
+completion audit maps all 21 accepted requirements to the authoritative ledger,
+reproducible gates and remaining publication boundary.
 
 # 1.4.1 — Release verification and installer safety — 29 September 2026
 
