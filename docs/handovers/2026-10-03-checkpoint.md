@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 16:16
+# Checkpoint — 2026-10-03 16:38
 
-Reason: manual · branch: codex/requirement-traceability-20261003 · HEAD: d940a8a
+Reason: manual · branch: codex/requirement-traceability-20261003 · HEAD: 6757696
 
-<!-- ledger-digest: 14aecd7c46e8eb875a222c55eab9ee7d73b8c30d83f45cf8e6b8750e8182eb8d -->
+<!-- ledger-digest: 5401165c78e076b4501a8586fd2272e50a723d04417c9249422962e7d1400326 -->
 
 ## Proposal 19 · Warm-up
 
@@ -165,31 +165,6 @@ Reason: manual · branch: codex/requirement-traceability-20261003 · HEAD: d940a
 - R-03 0%
 - R-04 0%
 - R-05 0%
-
-## Proposal 35 · Guide and architecture traceability
-
-0 done / 1 in progress / 0 blocked / 0 not started
-
-### In progress
-
-- T-01 · [ruflo · high · sonnet] · Generate holistic feature traceability and architecture conformance · Sponsor directed Common Rules implementation with an overall view first, feature-by-feature expected-versus-actual architecture conformance, typed code references, test-case IDs and visible test reports.
-
-### Blocked, and why
-
-- none
-
-### Open asks
-
-- none
-
-### Next unblocked
-
-- none
-
-### Open work by group
-
-**finish now**
-- T-01 0% · next T-01.A
 
 ## Proposal 36 · Calibrated project setup and workspace tracker
 

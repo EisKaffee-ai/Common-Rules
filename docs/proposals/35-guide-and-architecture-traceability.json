@@ -57,7 +57,7 @@
       ],
       "done": "The reusable command validates reviewed mappings across configured repository checkouts, resolves stable symbol/region/file and test-case anchors, verifies revision-bound test reports, classifies expected-versus-actual workflow coverage, generates a responsive overall and per-feature page, and fails check mode on stale output or broken evidence without AI runtime calls.",
       "depends": [],
-      "status": "in progress",
+      "status": "done",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
@@ -76,6 +76,13 @@
           "event": "Sponsor directed Common Rules implementation with an overall view first, feature-by-feature expected-versus-actual architecture conformance, typed code references, test-case IDs and visible test reports.",
           "by": "sponsor",
           "evidence": "Sponsor conversation 2026-10-03; Docs accepted visual proposal revision 6"
+        },
+        {
+          "at": "2026-10-03T16:37:49+02:00",
+          "event": "all parts done",
+          "by": "lead",
+          "evidence": "",
+          "status": "done"
         }
       ],
       "parts": [
@@ -83,7 +90,7 @@
           "id": "T-01.A",
           "title": "Implement and verify the reusable Python traceability engine and generated holistic view",
           "share": 100,
-          "status": "in progress",
+          "status": "done",
           "owner": "lead",
           "log": [
             {
@@ -92,6 +99,13 @@
               "by": "lead",
               "evidence": "Common Rules branch codex/requirement-traceability-20261003",
               "status": "in progress"
+            },
+            {
+              "at": "2026-10-03T16:37:49+02:00",
+              "event": "Implemented and independently reviewed the reusable deterministic traceability engine; fixed all six round-one findings and the final ignored-evidence finding.",
+              "by": "lead",
+              "evidence": "commits 1fa7021 f7b6482 591ed50 6757696; 20 focused traceability tests; merge gate 2108 tests OK in 213.4s",
+              "status": "done"
             }
           ]
         }
