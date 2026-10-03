@@ -364,6 +364,12 @@
           "event": "publishable candidate advanced from internal 1.10.0 to 1.10.1",
           "by": "session:codex",
           "evidence": "Version gate requires a patch marker because the fast-gate scheduler landed after the 1.10.0 marker; history is preserved rather than rewritten"
+        },
+        {
+          "at": "2026-10-03T12:17:04+02:00",
+          "event": "optimized full release gate passed",
+          "by": "session:codex",
+          "evidence": "workflow stamp current; version 1.10.1 agrees; context discovery 627 estimated tokens; all 2,065 tests pass in 189.1s with class-level cold sharding"
         }
       ],
       "parts": [
@@ -499,9 +505,9 @@
       "tests_commands": [
         "read-only Docs and GitHub plugin acceptance suite"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "Read-only acceptance verified 27 ledgers, one canonical workspace tracker and exactly 27 GitHub architecture issues including Proposal 08 issue #2; final acceptance is blocked because the independent Docs adoption lacks the complete issue contract, ledger traceability arrays and build receipt",
       "owner": "lead",
-      "status": "not started"
+      "status": "blocked"
     },
     {
       "id": "TR-06",
@@ -530,9 +536,9 @@
         "bin/workflow-stamp --check",
         "python3 -m unittest discover -s tests -q"
       ],
-      "receipt_or_refusal": "pending implementation",
+      "receipt_or_refusal": "Local 1.10.1 candidate passes context, version and workflow gates plus all 2,065 tests in 189.1s; downstream acceptance, CI and independent review remain",
       "owner": "lead",
-      "status": "not started"
+      "status": "in progress"
     }
   ],
   "asks": [

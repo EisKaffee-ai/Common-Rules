@@ -51,8 +51,9 @@ The first parallel run no longer waits for one whole slow file merely to learn
 its duration. Large files are split by test class on a cold checkout and later
 runs reuse measured shard timings. On the release host, all 124 warmup tests
 completed in 174.6 seconds versus the previously documented 575-second floor,
-about 70% faster. The aggregate runner still reports the complete test count,
-failures and errors and preserves the underlying exit code.
+about 70% faster. The final release gate passed all 2,065 tests in 189.1
+seconds. The aggregate runner still reports the complete test count, failures
+and errors and preserves the underlying exit code.
 
 ## Acceptance fixture
 

@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 12:12
+# Checkpoint — 2026-10-03 12:20
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 0045640
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 7fe0984
 
-<!-- ledger-digest: 17daa78f8c67c3af1fc959a7c573a39eb2bc3928778703150fd7bb50b4afe0ec -->
+<!-- ledger-digest: 93e6ac787382f082b7c322b489a091f36423f14ab0c2e0a3c76bdbe2debdad1b -->
 
 ## Proposal 19 · Warm-up
 
@@ -228,7 +228,7 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 0045640
 
 ### In progress
 
-- T-06 · [ruflo · lead · opus] · Release Common Rules 1.10.1 · publishable candidate advanced from internal 1.10.0 to 1.10.1
+- T-06 · [ruflo · lead · opus] · Release Common Rules 1.10.1 · optimized full release gate passed
 
 ### Blocked, and why
 

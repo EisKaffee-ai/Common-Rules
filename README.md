@@ -178,7 +178,8 @@ The full unittest gate uses every available worker without dropping tests.
 Large test files split by class even on a cold checkout, then measured shard
 durations improve later scheduling. In the 1.10.1 release checkout, the
 124-test warmup hotspot fell from the previously documented 575-second floor
-to 174.6 seconds (about 70% faster). Run the same aggregated gate with:
+to 174.6 seconds (about 70% faster). The final release gate completed all
+2,065 tests in 189.1 seconds. Run the same aggregated gate with:
 
 ```sh
 ./bin/quiet --label merge-gate --jobs auto -- python3 -m unittest discover -s tests -q
