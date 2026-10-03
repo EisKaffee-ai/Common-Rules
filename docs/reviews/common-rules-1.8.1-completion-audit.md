@@ -1,4 +1,4 @@
-# Common Rules 1.8.0 completion audit
+# Common Rules 1.8.1 completion audit
 
 Prepared 3 October 2026 for independent review of Proposal 36, the accepted
 implementation of Proposal 02.
@@ -7,13 +7,15 @@ implementation of Proposal 02.
 
 - Repository: `EisKaffee-ai/Common-Rules`
 - Branch: `codex/calibrated-setup-release`
-- Audited implementation commit: `95a1722`
-- Latest evidence commit when this audit was prepared: `eff3b61`
-- Version: `1.8.0`
+- Feature implementation baseline: `95a1722`
+- Release candidate marker: the commit that introduces `VERSION` 1.8.1
+- Version: `1.8.1`
 
-The implementation commit passed the full merge gate. Later commits contain
-only ledger, generated tracker and review evidence. The remote migration check
-confirms the published release branch matches its current local head.
+The feature implementation baseline passed the full merge gate as the 1.8.0
+precursor. Later reviewer-audit documentation changed the changelog, so the
+version policy correctly required this 1.8.1 patch candidate and a fresh final
+gate. The remote migration check must confirm the published release branch
+matches its current local head after that candidate is pushed.
 
 ## Outcome-by-requirement matrix
 
@@ -23,7 +25,7 @@ confirms the published release branch matches its current local head.
 | CR36-R05–R08 | TR-02 / C-02 | implemented | committed workspace truth, local-path separation, compatible revisions and joined tracker; workspace suite and generated board check green |
 | CR36-R09–R10 | TR-03 / C-03 | implemented | requirement/file/test/evidence graph and changed-file impact gate; 7 rows verified |
 | CR36-R11–R15, R20 | TR-04 / C-04 | implemented | portable OpenAI and Claude manifests, 13 lifecycle skills, optional issue links and trusted hooks; package tests and Claude validator green |
-| CR36-R18 | TR-05 / C-05 | verified | VERSION, changelog and manifests agree at 1.8.0; workflow stamp and version policy green; full gate green |
+| CR36-R18 | TR-05 / C-05 | testing | VERSION, changelog and manifests agree at 1.8.1; final workflow stamp, version policy and full gate are required after the candidate commit |
 | CR36-R19 | TR-06 / C-06 | verified | 3 histories, 320 source files and 7 source tags preserved; old remote untouched; release branch matches HEAD |
 | CR36-R21 | TR-07 / C-07 | implemented | current Common Rules landing, six accessible visual explainers, Codex/Claude setup, all 13 skills and three worked examples |
 
@@ -55,7 +57,10 @@ bin/quiet --label release-gate --jobs auto -- \
   python3 -m unittest discover -s tests -q
 ```
 
-Recorded result for `95a1722`: `quiet: OK · 2042 tests · 186.3s`.
+Precursor result for `95a1722`: `quiet: OK · 2042 tests · 186.3s`.
+
+The final 1.8.1 result is recorded only after the candidate commit passes the
+same gate and GitHub Actions confirms it.
 
 ## Visual verification
 
@@ -88,6 +93,6 @@ independent decision.
 
 Independent acceptance comes before sponsor merge. After acceptance, the
 sponsor may merge the branch, choose or confirm the default branch and create
-the `v1.8.0` tag/release. Publishing to OpenAI's universal Plugins Directory is
+the `v1.8.1` tag/release. Publishing to OpenAI's universal Plugins Directory is
 a separate account-bound submission and review process; it is not claimed by
 this repository release evidence.

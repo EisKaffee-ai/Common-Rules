@@ -1,6 +1,6 @@
 # Common Rules migration evidence
 
-Recorded 3 October 2026 for the Common Rules 1.8.0 release candidate.
+Recorded 3 October 2026 for the Common Rules 1.8.1 release candidate.
 
 ## Outcome
 
@@ -11,7 +11,7 @@ local-only development history, the source files, and the historical tags.
 
 ```text
 upstream/main              03e56ee ─┐
-upstream/w10-measured      b8a8b41 ─┼─► Common Rules 1.8.0 candidate
+upstream/w10-measured      b8a8b41 ─┼─► Common Rules 1.8.1 candidate
 local-source/w10-measured  7aefa56 ─┘
 ```
 
@@ -36,13 +36,12 @@ merge, select a default branch, create a release, or change either repository.
   rewriting source refs.
 - `bin/migration-check --remote` verified all 7 source tags and confirmed the
   Common Rules release branch matched the audited candidate.
-- Commit `95a1722` passed the final 1.8.0 release gate: 2,042 tests in 186.3
-  seconds, with the workflow stamp and version policy green. The following
-  evidence-only commits update the ledger and generated tracker without
-  changing runtime behavior.
+- Commit `95a1722` passed the complete-catalog 1.8.0 precursor gate: 2,042
+  tests in 186.3 seconds. The reviewer-audit changelog update required the
+  1.8.1 patch candidate and a new final gate before publication.
 
 ## Remaining publication boundary
 
-Independent review, sponsor merge, default-branch choice, and the `v1.8.0`
+Independent review, sponsor merge, default-branch choice, and the `v1.8.1`
 release tag remain publication actions. This evidence does not claim that any
 of them has happened.

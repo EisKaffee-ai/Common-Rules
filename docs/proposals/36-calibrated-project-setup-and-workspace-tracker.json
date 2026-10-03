@@ -210,13 +210,13 @@
       "id": "C-05",
       "phase": "C",
       "cx": "C4",
-      "title": "Release Common Rules 1.8.0",
+      "title": "Release Common Rules 1.8.1",
       "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.0.md",
-        "docs/reviews/common-rules-1.8.0-completion-audit.md"
+        "docs/RELEASE-1.8.1.md",
+        "docs/reviews/common-rules-1.8.1-completion-audit.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -232,7 +232,7 @@
         "C-06",
         "C-07"
       ],
-      "status": "in review",
+      "status": "in testing",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
@@ -301,6 +301,13 @@
           "event": "1.8.0 final catalog revision passed the full gate",
           "by": "session:codex",
           "evidence": "commit 95a1722; VERSION 1.8.0; 2042 tests OK in 186.3s; independent review and public-directory submission pending"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "PR #3 CI required the 1.8.1 patch candidate",
+          "by": "session:codex",
+          "evidence": "GitHub Actions run 37102371621: version-check saw changelog changes after the 1.8.0 marker; PR https://github.com/EisKaffee-ai/Common-Rules/pull/3; bump and final gate in progress",
+          "status": "in testing"
         }
       ]
     },
@@ -534,14 +541,14 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.0.md",
-        "docs/reviews/common-rules-1.8.0-completion-audit.md"
+        "docs/RELEASE-1.8.1.md",
+        "docs/reviews/common-rules-1.8.1-completion-audit.md"
       ],
       "tests_commands": [
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: commit 95a1722; VERSION 1.8.0; workflow stamp and version policy green; 2042 tests OK in 186.3s; independent review and publication pending",
+      "receipt_or_refusal": "receipt: 1.8.0 precursor gate passed; 1.8.1 patch gate required after reviewer-audit changelog update; independent review and publication pending",
       "owner": "lead",
       "status": "in review"
     },

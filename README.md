@@ -9,7 +9,7 @@ without forcing them into one commit.
 
 ![Common Rules connects Codex and Claude Code to one calibrated project record, traceability graph, and tracker](docs/assets/product-overview.svg)
 
-[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.8.0](docs/RELEASE-1.8.0.md)
+[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.8.1](docs/RELEASE-1.8.1.md)
 
 ## What you get
 

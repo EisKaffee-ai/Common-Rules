@@ -1,4 +1,4 @@
-# 1.8.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
+# 1.8.1 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated
 `.common-rules.json` integration manifest, visual joined tracking across
@@ -12,7 +12,7 @@ Common Rules is the tracker plugin and supersedes the separate Emberline AI
 Tracker runtime; migrations preserve ledger IDs and evidence before cutover.
 The same release now includes Claude Code's `.claude-plugin/plugin.json` and
 marketplace catalog, uses the shared Claude/OpenAI plugin-root hook variable,
-and validates both manifests against version 1.8.0. A new read-only
+and validates both manifests against version 1.8.1. A new read-only
 `migration-check` proves the source main, published development and local-only
 histories are ancestors of the release, no source file disappeared, source
 tags and branches are present at the destination, and the published candidate
@@ -30,6 +30,10 @@ Claude Code marketplace. This documentation and discoverability work is part
 of the same mandatory Common Rules release contract. A reviewer-ready
 completion audit maps all 21 accepted requirements to the authoritative ledger,
 reproducible gates and remaining publication boundary.
+
+Version 1.8.0 was an internal candidate. The reviewer-audit documentation was
+added after its version marker, so the release policy requires this 1.8.1 patch
+candidate before publication.
 
 # 1.4.1 — Release verification and installer safety — 29 September 2026
 
