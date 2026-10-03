@@ -210,12 +210,12 @@
       "id": "C-05",
       "phase": "C",
       "cx": "C4",
-      "title": "Release Common Rules 1.6.0",
+      "title": "Release Common Rules 1.7.0",
       "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.6.0.md"
+        "docs/RELEASE-1.7.0.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -265,6 +265,13 @@
           "by": "session:codex",
           "evidence": "VERSION 1.6.0; version-check and workflow-stamp green; 2032 tests OK",
           "status": "in review"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "release gate reopened for migration integrity",
+          "by": "session:codex",
+          "evidence": "migration-check added after the 1.6.0 marker; repository policy requires the 1.7.0 minor release",
+          "status": "in testing"
         }
       ]
     },
@@ -419,13 +426,13 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.6.0.md"
+        "docs/RELEASE-1.7.0.md"
       ],
       "tests_commands": [
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: OpenAI and Claude manifests validated; version and workflow checks green; 2032 tests OK; independent review pending",
+      "receipt_or_refusal": "receipt: OpenAI and Claude manifests validated; 1.7.0 full release gate pending; independent review pending",
       "owner": "lead",
       "status": "in review"
     },
