@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 13:51
+# Checkpoint — 2026-10-03 17:19
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
+Reason: manual · branch: codex/requirement-traceability-20261003 · HEAD: b6129e0
 
-<!-- ledger-digest: 7f4d1f8e3e96b50804ea6b06db89da65345c438bfa7ca6b4cdc73dcfa0038205 -->
+<!-- ledger-digest: 5401165c78e076b4501a8586fd2272e50a723d04417c9249422962e7d1400326 -->
 
 ## Proposal 19 · Warm-up
 
@@ -165,31 +165,6 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 10a87ed
 - R-03 0%
 - R-04 0%
 - R-05 0%
-
-## Proposal 35 · Guide and architecture traceability
-
-0 done / 1 in progress / 0 blocked / 0 not started
-
-### In progress
-
-- T-01 · [ruflo · high · sonnet] · Track guide-to-architecture evidence as a first-class map · started
-
-### Blocked, and why
-
-- none
-
-### Open asks
-
-- none
-
-### Next unblocked
-
-- none
-
-### Open work by group
-
-**finish now**
-- T-01 0% · next T-01.A
 
 ## Proposal 36 · Calibrated project setup and workspace tracker
 

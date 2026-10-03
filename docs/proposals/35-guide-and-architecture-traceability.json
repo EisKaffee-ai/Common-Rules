@@ -2,7 +2,7 @@
   "proposal": 35,
   "title": "Guide and architecture traceability",
   "status": "proposed",
-  "updated": "2026-09-20",
+  "updated": "2026-10-03",
   "tiers": {
     "C1": {
       "tier": "low",
@@ -42,23 +42,25 @@
       "id": "T-01",
       "phase": "T",
       "cx": "C3",
-      "title": "Track guide-to-architecture evidence as a first-class map",
-      "what": "Carry Loom-style traceability rows in the proposal ledger and render them in the project tracker so a guide claim can be followed through architecture, implementation, verification, and its receipt or refusal.",
+      "title": "Generate holistic feature traceability and architecture conformance",
+      "what": "Provide a reusable Python engine that reads project-owned reviewed manifests, scans every configured repository, validates stable requirement, workflow-node, code-anchor, test-case, test-report and issue references, compares the expected workflow graph with the actual implementation graph, and generates an overall dashboard plus per-feature drill-down without AI-authored runtime state.",
       "files": [
-        "tools/tracker/ledger.py",
-        "tools/tracker/board.py",
-        "templates/ledger.json"
+        "bin/traceability",
+        "tools/traceability.py",
+        "templates/traceability.html",
+        "tests/test_traceability.py",
+        "docs/user-guide/03-tracker-and-proposals.md"
       ],
       "tests": [
-        "tests/test_tracker_ledger.py",
-        "tests/test_tracker_board.py"
+        "python3 -m unittest -q tests.test_traceability",
+        "bin/traceability check --project tests/fixtures/traceability"
       ],
-      "done": "The ledger validates the complete traceability chain; the generated tracker renders it as a table; focused tests and tracker validation pass.",
+      "done": "The reusable command validates reviewed mappings across configured repository checkouts, resolves stable symbol/region/file and test-case anchors, verifies revision-bound test reports, classifies expected-versus-actual workflow coverage, generates a responsive overall and per-feature page, and fails check mode on stale output or broken evidence without AI runtime calls.",
       "depends": [],
-      "status": "in progress",
+      "status": "done",
       "tier": "high",
       "model": "sonnet",
-      "tag": "[ruflo \u00b7 high \u00b7 sonnet]",
+      "tag": "[ruflo · high · sonnet]",
       "issue": null,
       "owner": "lead",
       "log": [
@@ -68,15 +70,44 @@
           "by": "session:common-rules-traceability",
           "evidence": "Loom docs/handoffs/loom-cli-guide-maintenance-rule.md",
           "status": "in progress"
+        },
+        {
+          "at": "2026-10-03T15:59:03+02:00",
+          "event": "Sponsor directed Common Rules implementation with an overall view first, feature-by-feature expected-versus-actual architecture conformance, typed code references, test-case IDs and visible test reports.",
+          "by": "sponsor",
+          "evidence": "Sponsor conversation 2026-10-03; Docs accepted visual proposal revision 6"
+        },
+        {
+          "at": "2026-10-03T16:37:49+02:00",
+          "event": "all parts done",
+          "by": "lead",
+          "evidence": "",
+          "status": "done"
         }
       ],
       "parts": [
         {
           "id": "T-01.A",
-          "title": "Validate and render the complete traceability chain with focused test evidence",
+          "title": "Implement and verify the reusable Python traceability engine and generated holistic view",
           "share": 100,
-          "status": "in progress",
-          "owner": "lead"
+          "status": "done",
+          "owner": "lead",
+          "log": [
+            {
+              "at": "2026-10-03T15:59:03+02:00",
+              "event": "Implementation started from the accepted EisKaffee visual and project-agnostic ownership split.",
+              "by": "lead",
+              "evidence": "Common Rules branch codex/requirement-traceability-20261003",
+              "status": "in progress"
+            },
+            {
+              "at": "2026-10-03T16:37:49+02:00",
+              "event": "Implemented and independently reviewed the reusable deterministic traceability engine; fixed all six round-one findings and the final ignored-evidence finding.",
+              "by": "lead",
+              "evidence": "commits 1fa7021 f7b6482 591ed50 6757696; 20 focused traceability tests; merge gate 2108 tests OK in 213.4s",
+              "status": "done"
+            }
+          ]
         }
       ]
     }
@@ -104,7 +135,89 @@
       "status": "in progress"
     }
   ],
-  "asks": [],
+  "asks": [
+    {
+      "id": "A-01",
+      "at": "2026-10-03T15:57:46+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "So could you implement this as part of the common rules, a set of Python scripts that you can trigger and then create this traceability based on the criteria you have given?",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-02",
+      "at": "2026-10-03T15:57:46+02:00",
+      "by": "sponsor",
+      "kind": "question",
+      "quote": "Could it be made somewhat common, or would it be project-specific?",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-03T15:57:47+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "And you have for test sets well you have something like test cases or something like that, for test report and for implementation. It's pointing to something like for each layer. Is it something visible?",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-03T15:57:47+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Can we actually have some references? Like requirement has some actual reference code IDs, and those references are written in code, start and end and something like that, or we refer a complete file. Test case can be test IDs.",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-05",
+      "at": "2026-10-03T15:57:47+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Implement the script, but my aim is I want AI to first. How much time will it take for AI to complete the traceability?",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-06",
+      "at": "2026-10-03T15:57:47+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "So my aim is we pick up each feature at a time and we make sure the code is also architected accordingly. Can we look at it in a holistic view? Is it possible that bean is architected in the same way the workflow is expected to run?",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-07",
+      "at": "2026-10-03T15:57:47+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "First create an overall",
+      "became": "T-01",
+      "state": "became-item",
+      "source": "Sponsor conversation 2026-10-03"
+    },
+    {
+      "id": "A-08",
+      "at": "2026-10-03T17:18:16+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "merge it to main and make a release",
+      "became": null,
+      "state": "open",
+      "owner": "lead",
+      "source": "Sponsor conversation 2026-10-03"
+    }
+  ],
   "proposed_changes": [],
   "execution": {}
 }

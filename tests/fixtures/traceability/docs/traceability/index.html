@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="traceability-digest" content="eea439ea35bb0b8ad84a5d63b2e8486346c5597610ad419b7ce37da0d94fe9b2">
+  <title>Overall feature traceability</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#f5f7fb; --panel:#fff; --ink:#172033; --muted:#667085; --line:#d8dee9; --ok:#16794b; --bad:#b42318; --warn:#a15c00; --accent:#335cff; }
+    @media (prefers-color-scheme:dark) { :root { --bg:#111622; --panel:#1a2232; --ink:#f2f4f7; --muted:#aab4c5; --line:#344054; --ok:#55d693; --bad:#ff8a80; --warn:#ffc56b; --accent:#86a2ff; } }
+    * { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif }
+    main { width:min(1180px,calc(100% - 28px)); margin:28px auto 64px } h1,h2,h3 { line-height:1.15 } h1 { margin-bottom:6px } h2 { margin-top:34px }
+    .lede,.muted { color:var(--muted) } .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px }
+    .card,.feature { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 5px 20px rgb(16 24 40 / .05) }
+    .stat { font-size:1.8rem; font-weight:750 } .label { color:var(--muted); font-size:.85rem } .ok { color:var(--ok) } .bad { color:var(--bad) } .warn { color:var(--warn) }
+    table { width:100%; border-collapse:collapse; margin-top:10px } th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top } th { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em }
+    code,.pill { font-family:ui-monospace,SFMono-Regular,monospace; font-size:.84rem } .pill { display:inline-block; border:1px solid var(--line); border-radius:999px; padding:2px 8px; margin:2px }
+    details { margin-top:12px } summary { cursor:pointer; font-weight:700 } .flow { display:flex; flex-wrap:wrap; gap:7px; align-items:center } .arrow { color:var(--muted) }
+    a { color:var(--accent) } ul { padding-left:20px } .finding { color:var(--bad) }
+    @media (max-width:700px) { main { width:min(100% - 18px,1180px); margin-top:16px } .feature { padding:12px } table { display:block; overflow-x:auto } }
+  </style>
+</head>
+<body><main><header><h1>Overall traceability</h1><p class="lede">Reviewed, revision-bound evidence across every configured repository. Generated deterministically; AI proposals are never accepted evidence.</p></header>
+    <section class="grid" aria-label="Overall dashboard">
+      <div class="card"><div class="stat">1/1</div><div class="label">Conformant features</div></div>
+      <div class="card"><div class="stat">1</div><div class="label">Configured repositories</div></div>
+      <div class="card"><div class="stat">2</div><div class="label">Files scanned</div></div>
+      <div class="card"><div class="stat">2/3</div><div class="label">Strong code anchors</div></div>
+      <div class="card"><div class="stat">1</div><div class="label">Test reports</div></div>
+      <div class="card"><div class="stat">0</div><div class="label">Broken or missing evidence</div></div>
+    </section><h2>Feature drill-down</h2><article class="feature" id="FEAT-FIXTURE">
+      <h3>Traceability fixture <code>FEAT-FIXTURE</code></h3>
+      <p class="ok"><strong>conformant</strong></p>
+      <div class="flow"><span class="pill">Start</span><span class="arrow">→</span><span class="pill">End</span></div>
+      <details open><summary>Expected versus actual implementation</summary><table><thead><tr><th>Type</th><th>Expected</th><th>Actual code evidence</th><th>State</th></tr></thead><tbody><tr><td>Node</td><td><code>WFN-FIXTURE-START</code></td><td><span class="pill">CODE-FIXTURE-RUN</span></td><td class="ok">Accepted implementation</td></tr><tr><td>Node</td><td><code>WFN-FIXTURE-END</code></td><td><span class="pill">CODE-FIXTURE-END</span></td><td class="ok">Accepted implementation</td></tr><tr><td>Edge</td><td><code>WFE-FIXTURE-FLOW</code></td><td><span class="pill">CODE-FIXTURE-FILE</span></td><td class="ok">Accepted implementation</td></tr></tbody></table></details>
+      <details open><summary>Requirements and accepted mappings</summary><p><span class="pill">REQ-FIXTURE</span></p><p><span class="pill">MAP-FIXTURE</span></p></details>
+      <details open><summary>Code evidence</summary><table><thead><tr><th>Anchor</th><th>Repository revision and path</th><th>Locator</th><th>Evidence strength</th></tr></thead><tbody><tr><td><code>CODE-FIXTURE-RUN</code></td><td><code>fixture@WORKING:src/fixture.py</code></td><td>symbol run</td><td class="ok">symbol · strong</td></tr><tr><td><code>CODE-FIXTURE-END</code></td><td><code>fixture@WORKING:src/fixture.py</code></td><td># TRACE CODE-FIXTURE-END START … # TRACE CODE-FIXTURE-END END</td><td class="ok">region · strong</td></tr><tr><td><code>CODE-FIXTURE-FILE</code></td><td><code>fixture@WORKING:src/fixture.py</code></td><td>complete file</td><td class="warn">whole file · weak</td></tr></tbody></table></details>
+      <details open><summary>Test cases</summary><p><span class="pill">TEST-FIXTURE</span></p><p><strong>Latest test report:</strong> <strong>REPORT-FIXTURE-20261003</strong> · 2026-10-03T12:30:00+02:00<div><code>fixture@WORKING:reports/latest.json</code></div><div><span class="pill">TEST-FIXTURE: passed</span></div></p></details>
+      <details><summary>Issues and receipts</summary><p><a class="pill" href="https://example.invalid/issues/fixture">ISSUE-FIXTURE</a></p><p><span class="pill">RECEIPT-FIXTURE</span></p></details>
+      <details ><summary>Conformance findings</summary><ul><li class="ok">No gaps</li></ul></details>
+    </article></main><script type="application/json" id="traceability-data">{"counts":{"conformant":1,"features":1,"findings":0,"repositories":1,"scanned_files":2},"digest":"eea439ea35bb0b8ad84a5d63b2e8486346c5597610ad419b7ce37da0d94fe9b2","features":[{"conformance":"conformant","id":"FEAT-FIXTURE"}]}</script></body>
+</html>

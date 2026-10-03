@@ -1,3 +1,29 @@
+# 1.10.5 — Reviewed holistic traceability — 3 October 2026
+
+Version 1.10.4 was the internal candidate reviewed before the fixed-revision,
+topology, report-content, complete-chain, receipt-reference and safe-link
+hardening below. Version 1.10.5 is the reviewable candidate.
+
+Adds an opt-in, deterministic `bin/traceability` toolchain. Projects keep a
+reviewed manifest and repository-specific scan configuration; Common Rules
+validates stable typed requirement, workflow, code-anchor, test-case,
+test-report, issue, receipt and mapping IDs. The engine scans every configured
+checkout, resolves revision-bound symbol and explicit START/END anchors,
+labels whole-file evidence as weak, and checks expected workflow nodes and
+edges against accepted implementation evidence.
+
+The generated responsive page leads with an overall dashboard and then shows
+per-feature workflow, code, test-case, latest-report, issue and receipt
+evidence. AI-proposed mappings never contribute accepted coverage. Python owns
+all states, counts, digests and output, and check mode refuses broken evidence
+or stale generated HTML. There is no runtime AI dependency. Existing projects
+are unchanged until they add a reviewed manifest and invoke the command.
+
+Independent review added fixed-revision dirty-worktree refusal, actual-edge
+topology comparison, report-file/result verification, latest-report coverage,
+complete evidence-chain validation, receipt-reference validation, and safe
+HTTP(S)-only issue links before release.
+
 # 1.10.3 — Canonical project tracker and proposal issues — 3 October 2026
 
 Versions 1.10.0 through 1.10.2 were internal candidates. The class-level

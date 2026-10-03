@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "reviewed": {
+    "by": "fixture-review",
+    "at": "2026-10-03T12:00:00+02:00",
+    "status": "accepted"
+  },
+  "output": "docs/traceability/index.html",
+  "repositories": [
+    {
+      "id": "fixture",
+      "revision": "WORKING",
+      "scan": {
+        "include": ["src/*.py", "reports/*.json"],
+        "exclude": []
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "FEAT-FIXTURE",
+      "title": "Traceability fixture",
+      "requirements": [
+        {"id": "REQ-FIXTURE", "text": "Exercise the complete evidence chain"}
+      ],
+      "workflow": {
+        "expected_nodes": [
+          {"id": "WFN-FIXTURE-START", "label": "Start"},
+          {"id": "WFN-FIXTURE-END", "label": "End"}
+        ],
+        "expected_edges": [
+          {"id": "WFE-FIXTURE-FLOW", "from": "WFN-FIXTURE-START", "to": "WFN-FIXTURE-END"}
+        ],
+        "actual_nodes": [
+          {"id": "WFN-FIXTURE-START", "code_anchor_ids": ["CODE-FIXTURE-RUN"], "status": "accepted"},
+          {"id": "WFN-FIXTURE-END", "code_anchor_ids": ["CODE-FIXTURE-END"], "status": "accepted"}
+        ],
+        "actual_edges": [
+          {"id": "WFE-FIXTURE-FLOW", "from": "WFN-FIXTURE-START", "to": "WFN-FIXTURE-END", "code_anchor_ids": ["CODE-FIXTURE-FILE"], "status": "accepted"}
+        ]
+      },
+      "code_anchors": [
+        {"id": "CODE-FIXTURE-RUN", "repository": "fixture", "revision": "WORKING", "path": "src/fixture.py", "symbol": "run"},
+        {"id": "CODE-FIXTURE-END", "repository": "fixture", "revision": "WORKING", "path": "src/fixture.py", "region": {"start": "# TRACE CODE-FIXTURE-END START", "end": "# TRACE CODE-FIXTURE-END END"}},
+        {"id": "CODE-FIXTURE-FILE", "repository": "fixture", "revision": "WORKING", "path": "src/fixture.py", "whole_file": true}
+      ],
+      "test_cases": [
+        {"id": "TEST-FIXTURE", "requirement_ids": ["REQ-FIXTURE"], "code_anchor_ids": ["CODE-FIXTURE-RUN", "CODE-FIXTURE-END"]}
+      ],
+      "test_reports": [
+        {"id": "REPORT-FIXTURE-20261003", "repository": "fixture", "revision": "WORKING", "path": "reports/latest.json", "generated_at": "2026-10-03T12:30:00+02:00", "results": [{"test_case_id": "TEST-FIXTURE", "status": "passed"}]}
+      ],
+      "issues": [
+        {"id": "ISSUE-FIXTURE", "url": "https://example.invalid/issues/fixture", "status": "closed"}
+      ],
+      "receipts": [
+        {"id": "RECEIPT-FIXTURE", "kind": "review", "status": "accepted", "evidence_ids": ["REPORT-FIXTURE-20261003"]}
+      ],
+      "mappings": [
+        {
+          "id": "MAP-FIXTURE",
+          "status": "accepted",
+          "requirement_ids": ["REQ-FIXTURE"],
+          "workflow_node_ids": ["WFN-FIXTURE-START", "WFN-FIXTURE-END"],
+          "workflow_edge_ids": ["WFE-FIXTURE-FLOW"],
+          "code_anchor_ids": ["CODE-FIXTURE-RUN", "CODE-FIXTURE-END", "CODE-FIXTURE-FILE"],
+          "test_case_ids": ["TEST-FIXTURE"],
+          "test_report_ids": ["REPORT-FIXTURE-20261003"],
+          "issue_ids": ["ISSUE-FIXTURE"],
+          "receipt_ids": ["RECEIPT-FIXTURE"]
+        }
+      ]
+    }
+  ]
+}

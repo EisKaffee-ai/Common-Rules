@@ -76,6 +76,64 @@ field, the owner, the status, and the item it belongs to.
 Keep the ledger as the source of truth. Use the supported tracker commands to
 validate or render it rather than editing generated HTML by hand.
 
+### Holistic feature and architecture traceability
+
+`bin/traceability` is the stricter, project-wide view. It does not replace the
+proposal ledger row above. It reads a reviewed project manifest at
+`docs/common-rules/traceability.json`, scans every repository declared there,
+checks the evidence, and generates one overall dashboard with a drill-down for
+each feature.
+
+The split is deliberate:
+
+- Common Rules owns the Python validator, state calculations, freshness check,
+  and HTML template.
+- Each project owns its reviewed manifest, repository scan patterns, expected
+  workflow, accepted implementation mappings, and evidence references.
+- Machine checkout locations stay in the ignored
+  `.common-rules/workspace.local.json` `checkouts` map, keyed by repository ID.
+
+Stable IDs make every layer referable: `REQ-` for requirements, `WFN-` and
+`WFE-` for workflow nodes and edges, `CODE-` for code anchors, `TEST-` and
+`REPORT-` for test cases and reports, `ISSUE-` for issues, `RECEIPT-` for
+receipts, and `MAP-` for end-to-end mappings. IDs are globally unique in the
+manifest.
+
+A code anchor names a repository, revision, path, and exactly one locator:
+
+- `symbol` is strong evidence when the named declaration exists;
+- `region` is strong evidence when its explicit START and END markers each
+  exist exactly once and in order;
+- `whole_file: true` is accepted but visibly labelled weak evidence.
+
+Expected workflow nodes and edges conform only when their actual rows are
+`accepted` and point to valid code anchors. A `proposed_ai` workflow row or
+mapping remains visible as a finding and never contributes accepted coverage.
+Test reports name their test-case results, source repository, source revision,
+path, and timestamp; the latest report is shown for each feature. The referenced
+report is JSON with the same `id` and `results` as its manifest row. For a fixed
+revision, a dirty code or report path is refused instead of being mistaken for
+committed evidence. Every test case in an accepted mapping must have a result
+in the latest report.
+
+Each feature carries the complete chain: requirements, expected and actual
+workflow nodes and edges, code anchors, test cases and reports, issues,
+receipts, and accepted mappings. Receipt `evidence_ids` must resolve to typed
+evidence in that feature. Issue links are limited to HTTP(S).
+
+Build and then enforce the view with:
+
+```sh
+bin/traceability build --project .
+bin/traceability check --project .
+```
+
+`check` is read-only and fails when the manifest is unreviewed, a configured
+checkout or scan is incomplete, an ID/reference/anchor/report is broken, the
+expected and actual graphs differ, or the generated page is missing or stale.
+It has no runtime AI dependency. See `tests/fixtures/traceability` for the
+smallest complete manifest.
+
 ## The four views
 
 - **Tree** shows the proposal hierarchy and dependencies.
