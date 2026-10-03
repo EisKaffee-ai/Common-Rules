@@ -1,3 +1,16 @@
+# 1.5.0 — Calibrated setup and coherent workspaces — 3 October 2026
+
+**Standard change (mandatory):** projects can now opt into a calibrated
+`.common-rules.json` integration manifest, visual joined tracking across
+independently committed repositories, deterministic requirement-to-file
+traceability, and the portable Common Rules plugin lifecycle. Setup previews
+before writing and preserves existing declarations; local checkout paths stay
+uncommitted. Added visible setup, calibration, intake, planning, visual
+proposal, review, repair and handoff skills plus optional trusted hooks. No
+project is silently upgraded and no remote-write authority is inferred.
+Common Rules is the tracker plugin and supersedes the separate Emberline AI
+Tracker runtime; migrations preserve ledger IDs and evidence before cutover.
+
 # 1.4.1 — Release verification and installer safety — 29 September 2026
 
 Includes the Common Rules migration prepared as 1.4.0, plus the release-gate corrections and installer containment/shared-state fixes below. Version 1.4.0 was an unreleased candidate; 1.4.1 is the publication candidate after its verification fixes.

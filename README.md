@@ -8,7 +8,7 @@ next steps connected across **Claude Code and OpenAI Codex**.
 
 ![The problem and solution: session context, shared proposals and decisions, and a generated tracker for Claude Code and Codex](docs/assets/product-overview.svg)
 
-[**Get started →**](docs/GETTING-STARTED.md) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.4.0](docs/RELEASE-1.4.1.md)
+[**Get started →**](docs/GETTING-STARTED.md) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.5.0](docs/RELEASE-1.5.0.md)
 
 ## Less catching up. More moving forward.
 
@@ -63,7 +63,7 @@ the mandatory reading list. Record the exact installed commit; do not invent a
 new release version or silently upgrade to a development branch.
 ```
 
-The migration preserves the historical Emberline releases. Version 1.4.0 adds
+The migration preserves the historical Emberline releases. Version 1.4.0 added
 the AGENTS-first installer; install the release at its resolved commit.
 The source history and historical release labels retain their original names.
 

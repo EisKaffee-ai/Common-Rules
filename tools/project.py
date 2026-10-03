@@ -65,6 +65,14 @@ module does not know is ignored, because later proposals add keys.
       No project under apps/ declares it yet; the switch is the sponsor's
       to throw.
 
+  "integration": {"repository_id": "engine", "role": "business-logic",
+      "requirements": ["docs/requirements"], "tracker": "docs/proposals",
+      "issue_linking": "off", "skill_receipts": true,
+      "workspace": {"id": "product", "role": "member", "hub": "docs"}}
+      Proposal 36's calibrated repository identity and optional workspace
+      membership. Paths remain inside this repository; machine checkout paths
+      belong in the ignored `.common-rules/workspace.local.json`.
+
 EVERY VALUE IS UNTRUSTED. A path is relative to the project root: an absolute
 path, a `..` part, or a path that resolves (through a symlink) outside the
 project is a problem, and no declared path outside the project is read or hashed
@@ -142,11 +150,15 @@ DEFAULTS: dict = {
     "ruflo_namespace": None,
     "staging_branch": None,
     "goal": None,
+    "integration": None,
 }
 
 VALUES = ("high", "medium", "low")  # tools/tracker/ledger.py VALUES, proposal 25
 RISKS = ("standard", "elevated", "restricted")  # tools/tracker/ledger.py RISKS
 RISK_PATH_CLASSES = ("restricted", "elevated")
+INTEGRATION_ROLES = ("business-logic", "interface", "documentation", "assets", "operations", "combined")
+ISSUE_LINKING = ("off", "manual", "one-way")
+WORKSPACE_ROLES = ("hub", "member")
 
 INVALID, NOT_OBJECT = "invalid", "not an object"
 
@@ -202,6 +214,44 @@ def _goal_problem(value) -> str | None:
         if not isinstance(updated, str) or not _utf8(updated) or not _one_line(updated):
             return f"{FILE}: goal.updated must be a one-line date"
     return None
+
+
+def _integration_problems(value) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{FILE}: integration must be an object"]
+    bad = []
+    rid = value.get("repository_id")
+    if not isinstance(rid, str) or not rid.strip() or not _utf8(rid) or not _one_line(rid):
+        bad.append(f"{FILE}: integration.repository_id must be non-empty, valid UTF-8 and one line")
+    if value.get("role") not in INTEGRATION_ROLES:
+        bad.append(f"{FILE}: integration.role must be one of {', '.join(INTEGRATION_ROLES)}")
+    requirements = value.get("requirements")
+    if not isinstance(requirements, list) or not requirements or not all(isinstance(v, str) for v in requirements):
+        bad.append(f"{FILE}: integration.requirements must be a non-empty list of repository paths")
+    else:
+        bad.extend(filter(None, (_path_problem("integration.requirements", v) for v in requirements)))
+    tracker = value.get("tracker")
+    if not isinstance(tracker, str):
+        bad.append(f"{FILE}: integration.tracker must be a repository path")
+    else:
+        why = _path_problem("integration.tracker", tracker)
+        if why: bad.append(why)
+    if value.get("issue_linking") not in ISSUE_LINKING:
+        bad.append(f"{FILE}: integration.issue_linking must be one of {', '.join(ISSUE_LINKING)}")
+    if value.get("skill_receipts") is not True:
+        bad.append(f"{FILE}: integration.skill_receipts must be true")
+    workspace = value.get("workspace")
+    if workspace is not None:
+        if not isinstance(workspace, dict):
+            bad.append(f"{FILE}: integration.workspace must be an object")
+        else:
+            if not isinstance(workspace.get("id"), str) or not workspace.get("id", "").strip():
+                bad.append(f"{FILE}: integration.workspace.id must be a non-empty string")
+            if workspace.get("role") not in WORKSPACE_ROLES:
+                bad.append(f"{FILE}: integration.workspace.role must be hub or member")
+            if workspace.get("role") == "member" and not isinstance(workspace.get("hub"), str):
+                bad.append(f"{FILE}: a workspace member must name its hub repository id")
+    return bad
 
 
 def _relative(rel: str) -> bool:
@@ -469,6 +519,12 @@ def _checked(data: dict) -> tuple[dict, list[str]]:
             bad.append(why)
         else:
             ok["goal"] = copy.deepcopy(data["goal"])
+    if "integration" in data:
+        why = _integration_problems(data["integration"])
+        if why:
+            bad.extend(why)
+        else:
+            ok["integration"] = copy.deepcopy(data["integration"])
     return ok, bad
 
 
@@ -549,6 +605,13 @@ def problems(project: Path) -> list[str]:
         _target, why = _series_place(root, rel)
         if why:
             bad.append(why)
+    integration = ok.get("integration")
+    if integration:
+        for rel in [*integration["requirements"], integration["tracker"]]:
+            if not inside(root, rel):
+                bad.append(f"{FILE}: integration path {rel!r} {outside}")
+            elif not (root / rel).exists():
+                bad.append(f"{FILE}: integration path {rel} does not exist")
     return _unique(bad)
 
 
