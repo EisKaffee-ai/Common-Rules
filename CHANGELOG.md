@@ -1,3 +1,14 @@
+# 1.10.0 — Canonical project tracker and proposal issues — 3 October 2026
+
+Common Rules now validates an optional proposal-level GitHub issue contract:
+`issue_repository`, `issue_granularity: proposal`, and
+`issue_sync_direction: ledger-to-github` are declared together with one-way
+issue linking. Reverse or partial contracts are refused. Setup discovers
+nested source-ledger catalogues, excludes generated and vendored copies, and
+prefers the largest real catalogue instead of proposing a duplicate
+`docs/proposals` tracker. Existing manifests without the optional contract
+retain their prior behavior.
+
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 
 **Standard change (mandatory):** projects can now opt into a calibrated

@@ -6,10 +6,15 @@ import json
 import re
 from pathlib import Path, PurePosixPath
 
+from tools import project as declaration
+
 ROLES = ("business-logic", "interface", "documentation", "assets", "operations", "combined")
 ISSUES = ("off", "manual", "one-way")
+ISSUE_GRANULARITY = ("proposal",)
+ISSUE_SYNC_DIRECTIONS = ("ledger-to-github",)
 WORKSPACE_ROLES = ("hub", "member")
 LOCAL = ".common-rules/workspace.local.json"
+DISCOVERY_EXCLUDES = frozenset({".git", ".common-rules", "build", "dist", "node_modules", "releases", "tracker"})
 
 
 def _safe_id(value: str) -> str:
@@ -26,12 +31,36 @@ def _inside(root: Path, rel: str) -> bool:
         return False
 
 
+def _ledger_catalogues(root: Path) -> list[tuple[int, str]]:
+    """Return source ledger directories, with the largest catalogue first."""
+    counts: dict[Path, int] = {}
+    for path in root.rglob("*.json"):
+        try:
+            rel = path.relative_to(root)
+        except ValueError:
+            continue
+        if any(part in DISCOVERY_EXCLUDES or part.startswith(".") for part in rel.parts[:-1]):
+            continue
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            continue
+        if (isinstance(data, dict) and isinstance(data.get("items"), list)
+                and isinstance(data.get("title"), str) and "proposal" in data):
+            counts[path.parent] = counts.get(path.parent, 0) + 1
+    return sorted(((count, directory.relative_to(root).as_posix())
+                   for directory, count in counts.items()),
+                  key=lambda row: (-row[0], row[1]))
+
+
 def discover(root: Path) -> dict:
     requirements = [p for p in ("docs/requirements", "requirements") if (root / p).is_dir()]
     trackers = [p for p in ("docs/proposals", "docs/tracker", "tracker") if (root / p).is_dir()]
+    catalogues = _ledger_catalogues(root)
     return {"project_state": "existing" if any(root.iterdir()) else "new",
             "requirements": requirements or ["docs/requirements"],
-            "tracker": (trackers or ["docs/proposals"])[0]}
+            "tracker": catalogues[0][1] if catalogues else (trackers or ["docs/proposals"])[0],
+            "ledger_count": catalogues[0][0] if catalogues else 0}
 
 
 def _existing(root: Path) -> dict:
@@ -54,11 +83,18 @@ def proposed(root: Path, args) -> dict:
         "issue_linking": args.issue_linking or integration.get("issue_linking") or "off",
         "skill_receipts": True,
     })
+    for key in ("issue_repository", "issue_granularity", "issue_sync_direction"):
+        value = getattr(args, key, None)
+        if value is not None:
+            integration[key] = value
     if args.workspace_id:
         integration["workspace"] = {"id": _safe_id(args.workspace_id),
                                     "role": args.workspace_role or "member"}
         if args.hub_repository_id:
             integration["workspace"]["hub"] = _safe_id(args.hub_repository_id)
+    problems = declaration._integration_problems(integration)
+    if problems:
+        raise ValueError("; ".join(problems))
     data["integration"] = integration
     return data
 
@@ -112,6 +148,9 @@ def main(argv=None) -> int:
         p.add_argument("--repository-id"); p.add_argument("--role", choices=ROLES)
         p.add_argument("--requirements", action="append"); p.add_argument("--tracker")
         p.add_argument("--issue-linking", choices=ISSUES)
+        p.add_argument("--issue-repository")
+        p.add_argument("--issue-granularity", choices=ISSUE_GRANULARITY)
+        p.add_argument("--issue-sync-direction", choices=ISSUE_SYNC_DIRECTIONS)
         p.add_argument("--workspace-id"); p.add_argument("--workspace-role", choices=WORKSPACE_ROLES)
         p.add_argument("--hub-repository-id")
     sub.add_parser("doctor")

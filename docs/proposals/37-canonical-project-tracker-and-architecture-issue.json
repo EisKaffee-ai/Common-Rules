@@ -55,7 +55,7 @@
       ],
       "done": "Setup preview identifies the existing configured ledger directory, the manifest validates the one-way proposal contract, and existing manifests behave unchanged.",
       "depends": [],
-      "status": "in progress",
+      "status": "in review",
       "tier": "high",
       "model": "sonnet",
       "tag": "[ruflo · high · sonnet]",
@@ -68,6 +68,13 @@
           "by": "session:codex",
           "evidence": "Docs contains 27 ledgers at content/proposal/delivery/docs/proposals; supplied manifest recorded as A-03; no Docs files changed",
           "status": "in progress"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "implementation and real Docs preview verified",
+          "by": "session:codex",
+          "evidence": "83 focused tests OK; read-only Docs preview selected content/proposal/delivery/docs/proposals with 27 ledgers and complete ledger-to-github proposal contract; Docs git status unchanged",
+          "status": "in review"
         }
       ]
     },
@@ -88,7 +95,9 @@
         "python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"
       ],
       "done": "A complete draft set validates before mutation; issue #2-style mappings are reused; all items map to one group issue; reverse synchronization is refused.",
-      "depends": ["T-01"],
+      "depends": [
+        "T-01"
+      ],
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
@@ -117,7 +126,9 @@
         "python3 -m unittest -q tests.test_tracker_board tests.test_tracker_board_filters tests.test_tracker_architecture tests.test_workspace_tracker"
       ],
       "done": "The configured canonical page exposes all five views, layer-grouped architecture cards and joined repository status with exact ledger totals and no copied member ledgers.",
-      "depends": ["T-01"],
+      "depends": [
+        "T-01"
+      ],
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
@@ -143,7 +154,9 @@
         "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"
       ],
       "done": "The packaged skill names the provider boundary, full-set preflight, create/update/close/reopen rules, explicit write-back and reconciliation refusal.",
-      "depends": ["T-02"],
+      "depends": [
+        "T-02"
+      ],
       "status": "not started",
       "tier": "high",
       "model": "sonnet",
@@ -172,7 +185,11 @@
         "Docs npm test && npm run check && npm run build"
       ],
       "done": "Read-only evidence proves 27 groups, 59 features, 362 rows, one canonical tracker and exactly one issue mapping per proposal including Proposal 08 → issue #2; Docs reports its own build receipt.",
-      "depends": ["T-02", "T-03", "T-04"],
+      "depends": [
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
       "status": "not started",
       "tier": "lead",
       "model": "opus",
@@ -201,7 +218,13 @@
         "python3 -m unittest discover -s tests -q"
       ],
       "done": "The 1.10.0 candidate passes focused and full gates, CI and independent review before merge, tag and public release.",
-      "depends": ["T-01", "T-02", "T-03", "T-04", "T-05"],
+      "depends": [
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04",
+        "T-05"
+      ],
       "status": "not started",
       "tier": "lead",
       "model": "opus",
@@ -215,11 +238,21 @@
     {
       "id": "TR-01",
       "item": "T-01",
-      "requirement_ids": ["CR37-R01", "CR37-R02", "CR37-R03", "CR37-R20"],
+      "requirement_ids": [
+        "CR37-R01",
+        "CR37-R02",
+        "CR37-R03",
+        "CR37-R20"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#setup-and-discovery",
-      "implementation_files": ["tools/project.py", "tools/project_setup.py"],
-      "tests_commands": ["python3 -m unittest -q tests.test_project_declaration tests.test_project_setup"],
+      "implementation_files": [
+        "tools/project.py",
+        "tools/project_setup.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_project_declaration tests.test_project_setup"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "in progress"
@@ -227,11 +260,25 @@
     {
       "id": "TR-02",
       "item": "T-02",
-      "requirement_ids": ["CR37-R05", "CR37-R06", "CR37-R07", "CR37-R08", "CR37-R10", "CR37-R11", "CR37-R12", "CR37-R18"],
+      "requirement_ids": [
+        "CR37-R05",
+        "CR37-R06",
+        "CR37-R07",
+        "CR37-R08",
+        "CR37-R10",
+        "CR37-R11",
+        "CR37-R12",
+        "CR37-R18"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#proposal-issue-plan",
-      "implementation_files": ["tools/tracker/sync.py", "bin/tracker"],
-      "tests_commands": ["python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"],
+      "implementation_files": [
+        "tools/tracker/sync.py",
+        "bin/tracker"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracker_sync tests.test_tracker_proposal_issues"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "not started"
@@ -239,11 +286,26 @@
     {
       "id": "TR-03",
       "item": "T-03",
-      "requirement_ids": ["CR37-R04", "CR37-R13", "CR37-R14", "CR37-R15", "CR37-R16", "CR37-R17", "CR37-R18", "CR37-R19"],
+      "requirement_ids": [
+        "CR37-R04",
+        "CR37-R13",
+        "CR37-R14",
+        "CR37-R15",
+        "CR37-R16",
+        "CR37-R17",
+        "CR37-R18",
+        "CR37-R19"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#canonical-tracker-sections",
-      "implementation_files": ["tools/tracker/board.py", "tools/tracker/assets/board.js", "tools/workspace_tracker.py"],
-      "tests_commands": ["python3 -m unittest -q tests.test_tracker_architecture tests.test_workspace_tracker"],
+      "implementation_files": [
+        "tools/tracker/board.py",
+        "tools/tracker/assets/board.js",
+        "tools/workspace_tracker.py"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_tracker_architecture tests.test_workspace_tracker"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "not started"
@@ -251,11 +313,22 @@
     {
       "id": "TR-04",
       "item": "T-04",
-      "requirement_ids": ["CR37-R09", "CR37-R10", "CR37-R11", "CR37-R12"],
+      "requirement_ids": [
+        "CR37-R09",
+        "CR37-R10",
+        "CR37-R11",
+        "CR37-R12"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#requirements",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#proposal-issue-plan",
-      "implementation_files": ["skills/tracker/SKILL.md", "skills/setup/SKILL.md", "skills/review-and-verify/SKILL.md"],
-      "tests_commands": ["python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"],
+      "implementation_files": [
+        "skills/tracker/SKILL.md",
+        "skills/setup/SKILL.md",
+        "skills/review-and-verify/SKILL.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_plugin_package tests.test_tracker_skill"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "not started"
@@ -263,11 +336,24 @@
     {
       "id": "TR-05",
       "item": "T-05",
-      "requirement_ids": ["CR37-R12", "CR37-R15", "CR37-R16", "CR37-R17", "CR37-R18", "CR37-R19", "CR37-R20"],
+      "requirement_ids": [
+        "CR37-R12",
+        "CR37-R15",
+        "CR37-R16",
+        "CR37-R17",
+        "CR37-R18",
+        "CR37-R19",
+        "CR37-R20"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#vanilla-acceptance-fixture",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#repository-ownership",
-      "implementation_files": ["docs/requirements/37-canonical-tracker-and-proposal-issues.md", "docs/design/37-canonical-tracker-and-proposal-issues.md"],
-      "tests_commands": ["read-only Docs and GitHub plugin acceptance suite"],
+      "implementation_files": [
+        "docs/requirements/37-canonical-tracker-and-proposal-issues.md",
+        "docs/design/37-canonical-tracker-and-proposal-issues.md"
+      ],
+      "tests_commands": [
+        "read-only Docs and GitHub plugin acceptance suite"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "not started"
@@ -275,11 +361,22 @@
     {
       "id": "TR-06",
       "item": "T-06",
-      "requirement_ids": ["CR37-R21"],
+      "requirement_ids": [
+        "CR37-R21"
+      ],
       "guide_section": "docs/requirements/37-canonical-tracker-and-proposal-issues.md#acceptance-evidence",
       "architecture_section": "docs/design/37-canonical-tracker-and-proposal-issues.md#release-boundary",
-      "implementation_files": ["VERSION", "CHANGELOG.md", "plugin.json", ".claude-plugin/plugin.json"],
-      "tests_commands": ["bin/version-check --check", "bin/workflow-stamp --check", "python3 -m unittest discover -s tests -q"],
+      "implementation_files": [
+        "VERSION",
+        "CHANGELOG.md",
+        "plugin.json",
+        ".claude-plugin/plugin.json"
+      ],
+      "tests_commands": [
+        "bin/version-check --check",
+        "bin/workflow-stamp --check",
+        "python3 -m unittest discover -s tests -q"
+      ],
       "receipt_or_refusal": "pending implementation",
       "owner": "lead",
       "status": "not started"

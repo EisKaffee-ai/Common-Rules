@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 10:36
+# Checkpoint — 2026-10-03 10:49
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 7ce6ff2
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 2e083df
 
-<!-- ledger-digest: 0dadc88f390cf680f612bbcecb483ab0c5d857fb0a7b2682b1a43eeac4de3f57 -->
+<!-- ledger-digest: f0d795d9d7e33303b66bb6de31d6b7902ba3ae35c44eb92ac739cf728f50b9eb -->
 
 ## Proposal 19 · Warm-up
 
@@ -222,11 +222,11 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 7ce6ff2
 
 ## Proposal 37 · Canonical project tracker and architecture issue synchronization
 
-0 done / 1 in progress / 0 blocked / 5 not started
+0 done / 0 in progress / 0 blocked / 5 not started / 1 in review
 
 ### In progress
 
-- T-01 · [ruflo · high · sonnet] · Calibrated canonical tracker manifest and discovery · accepted target manifest and existing Docs catalogue inspected
+- none
 
 ### Blocked, and why
 

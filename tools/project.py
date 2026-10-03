@@ -68,10 +68,16 @@ module does not know is ignored, because later proposals add keys.
   "integration": {"repository_id": "engine", "role": "business-logic",
       "requirements": ["docs/requirements"], "tracker": "docs/proposals",
       "issue_linking": "off", "skill_receipts": true,
+      "issue_repository": "owner/repository",
+      "issue_granularity": "proposal",
+      "issue_sync_direction": "ledger-to-github",
       "workspace": {"id": "product", "role": "member", "hub": "docs"}}
       Proposal 36's calibrated repository identity and optional workspace
-      membership. Paths remain inside this repository; machine checkout paths
-      belong in the ignored `.common-rules/workspace.local.json`.
+      membership. The three issue_* fields are an optional, indivisible
+      proposal-level synchronization contract: the ledger is authoritative
+      and only ledger-to-GitHub flow is supported. Paths remain inside this
+      repository; machine checkout paths belong in the ignored
+      `.common-rules/workspace.local.json`.
 
 EVERY VALUE IS UNTRUSTED. A path is relative to the project root: an absolute
 path, a `..` part, or a path that resolves (through a symlink) outside the
@@ -130,6 +136,7 @@ import datetime
 import glob
 import json
 import os
+import re
 from pathlib import Path, PurePosixPath
 
 FILE = ".common-rules.json"
@@ -158,6 +165,8 @@ RISKS = ("standard", "elevated", "restricted")  # tools/tracker/ledger.py RISKS
 RISK_PATH_CLASSES = ("restricted", "elevated")
 INTEGRATION_ROLES = ("business-logic", "interface", "documentation", "assets", "operations", "combined")
 ISSUE_LINKING = ("off", "manual", "one-way")
+ISSUE_GRANULARITY = ("proposal",)
+ISSUE_SYNC_DIRECTIONS = ("ledger-to-github",)
 WORKSPACE_ROLES = ("hub", "member")
 
 INVALID, NOT_OBJECT = "invalid", "not an object"
@@ -238,6 +247,21 @@ def _integration_problems(value) -> list[str]:
         if why: bad.append(why)
     if value.get("issue_linking") not in ISSUE_LINKING:
         bad.append(f"{FILE}: integration.issue_linking must be one of {', '.join(ISSUE_LINKING)}")
+    issue_keys = ("issue_repository", "issue_granularity", "issue_sync_direction")
+    if any(key in value for key in issue_keys):
+        if not all(key in value for key in issue_keys):
+            bad.append(f"{FILE}: proposal issue synchronization requires issue_repository, "
+                       "issue_granularity and issue_sync_direction together")
+        repository = value.get("issue_repository")
+        if (not isinstance(repository, str) or not _utf8(repository) or not _one_line(repository)
+                or re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None):
+            bad.append(f"{FILE}: integration.issue_repository must be an owner/repository name")
+        if value.get("issue_granularity") not in ISSUE_GRANULARITY:
+            bad.append(f"{FILE}: integration.issue_granularity must be proposal")
+        if value.get("issue_sync_direction") not in ISSUE_SYNC_DIRECTIONS:
+            bad.append(f"{FILE}: integration.issue_sync_direction must be ledger-to-github")
+        if value.get("issue_linking") != "one-way":
+            bad.append(f"{FILE}: proposal issue synchronization requires integration.issue_linking one-way")
     if value.get("skill_receipts") is not True:
         bad.append(f"{FILE}: integration.skill_receipts must be true")
     workspace = value.get("workspace")

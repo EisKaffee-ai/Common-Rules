@@ -132,6 +132,50 @@ class TestLoad(Scratch):
         self.assertEqual(DEFAULT_READ_ORDER, d["read_order"])
         self.assertEqual([], P().problems(self.root))
 
+    def test_proposal_issue_contract_is_loaded(self):
+        for rel in ("docs/architecture", "content", "templates",
+                    "content/proposal/delivery/docs/proposals"):
+            (self.root / rel).mkdir(parents=True, exist_ok=True)
+        integration = {
+            "repository_id": "docs",
+            "role": "documentation",
+            "requirements": ["docs/architecture", "content", "templates"],
+            "tracker": "content/proposal/delivery/docs/proposals",
+            "issue_linking": "one-way",
+            "issue_repository": "EisKaffee-ai/bean-engine",
+            "issue_granularity": "proposal",
+            "issue_sync_direction": "ledger-to-github",
+            "skill_receipts": True,
+            "workspace": {"id": "eiskaffee-vanilla", "role": "hub"},
+        }
+        self.write(".common-rules.json", {"integration": integration})
+        self.assertEqual(integration, P().load(self.root)["integration"])
+        self.assertEqual([], P().problems(self.root))
+
+    def test_proposal_issue_contract_is_complete_and_one_way(self):
+        (self.root / "docs/requirements").mkdir(parents=True)
+        (self.root / "docs/proposals").mkdir(parents=True)
+        base = {
+            "repository_id": "docs", "role": "documentation",
+            "requirements": ["docs/requirements"], "tracker": "docs/proposals",
+            "issue_linking": "one-way", "skill_receipts": True,
+        }
+        invalid = (
+            {"issue_repository": "EisKaffee-ai/bean-engine"},
+            {"issue_repository": "not-a-repository", "issue_granularity": "proposal",
+             "issue_sync_direction": "ledger-to-github"},
+            {"issue_repository": "EisKaffee-ai/bean-engine", "issue_granularity": "item",
+             "issue_sync_direction": "ledger-to-github"},
+            {"issue_repository": "EisKaffee-ai/bean-engine", "issue_granularity": "proposal",
+             "issue_sync_direction": "github-to-ledger"},
+        )
+        for extra in invalid:
+            with self.subTest(extra=extra):
+                self.write(".common-rules.json", {"integration": {**base, **extra}})
+                found = "\n".join(P().problems(self.root))
+                self.assertTrue(found, extra)
+                self.assertNotIn("integration", P().declared(self.root))
+
     def test_a_safety_rules_list_is_accepted(self):
         self.write("CLAUDE.md", "# app\n")
         self.write("SAFETY.md", "# safety\n")

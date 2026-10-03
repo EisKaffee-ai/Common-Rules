@@ -33,6 +33,55 @@ class ProjectSetupTest(unittest.TestCase):
         self.assertEqual(["docs/requirements"], data["integration"]["requirements"])
         self.assertFalse((self.project / ".common-rules.json").exists())
 
+    def test_preview_prefers_existing_nested_ledger_catalogue(self):
+        canonical = self.project / "content/proposal/delivery/docs/proposals"
+        canonical.mkdir(parents=True)
+        for number in range(1, 28):
+            (canonical / f"{number:02d}-group.json").write_text(json.dumps({
+                "proposal": number, "title": f"Group {number}", "items": []
+            }))
+        generated = self.project / "build/proposal/delivery/docs/proposals"
+        generated.mkdir(parents=True)
+        for number in range(1, 28):
+            (generated / f"{number:02d}-group.json").write_text(json.dumps({
+                "proposal": number, "title": f"Generated {number}", "items": []
+            }))
+
+        result = self.invoke("preview", "--repository-id", "docs", "--role", "documentation")
+        self.assertEqual(0, result.returncode, result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual("content/proposal/delivery/docs/proposals", data["integration"]["tracker"])
+
+    def test_preview_adds_proposal_issue_contract(self):
+        result = self.invoke(
+            "preview", "--repository-id", "docs", "--role", "documentation",
+            "--issue-linking", "one-way",
+            "--issue-repository", "EisKaffee-ai/bean-engine",
+            "--issue-granularity", "proposal",
+            "--issue-sync-direction", "ledger-to-github",
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        integration = json.loads(result.stdout)["integration"]
+        self.assertEqual("EisKaffee-ai/bean-engine", integration["issue_repository"])
+        self.assertEqual("proposal", integration["issue_granularity"])
+        self.assertEqual("ledger-to-github", integration["issue_sync_direction"])
+
+    def test_preview_refuses_an_incomplete_or_reverse_issue_contract(self):
+        incomplete = self.invoke(
+            "preview", "--issue-linking", "one-way",
+            "--issue-repository", "EisKaffee-ai/bean-engine",
+        )
+        self.assertEqual(2, incomplete.returncode)
+        self.assertIn("requires issue_repository", incomplete.stdout)
+
+        reverse = self.invoke(
+            "preview", "--issue-linking", "one-way",
+            "--issue-repository", "EisKaffee-ai/bean-engine",
+            "--issue-granularity", "proposal",
+            "--issue-sync-direction", "github-to-ledger",
+        )
+        self.assertEqual(2, reverse.returncode)
+
     def test_apply_preserves_existing_declaration(self):
         original = {"gates": {"quick": "true"}, "unknown_future_key": {"keep": True}}
         (self.project / ".common-rules.json").write_text(json.dumps(original))
