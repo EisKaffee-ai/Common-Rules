@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-03 11:07
+# Checkpoint — 2026-10-03 11:16
 
-Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 3098493
+Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: d0f719e
 
-<!-- ledger-digest: 1b96d9104b86525aedf0079cc8f3a152091be64521fd8e9b06837a81080b13b3 -->
+<!-- ledger-digest: a53dad6574f704cdd205dc87a664afe6209b8eceee23022efbb2dc53e772eaf7 -->
 
 ## Proposal 19 · Warm-up
 
@@ -228,7 +228,7 @@ Reason: manual · branch: codex/canonical-tracker-issue-sync · HEAD: 3098493
 
 ### In progress
 
-- T-03 · [ruflo · high · sonnet] · Five-view canonical tracker with workspace coherence · workspace output consolidated into the canonical page
+- T-03 · [ruflo · high · sonnet] · Five-view canonical tracker with workspace coherence · removed the internal goal panel from the public tracker
 
 ### Blocked, and why
 

@@ -178,18 +178,6 @@ def project_page_state(project: Path) -> tuple[str, Path]:
     return freshness(paths, page, project), page
 
 
-def goal_contract(goal: dict | None) -> str:
-    """The compact goal story shown above the tracker filters."""
-    if not goal:
-        return ""
-    constraints = " · ".join(b(row) for row in goal["constraints"])
-    verification = " · ".join(b(row) for row in goal["verification"])
-    return (f'<section class="goal-contract" id="goal"><p class="eyebrow">Current goal</p>'
-            f'<h2>{b(goal["outcome"])}</h2>'
-            f'<p><strong>Constraints</strong> · {constraints}</p>'
-            f'<p><strong>Verify</strong> · {verification}</p></section>')
-
-
 # ---------------------------------------------------------------------------
 # pieces
 
@@ -1302,8 +1290,7 @@ def render(ledgers: list[tuple[Path, dict]], name: str, repo, project=None) -> s
         f'data-in-review="{display_totals.get("in review", 0)}" data-in-testing="{display_totals.get("in testing", 0)}" '
         f'data-deferred="{display_totals.get("deferred", 0)}">'
         f'<p class="line">{e(status_line)}</p>{mini_bar(display_totals)}</section></header>'
-        + goal_contract(goal) +
-        information_nav() +
+        + information_nav() +
         '<div class="filters" role="search" data-product-controls hidden>'
         '<div class="views" role="group" aria-label="View">'
         '<button type="button" data-view="tree" aria-pressed="true">Tree</button>'

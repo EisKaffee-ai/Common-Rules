@@ -32,7 +32,9 @@ board and namespaces cached snapshots by that directory. The current header
 also refuses a historical denominator that differs from the current ledgers.
 Architecture catalogues describe their hierarchy explicitly as layers,
 architecture groups, features and lifecycle steps, preventing an unrelated
-parent-project total from appearing as the catalogue's task count.
+parent-project total from appearing as the catalogue's task count. The goal
+contract remains a freshness input and warm-up control but is not rendered as
+a large prose panel in the public tracker.
 
 # 1.9.0 — Common Rules tracker plugin for OpenAI and Claude — 3 October 2026
 

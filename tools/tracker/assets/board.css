@@ -27,10 +27,6 @@ h1{font:600 34px/1.1 var(--sans);letter-spacing:-.015em;margin:4px 0 0;text-wrap
 .line{font:500 14px var(--mono);margin:0 0 8px;font-variant-numeric:tabular-nums}
 .bar{display:flex;height:8px;background:var(--rule);border-radius:2px;overflow:hidden}
 .totals .bar{height:12px}
-.goal-contract{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,var(--rule));border-radius:8px;padding:16px 18px;max-width:920px}
-.goal-contract h2{font-size:22px;line-height:1.2;margin:4px 0 10px}
-.goal-contract p:not(.eyebrow){margin:5px 0;color:var(--dim)}
-.goal-contract strong{color:var(--ink);font-weight:600}
 .information-views{position:sticky;top:0;z-index:7;display:flex;gap:6px;overflow-x:auto;padding:8px 0;background:var(--ground)}
 .information-views button{flex:none;color:var(--dim);border:1px solid var(--rule);border-radius:999px;padding:6px 12px;background:var(--raise);font-size:13px;cursor:pointer}
 .information-views button:hover{color:var(--accent);border-color:var(--accent)}

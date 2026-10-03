@@ -99,7 +99,7 @@ class TestBoardPage(unittest.TestCase):
         self.assertTrue(self.p.page.is_file())
         self.assertIn("2 done / 1 in progress / 1 blocked / 2 not started", r.stdout)
 
-    def test_goal_contract_is_shown_and_makes_the_page_stale_when_changed(self):
+    def test_goal_contract_governs_freshness_without_rendering_internal_prose(self):
         (self.p.root / ".common-rules.json").write_text(json.dumps({
             "goal": {
                 "outcome": "ship the smallest release",
@@ -109,8 +109,9 @@ class TestBoardPage(unittest.TestCase):
         }))
         self.assertEqual(0, self.p.run().returncode)
         text = self.p.page.read_text()
-        self.assertIn("ship the smallest release", text)
-        self.assertIn("preserve behavior", text)
+        self.assertIn('meta name="goal-digest"', text)
+        self.assertNotIn("ship the smallest release", text)
+        self.assertNotIn("preserve behavior", text)
         self.assertEqual("ok", board.project_page_state(self.p.root)[0])
         (self.p.root / ".common-rules.json").write_text(json.dumps({
             "goal": {

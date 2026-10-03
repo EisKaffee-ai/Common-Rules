@@ -163,6 +163,13 @@
           "event": "workspace output consolidated into the canonical page",
           "by": "session:codex",
           "evidence": "102 focused tests OK; proposal-mode workspace-tracker renders/checks the canonical configured page and creates no second tracker"
+        },
+        {
+          "at": "2026-10-03",
+          "event": "removed the internal goal panel from the public tracker",
+          "by": "session:codex",
+          "evidence": "sponsor-selected region removed; goal digest still drives freshness; 102 tracker/history/architecture/workspace tests OK; refreshed real fixture contains no Current goal or goal-contract markup",
+          "status": "in progress"
         }
       ]
     },
@@ -442,6 +449,17 @@
       "became": "T-01",
       "state": "became-item",
       "source": "chat"
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-03",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Also before creating the next release, please optimize, like when this plugin is loaded, how much memory it utilizes in the context. I want those analysis, and that analysis should also be part of the readme.",
+      "became": "T-06",
+      "state": "became-item",
+      "source": "chat",
+      "note": "Release 1.10.0 must include measured context-loading analysis, optimization and README documentation before publication."
     }
   ],
   "proposed_changes": [],
