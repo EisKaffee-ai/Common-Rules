@@ -210,13 +210,13 @@
       "id": "C-05",
       "phase": "C",
       "cx": "C4",
-      "title": "Release Common Rules 1.8.1",
+      "title": "Release Common Rules 1.9.0",
       "what": "Reconcile version, changelog, proposal evidence and release checks for sponsor review.",
       "files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.1.md",
-        "docs/reviews/common-rules-1.8.1-completion-audit.md"
+        "docs/RELEASE-1.9.0.md",
+        "docs/reviews/common-rules-1.9.0-completion-audit.md"
       ],
       "tests": [
         "bin/version-check --check",
@@ -304,7 +304,7 @@
         },
         {
           "at": "2026-10-03",
-          "event": "PR #3 CI required the 1.8.1 patch candidate",
+          "event": "PR #3 CI required a new release candidate",
           "by": "session:codex",
           "evidence": "GitHub Actions run 37102371621: version-check saw changelog changes after the 1.8.0 marker; PR https://github.com/EisKaffee-ai/Common-Rules/pull/3; bump and final gate in progress",
           "status": "in testing"
@@ -541,14 +541,14 @@
       "implementation_files": [
         "VERSION",
         "CHANGELOG.md",
-        "docs/RELEASE-1.8.1.md",
-        "docs/reviews/common-rules-1.8.1-completion-audit.md"
+        "docs/RELEASE-1.9.0.md",
+        "docs/reviews/common-rules-1.9.0-completion-audit.md"
       ],
       "tests_commands": [
         "bin/version-check --check",
         "bin/workflow-stamp --check"
       ],
-      "receipt_or_refusal": "receipt: 1.8.0 precursor gate passed; 1.8.1 patch gate required after reviewer-audit changelog update; independent review and publication pending",
+      "receipt_or_refusal": "receipt: 1.8.0 precursor gate passed; semantic-version policy requires the 1.9.0 minor candidate after the mandatory changelog update; independent review and publication pending",
       "owner": "lead",
       "status": "in review"
     },

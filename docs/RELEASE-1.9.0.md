@@ -1,8 +1,8 @@
-# Common Rules 1.8.1 release candidate
+# Common Rules 1.9.0 release candidate
 
 ## Outcome
 
-Version 1.8.1 turns the accepted calibrated-project proposal into an opt-in
+Version 1.9.0 turns the accepted calibrated-project proposal into an opt-in
 release surface:
 
 - `bin/project-setup` discovers, previews, applies and diagnoses a repository
