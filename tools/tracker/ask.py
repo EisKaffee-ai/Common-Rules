@@ -6,7 +6,7 @@ hand-editing ledger JSON, which the rules forbid.
 
   tracker ask LEDGER --kind KIND --quote TEXT [--state STATE] [--by NAME]
                       [--at ISO8601] [--owner O] [--became ITEM]
-                      [--source TEXT] [--note TEXT]
+                      [--source TEXT] [--note TEXT] [--review ITEM]
 
   tracker ask LEDGER --close A-nn --state answered|became-item|declined
                       [--became ITEM] [--note TEXT] [--by NAME] [--at ISO8601]
@@ -101,6 +101,32 @@ def _create(args, say: str) -> int:
 
     quote = args.quote[:-1] if args.quote.endswith("\n") else args.quote
 
+    if args.review is not None:
+        if args.review not in L.by_id(data):
+            print(f"{say} --review {args.review} is not an item in {args.ledger} -- nothing written",
+                  file=sys.stderr)
+            return 1
+        at = args.at or _now()
+        by = args.by or "sponsor"
+        for existing in data.get("asks") or []:
+            if (isinstance(existing, dict) and existing.get("review") == args.review
+                    and existing.get("state") == "open"):
+                feedback = list(existing.get("feedback") or [])
+                feedback.append({"at": at, "by": by, "quote": quote})
+                existing["feedback"] = feedback
+                data["updated"] = datetime.date.today().isoformat()
+                problems = L.validate(data)
+                if problems:
+                    print(f"{say} {args.ledger} would not be well-formed after this change -- nothing written:",
+                          file=sys.stderr)
+                    for problem in problems:
+                        print(f"  {problem}", file=sys.stderr)
+                    return 1
+                args.ledger.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+                _render(data, args.ledger)
+                print(f"{say} {existing['id']} review {args.review} coalesced ({len(feedback)} feedback)")
+                return 0
+
     new_id = _next_id(data)
     ask = {
         "id": new_id,
@@ -117,6 +143,9 @@ def _create(args, say: str) -> int:
         ask["source"] = args.source
     if args.note is not None:
         ask["note"] = args.note
+    if args.review is not None:
+        ask["review"] = args.review
+        ask["feedback"] = [{"at": ask["at"], "by": ask["by"], "quote": quote}]
 
     asks = list(data.get("asks") or [])
     asks.append(ask)
@@ -204,6 +233,8 @@ def main(argv) -> int:
     ap.add_argument("--became")
     ap.add_argument("--source")
     ap.add_argument("--note")
+    ap.add_argument("--review", metavar="ITEM_ID",
+                    help="coalesce this comment into the open review ask for ITEM_ID")
     ap.add_argument("--close", metavar="ASK_ID")
     ap.add_argument("--force", action="store_true")
     args = ap.parse_args(argv)

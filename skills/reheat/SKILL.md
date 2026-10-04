@@ -64,7 +64,8 @@ nothing further, keep working.
 ## 3. Act on it
 
 Same as `/warmup` section 3: fix a ✗ line or record it `blocked` with the
-reason; prohibitions are still verbatim from HANDOFF.md; Ruflo is still
-mandatory around every item; a `page changed since last publish` line still
-needs the same three-step republish `/warmup` describes. This skill changes
-when and what is read, not what a lead does about it.
+reason; prohibitions are still verbatim from HANDOFF.md; Ruflo remains scoped
+to the feature bundle and its `ready`/`checkpoint`/`land` transitions; a
+`page changed since last publish` line still needs the same three-step
+republish `/warmup` describes. This skill changes when and what is read, not
+what a lead does about it.

@@ -827,6 +827,16 @@ class TestItem9Ruflo(Copy):
         data, _ = report(self.p)
         self.assertEqual(states_of(data)[9], HOLDS)
 
+    def test_checkpoint_compatibility_done_record_holds(self):
+        """`ruflo-item checkpoint` writes this done key beside its richer
+        checkpoint key, so existing conformance remains compatible."""
+        self.close_b02()
+        write_swarm_db(self.p, [("item:B-02:start", "demo"),
+                                ("item:B-02:checkpoint", "demo"),
+                                ("item:B-02:done", "demo")])
+        data, _ = report(self.p)
+        self.assertEqual(states_of(data)[9], HOLDS)
+
     def test_only_a_start_record_still_does_not_hold(self):
         self.close_b02()
         write_swarm_db(self.p, [("item:B-02:start", "demo")])

@@ -30,7 +30,9 @@ cannot tell whether it already warmed up.
   queued: it is always safe to include.
 - **`--state .claude/warmup/last.json`** saves this run's state, so `/reheat`
   has a baseline to compare against later in the session. `.claude/warmup/`
-  is scratch state — never commit it.
+  is scratch state — never commit it. If the same host session invokes plain
+  warm-up again with unchanged state, the command returns only the delta; it
+  does not print another mandatory-read card.
 - **Anything the sponsor typed after `/warmup` is context — pass it
   through.** `/warmup we are picking up the engine work` means
   `--context "we are picking up the engine work"`, in the same run, not a
@@ -76,10 +78,17 @@ ask), never from the summary.
   `blocked` with the reason. Never start work over a red card silently.
 - **Prohibitions** are verbatim from HANDOFF.md. Put them, word for word, in
   every agent brief.
-- **Ruflo is mandatory.** The card shows where the CLI is; warm-up never runs
-  it. For every item: `memory search` and `hooks route` before, `hooks
-  post-task` and `memory store` after, run from the project root, then
-  `daemon stop` for the daemon your calls started. Never kill it by name.
+- **Ruflo is mandatory at a meaningful feature-bundle boundary, not around
+  each review comment or tiny visual edit.** The card shows where the CLI is;
+  warm-up never runs it. Start once for the bundle, use `note` for progress,
+  `ready` for the focused development gate, `checkpoint` for the merge gate
+  plus one test-gap worker, and `land` for release evidence. `done` remains a
+  compatibility alias for `checkpoint`. The wrapper reuses a green receipt
+  only at the same verification level and unchanged worktree/configuration.
+  It stops the daemon it started; never kill it by name.
+  The canonical Ruflo sequence remains `memory search` and `hooks route` before, `hooks
+  post-task` and `memory store` after; the wrapper applies that sequence at
+  the bundle lifecycle boundary instead of repeating it for every comment.
   **Never register Ruflo's full MCP tool set for this reason.** `bin/ruflo-item`
   is a CLI wrapper, not an MCP client — it shells out to the `claude-flow`/
   `ruflo` binary for `hooks pre-task`, `memory search`, `hooks route`,
@@ -187,8 +196,10 @@ While working, keep to one status line in the lead prompt's form:
 `deferred` is terminal, green, and reasoned; it is not active work or a
 blocker. Reopen it only with `tracker set ... --status <non-terminal> --reopen`.
 
-Every sponsor message that is not an answer to a question becomes an ask
-row (`HANDOFF.md`, "Operating rules"), in the same turn.
+Every sponsor message that is not an answer to a question becomes an ask row
+in the same turn. During one open visual or interaction review, use
+`tracker ask --review <item>`: each comment stays verbatim in that row's
+feedback list instead of creating a new ask and a new implementation cycle.
 
 ## Moving a running project onto the standard
 

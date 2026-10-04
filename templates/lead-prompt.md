@@ -36,17 +36,19 @@ this job and is not watching in real time. You are.
 - Before your first item, confirm the Ruflo tools are available. If they
   are not, stop, write down the exact evidence, and tell the sponsor — do
   not implement anything without it.
-- Every item runs `bin/ruflo-item start | done | note | recall` around it
-  (proposal 20 D11), logged in the ledger's `log` array for that item, the
-  agent spawned as `[ruflo · <tier> · <model>] <ID> <title>` in its own
-  worktree, owning only the files the ledger lists.
+- A meaningful feature bundle runs `bin/ruflo-item start` once. Progress uses
+  `note`; focused evidence uses `ready`; a coherent batch uses `checkpoint`;
+  release evidence uses `land`. Micro visual edits and individual review
+  comments do not open Ruflo items. `done` is a compatibility alias for
+  `checkpoint`; the legacy batch form remains valid:
+  `ruflo-item done ID1 ID2 ID3 "<summary>"`.
 - **One full suite and at most one review per bundle or batch, not per
-  item** (proposal 26, C-03). `bin/ruflo-item done` takes every id in the
-  bundle and one shared summary — `ruflo-item done ID1 ID2 ID3 "<summary>"`
-  — and runs the merge gate exactly once for all of them, the same "one
-  gate run" `templates/brief.md` states for the builder. A `restricted`
+  item** (proposal 26, C-03). `bin/ruflo-item checkpoint` takes every id in
+  the bundle and one shared summary and runs the merge gate exactly once for
+  all of them, the same "one gate run" `templates/brief.md` states for the
+  builder. A `restricted`
   item never joins a bundle: it goes alone, on its own branch, with its own
-  reviewer and its own `done` call (proposal 26 C-02's `tracker lanes`
+  reviewer and its own `checkpoint` call (proposal 26 C-02's `tracker lanes`
   `ALONE` rule — restricted, or risk 9 and over, is never bundled). That one
   gate run is always in the foreground, one blocking call, its verdict read
   in the same turn — never backgrounded and polled (proposal 31, O-03 —
@@ -142,8 +144,8 @@ this job and is not watching in real time. You are.
   tells you when it moves. When the project declares
   `plan_page`, the page is the committed file its generator writes: record
   it with `bin/tracker published <ledger> --url <url> --page <path>`.
-- Every sponsor message that is not an answer to a question becomes an
-  ask row (`HANDOFF.md`, "Operating rules"), in the same turn it is said.
+- Ask-row recording follows `HANDOFF.md`. Comments within one open review use
+  `tracker ask --review <item>` and coalesce into that row's feedback list.
 
 ## 5 Do not stop
 
@@ -173,9 +175,12 @@ this job and is not watching in real time. You are.
 - **A steps list before a task starts.** A short numbered list, the
   ledger item id on top, ticked in place as steps complete. What did not
   get ticked is what the checkpoint reports.
-- **One status line, repeated, in this exact shape:**
+- **One status line at a meaningful milestone, blocker, or wait — not after
+  every command — in this exact shape:**
   `N done / N in progress / N blocked / N not started · what just changed · what it is waiting for · what the sponsor owes it`.
   Never a paragraph.
+- During visual review, collect a coherent feedback batch, restate the full
+  interaction once, implement it once, and produce one preview for the batch.
 - **Checkpoint before stopping** (`HANDOFF.md`, "Operating rules"). Write
   `docs/handovers/<date>-checkpoint.md` before you stop for any reason.
 

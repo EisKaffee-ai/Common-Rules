@@ -159,7 +159,16 @@ def all_asks(project: Path) -> list[dict]:
             data = L.load(p)
         except ValueError:
             continue
-        out.extend(data.get("asks") or [])
+        for ask in data.get("asks") or []:
+            if not isinstance(ask, dict):
+                continue
+            feedback = ask.get("feedback")
+            if isinstance(feedback, list) and feedback:
+                # One open review is one tracker row, while each verbatim
+                # sponsor comment remains independently coverable here.
+                out.extend(entry for entry in feedback if isinstance(entry, dict))
+            else:
+                out.append(ask)
     return out
 
 
