@@ -1,3 +1,27 @@
+# 1.11.0 — Lean workflow boundaries — 4 October 2026
+
+**Standard change (mandatory):** Common Rules now treats warm-up, sponsor
+review, verification and Ruflo as lifecycle boundaries rather than operations
+to repeat after every small edit. A fresh session warms once; a running session
+uses delta reheat after compaction, resume or relevant state change. Related
+visual and architecture feedback stays in one open review batch, and projects
+run development, checkpoint and release verification at their matching
+strength instead of repeatedly invoking the release gate.
+
+Ruflo remains the feature-bundle and release memory, but micro-edits no longer
+become Ruflo items. The supported lifecycle separates non-gating notes and
+readiness evidence from checkpoint and land boundaries. The expensive merge
+gate and `testgaps` worker run only at those verified boundaries; legacy
+`ruflo-item done` remains a checkpoint-compatible alias. Revision-bound gate
+receipts prevent an unchanged gate from running twice without allowing weak
+development evidence to certify a PR, merge or release.
+
+Lead and review guidance now batches related annotations, preview regeneration
+and sponsor reporting. Existing projects keep their current ledgers and gates
+until their owning session aligns them; alignment preserves uncommitted work.
+The release includes focused regressions, independent restricted-risk review
+and rollout instructions for the active EisKaffee worktrees.
+
 # 1.10.5 — Reviewed holistic traceability — 3 October 2026
 
 Version 1.10.4 was the internal candidate reviewed before the fixed-revision,

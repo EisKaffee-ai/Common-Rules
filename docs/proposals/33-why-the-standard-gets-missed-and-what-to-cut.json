@@ -2,7 +2,7 @@
   "proposal": 33,
   "title": "Why the standard gets missed, and what to cut",
   "status": "accepted",
-  "updated": "2026-09-24",
+  "updated": "2026-10-04",
   "tiers": {
     "C1": {
       "tier": "low",
@@ -101,20 +101,111 @@
       "phase": "R",
       "cx": "C4",
       "title": "An inventory of every rule in the must-read: enforced, moved, or cut",
-      "what": "CLAUDE-workflow.md carries 76 prose rules against 12 machine checks, and the mandatory read is about 16,200 tokens -- 13% of a context window before any work. The rules that held today are code (parts validation, quiet's verdict, land's refusals, proposalcheck); the ones that failed are prose a session must remember (use the Read tool -- measurably failing; stage, do not set -- my own briefs broke it). Go through every rule with one of three verdicts: enforced by code, moved to reference and out of the mandatory read, or cut.",
+      "what": "Implement the sponsor-approved Lean Common Rules package as one restricted-risk bundle: warmup/reheat deduplication; review-session ask coalescing; development/checkpoint/release verification levels with revision receipts; Ruflo note/ready/checkpoint/land semantics with testgaps only at checkpoints; quieter status and preview batching guidance; backward-compatible rollout to active EisKaffee sessions.",
       "files": [],
       "tests": [],
-      "done": "Every rule in the must-read carries a verdict and a reason; the mandatory read is measurably smaller, reported in tokens before and after; nothing enforced was lost in the move.",
+      "done": "Fresh sessions warm once; unchanged running sessions do not repeat full reads; review replies remain attached to one open ask; micro work cannot trigger merge gates or testgaps; checkpoint and land still require their declared evidence; unchanged revision receipts prevent duplicate gates; three target chats receive rollout instructions; focused tests, independent restricted-risk review, merge gate, PR, merge and release receipts are recorded.",
       "depends": [],
-      "status": "not started",
+      "status": "in progress",
       "tier": "lead",
       "model": "opus",
       "tag": "[ruflo · lead · opus]",
       "owner": "lead",
       "issue": null,
-      "log": [],
+      "log": [
+        {
+          "at": "2026-10-04T06:37:45+02:00",
+          "event": "Sponsor approved the Lean Common Rules package and release; requirements and design locked as six traceable parts.",
+          "by": "lead",
+          "evidence": "docs/requirements/lean-common-rules.md; docs/design/lean-common-rules.md; analysis of 50 recent turns in each target chat",
+          "status": "in progress"
+        }
+      ],
       "points": 8,
-      "value": "high"
+      "value": "high",
+      "parts": [
+        {
+          "id": "R-04.A",
+          "title": "Session initialization is idempotent and delta-only",
+          "share": 20,
+          "status": "done",
+          "log": [
+            {
+              "at": "2026-10-04T07:00:45+02:00",
+              "event": "Same-session warmup dedupe implemented with project-identity guard; focused and cross-project regressions green.",
+              "by": "lead",
+              "evidence": "25ab942, c52805b; tests.test_lean_workflow.WarmupDedupeTests",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "R-04.B",
+          "title": "Review feedback and tracker asks coalesce by open review",
+          "share": 15,
+          "status": "done",
+          "log": [
+            {
+              "at": "2026-10-04T07:00:45+02:00",
+              "event": "Open-review feedback coalescing and handover coverage implemented; focused and legacy ask/handover tests green.",
+              "by": "lead",
+              "evidence": "25ab942; tests.test_lean_workflow.ReviewCoalescingTests",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "R-04.C",
+          "title": "Verification has development, checkpoint and release levels with reusable receipts",
+          "share": 20,
+          "status": "done",
+          "log": [
+            {
+              "at": "2026-10-04T07:00:45+02:00",
+              "event": "Development/checkpoint/release gates and level-bound revision receipts implemented; focused receipt tests green.",
+              "by": "lead",
+              "evidence": "25ab942; tests.test_lean_workflow.GateReceiptTests",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "R-04.D",
+          "title": "Ruflo is feature-bundle scoped and testgaps runs only at checkpoints",
+          "share": 20,
+          "status": "done",
+          "log": [
+            {
+              "at": "2026-10-04T07:00:45+02:00",
+              "event": "Bundle-scoped Ruflo lifecycle implemented; repeated boundaries reuse gates without redispatch; conformance compatibility preserved.",
+              "by": "lead",
+              "evidence": "25ab942, c52805b; RufloLevelsTests and TestItem9Ruflo checkpoint compatibility",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "R-04.E",
+          "title": "Preview and sponsor communication are batched and quiet",
+          "share": 10,
+          "status": "done",
+          "log": [
+            {
+              "at": "2026-10-04T07:00:46+02:00",
+              "event": "Lead, brief, warmup and reheat guidance now batch review feedback, previews and milestone reporting.",
+              "by": "lead",
+              "evidence": "25ab942; independent review LR-05 pass by inspection",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "id": "R-04.F",
+          "title": "Three active chats and adopting repositories receive a compatible release rollout",
+          "share": 15,
+          "status": "not started"
+        }
+      ]
     },
     {
       "id": "R-05",
@@ -188,6 +279,26 @@
       "quote": "Make the necessary decisions and implement proposal 33.",
       "became": null,
       "state": "answered"
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-04T06:35:47+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "Approve and implement this, and then we make a release. I want this to be done as fast as possible because the other chat sessions are eating up my budget.",
+      "became": "R-04",
+      "state": "became-item",
+      "note": "Approved the Lean Common Rules package: deduplicate session initialization, batch review feedback, tier verification, make Ruflo checkpoint-scoped, reduce preview/status churn, roll out to active EisKaffee sessions, and release."
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-04T06:35:47+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "scrap the old common rules from app",
+      "became": "R-04",
+      "state": "answered",
+      "note": "Archived the obsolete Emberline checkout from /Users/aashish/apps/common-rules to /Users/aashish/AppProjects/_archive/legacy-common-rules-emberline-20261004; active EisKaffee work stays under AppProjects."
     }
   ],
   "proposed_changes": [],

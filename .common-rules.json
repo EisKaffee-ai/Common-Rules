@@ -19,17 +19,18 @@
   "risk_always": "restricted",
   "ruflo_namespace": "patterns",
   "goal": {
-    "outcome": "Release one canonical project tracker with proposal-level, ledger-to-GitHub architecture issue synchronization.",
+    "outcome": "Release and roll out a lean Common Rules workflow that removes repeated ceremony while preserving evidence and safety.",
     "constraints": [
-      "The ledger remains authoritative and GitHub issue changes never silently update it.",
-      "Preserve existing tracker and row-level issue behavior until a project opts into proposal granularity.",
-      "Use the integrated GitHub plugin for issue mutations; keep repositories independently committed."
+      "The ledger remains authoritative and sponsor words are never discarded.",
+      "Full gates, independent review and release evidence remain mandatory at their actual boundaries.",
+      "Adopting repositories keep independent commits and existing uncommitted work."
     ],
     "verification": [
-      "Validate Proposal 37 against the Docs fixture of 27 groups, 59 features and 362 lifecycle rows.",
-      "Pass setup, doctor, tracecheck, tracker, workspace, plugin and full release gates before publication."
+      "Verify requirements LR-01 through LR-07 with focused regression tests and an independent restricted-risk review.",
+      "Pass traceability, workspace coherence and the full release gate before publication.",
+      "Record rollout receipts from Bean Integration, Pockets UI and EisKaffee UI."
     ],
-    "updated": "2026-10-03"
+    "updated": "2026-10-04"
   },
   "integration": {
     "repository_id": "common-rules",
