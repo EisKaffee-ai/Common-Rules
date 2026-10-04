@@ -43,19 +43,60 @@ A proposal normally records:
 
 A proposal is a decision page, not a transcript. Put a compact visual summary
 before `Decisions` so the sponsor can understand the recommendation without
-reading every paragraph:
+reading every paragraph. Choose the smallest form that answers the question:
 
-- `.verdict` for the one-line recommendation;
-- `.big` containing `.stat` blocks for headline figures;
-- `.tk` for comparisons, with a single-word verdict column such as `TAKE`,
-  `LEAVE`, or `OPEN`;
-- `.ev` directly beneath the claim it supports.
+- before / after for a change in state;
+- option cards and `.tk` for a choice;
+- a flow for data, control, or authority movement;
+- a lifecycle for transitions and stop states;
+- a hierarchy for ownership;
+- a capability matrix for supported, partial, missing, and out-of-scope work;
+- `.big` / `.stat` for measured size, speed, cost, or coverage;
+- a status board for stable IDs, owners, dependencies, and remaining work.
 
 `bin/new-proposal` includes these primitives in every new page. Run
 `bin/proposalcheck --project .` to receive a warning when a page has no table,
 inline SVG, or headline-figure block before `Decisions`. The warning is
 advisory for existing pages; no chart library or screenshot is required.
-Inline SVG should use the page's CSS variables so it works in dark mode.
+Inline SVG uses the page's CSS variables, plus a semantic `title` and `desc`, so
+it remains readable in dark mode and accessible without the drawing.
+
+### Luna implementation context
+
+The final section of a new proposal is `#luna-context`. It is collapsed for the
+normal decision review, but it carries the deeper execution context that Luna or
+any other implementation agent needs after acceptance:
+
+```text
+outcome + accepted decisions
+scope in / scope out
+repository ownership + implementation map
+contracts and data + ordered steps
+future implementation verification + risks and refusals
+dependencies + open questions + completion evidence
+```
+
+The page also shows proposal state on two axes. The decision axis comes from
+`proposal-status` plus the verbatim `Decided` block. The delivery axis comes
+from ledger items, tests, review, and release receipts. The lifecycle rail is a
+visual summary of those sources, not another field an agent may set independently.
+The Luna context records the current state, allowed next state, transition
+authority, required evidence, and any deferred or superseded reason.
+
+The section is not a second proposal and not a transcript. It must agree with the
+visual decision surface, name only repository facts that were verified, and mark
+missing facts as `Unresolved — reason`. Proposed decisions are not implementation
+authority. Proposal acceptance authorizes requirements and design work; it does
+not prove that code, tests, review, or a release exists.
+
+Creating, reviewing, and accepting the proposal itself does not require
+executable tests. The proposal needs structural validation, a readable render,
+sources, and the sponsor's recorded decision. Its Implementation verification
+field describes the tests or observations that become due only after accepted
+scope enters implementation; it does not claim those checks already ran.
+
+The detailed authoring guide ships on demand with the `visual-proposal` skill at
+`skills/visual-proposal/references/visual-language.md`.
 
 ### Guide-to-architecture traceability
 

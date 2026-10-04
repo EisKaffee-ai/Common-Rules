@@ -1,8 +1,8 @@
-# Checkpoint — 2026-10-04 07:01
+# Checkpoint — 2026-10-04 17:51
 
-Reason: manual · branch: codex/lean-workflow-20261004 · HEAD: c52805b
+Reason: manual · branch: codex/visual-proposal-standard-20261004 · HEAD: 8ff56e4
 
-<!-- ledger-digest: 886d60eeb1a38ed481497a2c3dede68b6fbefcbd557c2cf425c8b53f606d0fc7 -->
+<!-- ledger-digest: c5fdbc505058469bb519ce8f5c630c1182dcee41f28737efcc272ec14d2fd0ec -->
 
 ## Proposal 19 · Warm-up
 
@@ -225,6 +225,34 @@ Reason: manual · branch: codex/lean-workflow-20261004 · HEAD: c52805b
 - T-03 0% · next T-03.A
 - T-04 0% · next T-04.A
 - T-06 0% · next T-06.A
+
+## Proposal 38 · Visual proposals with Luna implementation context
+
+0 done / 1 in progress / 0 blocked / 0 not started / 3 in review
+
+### In progress
+
+- V-04 · [ruflo · high · sonnet] · Common Rules 1.12.0 plugin release · Final independent report-only re-review completed with no actionable findings.
+
+### Blocked, and why
+
+- none
+
+### Open asks
+
+- none
+
+### Next unblocked
+
+- none
+
+### Open work by group
+
+**finish now**
+- V-01 0% · next V-01.A
+- V-02 0% · next V-02.A
+- V-03 0% · next V-03.A
+- V-04 0% · next V-04.A
 
 ## Exact next action
 

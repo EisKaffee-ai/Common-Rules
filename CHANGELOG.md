@@ -1,3 +1,37 @@
+# 1.12.0 — Visual proposals with executable Luna context — 4 October 2026
+
+**Standard change (mandatory):** every new Common Rules proposal is now a
+visual-first decision page with a structured `#luna-context` handoff at the
+bottom. The sponsor sees the recommendation, measurements, comparison or flow,
+and stable decisions without reading implementation prose. After acceptance,
+Luna or any other implementation agent can read the same page for verified
+repository ownership, scope, contracts, ordered steps, tests, risks, open
+questions, and completion evidence.
+
+Proposal work itself does not require executable tests. New pages are checked
+for structure, rendered for review, sourced, and accepted by the sponsor. Their
+Implementation verification field specifies future delivery checks, which become
+due only when accepted scope enters implementation.
+
+Each page now shows state without creating a second status system. Proposal
+metadata and the verbatim Decided block own decision state; ledger items, tests,
+reviews and release receipts own delivery state. The visual lifecycle rail
+summarizes those authorities, and the Luna context names the allowed next state,
+transition authority, required evidence, and deferred or superseded reason.
+
+The `visual-proposal` skill now routes detailed visual selection and handoff
+guidance through an on-demand reference. The proposal template supplies
+mobile/dark-mode primitives, an accessible flow scaffold, and fourteen stable
+handoff fields including state management. `bin/proposalcheck` enforces the Luna contract only on
+new pages carrying `common-rules-visual-contract=proposal/38`; existing
+proposal/21 pages remain valid. `bin/new-proposal` explicitly calls out the
+handoff before accepted work moves into implementation.
+
+Proposal 38 is the worked example and records the sponsor's exact ask, accepted
+decisions, requirements, design, traceability, and release route. The ledger
+wire format, proposal status vocabulary, and existing decision-history rules
+are unchanged.
+
 # 1.11.0 — Lean workflow boundaries — 4 October 2026
 
 **Standard change (mandatory):** Common Rules now treats warm-up, sponsor
@@ -113,7 +147,7 @@ runs. Large files are split by test class before duration data exists, and an
 older coarse cache is refined into class-level timings. The 124-test warmup
 hotspot fell from the previously documented 575-second floor to 174.6 seconds
 on the release host. After those named environment/checkpoint findings were
-resolved, the final release gate passed all 2,088 tests in 189.6 seconds. Coverage and
+resolved, the final release gate passed all 2,138 tests in 191.2 seconds. Coverage and
 aggregate failure detection are unchanged.
 
 Tracker generation is now an explicit Python-owned boundary. Shipped commands

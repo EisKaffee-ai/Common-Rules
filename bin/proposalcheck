@@ -155,6 +155,7 @@ import re
 import subprocess
 import sys
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from pathlib import Path
 
 # The day this rule was written. Nothing decided before it is checked -- see
@@ -195,6 +196,124 @@ DECISIONS_HEADING_RE = re.compile(r'<h2\b[^>]*>\s*Decisions\s*</h2\s*>', re.I)
 VISUAL_RE = re.compile(
     r'<(?:table|svg)\b|class=["\'][^"\']*\b(?:big|stat)\b[^"\']*["\']', re.I
 )
+
+LUNA_CONTEXT_FIELDS = (
+    "Outcome",
+    "Accepted decisions",
+    "Scope in",
+    "Scope out",
+    "Repository ownership",
+    "Implementation map",
+    "Contracts and data",
+    "Ordered implementation steps",
+    "Implementation verification",
+    "Risks and refusals",
+    "Dependencies and assumptions",
+    "Open questions",
+    "State management",
+    "Completion evidence",
+)
+
+
+class Proposal38ContractParser(HTMLParser):
+    """Read the proposal/38 contract from HTML structure, not raw substrings.
+
+    Comments, text outside the handoff, and arbitrary elements carrying the
+    same id cannot satisfy the contract. HTML attribute order and quote style
+    remain irrelevant, as they are in a browser.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.has_visual_contract = False
+        self.context_found = False
+        self.context_open = False
+        self.context_details_depth = 0
+        self.context_order: int | None = None
+        self.decided_order: int | None = None
+        self.context_closed = False
+        self.content_after_context = False
+        self.has_luna_summary = False
+        self.fields: set[str] = set()
+        self._event = 0
+        self._heading_tag: str | None = None
+        self._heading_text: list[str] = []
+        self._summary_open = False
+        self._summary_text: list[str] = []
+
+    @staticmethod
+    def _attrs(attrs: list[tuple[str, str | None]]) -> dict[str, str]:
+        return {name.lower(): value or "" for name, value in attrs}
+
+    def _start(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self._event += 1
+        tag = tag.lower()
+        values = self._attrs(attrs)
+        if self.context_closed:
+            self.content_after_context = True
+        if (tag == "meta"
+                and values.get("name", "").lower() == "common-rules-visual-contract"
+                and values.get("content", "").lower() == "proposal/38"):
+            self.has_visual_contract = True
+
+        if tag == "details":
+            if self.context_open:
+                self.context_details_depth += 1
+            elif not self.context_found and values.get("id") == "luna-context":
+                self.context_found = True
+                self.context_open = True
+                self.context_details_depth = 1
+                self.context_order = self._event
+
+        if (tag == "summary" and self.context_open
+                and self.context_details_depth == 1
+                and not self.has_luna_summary):
+            self._summary_open = True
+            self._summary_text = []
+
+        if tag == "h2" or (tag == "h3" and self.context_open):
+            self._heading_tag = tag
+            self._heading_text = []
+
+    def handle_starttag(self, tag: str,
+                        attrs: list[tuple[str, str | None]]) -> None:
+        self._start(tag, attrs)
+
+    def handle_startendtag(self, tag: str,
+                           attrs: list[tuple[str, str | None]]) -> None:
+        self._start(tag, attrs)
+
+    def handle_data(self, data: str) -> None:
+        if self._heading_tag:
+            self._heading_text.append(data)
+        if self._summary_open:
+            self._summary_text.append(data)
+        if self.context_closed and data.strip():
+            self.content_after_context = True
+
+    def handle_endtag(self, tag: str) -> None:
+        self._event += 1
+        tag = tag.lower()
+        if self._heading_tag == tag:
+            heading = " ".join("".join(self._heading_text).split())
+            if tag == "h2" and heading.lower() == "decided":
+                self.decided_order = self._event
+            elif tag == "h3" and self.context_open:
+                self.fields.add(heading)
+            self._heading_tag = None
+            self._heading_text = []
+
+        if tag == "summary" and self._summary_open:
+            summary = " ".join("".join(self._summary_text).split()).lower()
+            self.has_luna_summary = "luna implementation context" in summary
+            self._summary_open = False
+            self._summary_text = []
+
+        if tag == "details" and self.context_open:
+            self.context_details_depth -= 1
+            if self.context_details_depth == 0:
+                self.context_open = False
+                self.context_closed = True
 
 
 def meta(text: str, name: str) -> str | None:
@@ -247,6 +366,36 @@ def visual_warning(text: str) -> str | None:
         return None
     return ('no table, diagram, or headline-figure block before Decisions -- '
             'add <table>, <svg>, or a .big/.stat block')
+
+
+def luna_context_violations(text: str) -> list[str]:
+    """Proposal/38's executable handoff contract, scoped to new pages only.
+
+    Existing proposal/21 pages remain valid. A page opts into this stricter
+    contract through its generator-written visual-contract meta.
+    """
+    parser = Proposal38ContractParser()
+    parser.feed(text)
+    if not parser.has_visual_contract:
+        return []
+    if not parser.context_found:
+        return ['visual contract proposal/38 has no <details id="luna-context"> agent handoff']
+
+    missing = [field for field in LUNA_CONTEXT_FIELDS if field not in parser.fields]
+    violations = []
+    if missing:
+        violations.append("missing Luna context fields: " + ", ".join(missing))
+
+    if not parser.has_luna_summary:
+        violations.append('id="luna-context" needs a “Luna implementation context” summary')
+    if parser.decided_order is None:
+        violations.append('visual contract proposal/38 has no Decided heading before the agent handoff')
+    elif (parser.context_order is not None
+          and parser.context_order < parser.decided_order):
+        violations.append('id="luna-context" appears before Decided; the agent handoff must be last')
+    if parser.content_after_context:
+        violations.append('content appears after id="luna-context"; the agent handoff must be the final section')
+    return violations
 
 
 def grandfathered(decided: str | None, floor: str = EFFECTIVE_DATE) -> bool:
@@ -351,6 +500,8 @@ def check_proposal(path: Path, text: str, ctx: RepoContext) -> list[str]:
     violations = []
     status = meta(text, "status")
     decided = meta(text, "decided")
+
+    violations.extend(luna_context_violations(text))
 
     if (status in DECISION_STATUSES and decided is None
             and has_template_meta(text)):

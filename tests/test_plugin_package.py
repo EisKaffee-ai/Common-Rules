@@ -20,6 +20,22 @@ class PluginPackageTest(unittest.TestCase):
             self.assertIn("name:", text)
             self.assertIn("description:", text)
 
+    def test_visual_proposal_skill_ships_on_demand_visual_language(self):
+        skill = (ROOT / "skills/visual-proposal/SKILL.md").read_text()
+        reference = ROOT / "skills/visual-proposal/references/visual-language.md"
+        self.assertTrue(reference.is_file())
+        self.assertIn("references/visual-language.md", skill)
+        text = reference.read_text()
+        for phrase in (
+            "before / after",
+            "capability matrix",
+            "Luna implementation context",
+            "Repository ownership",
+            "State management",
+            "Completion evidence",
+        ):
+            self.assertIn(phrase, text)
+
     def test_plugin_hooks_are_portable_and_non_mutating(self):
         hooks = json.loads((ROOT / "hooks/hooks.json").read_text())
         commands = json.dumps(hooks)

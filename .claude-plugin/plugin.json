@@ -1,8 +1,8 @@
 {
   "name": "common-rules",
   "displayName": "Common Rules Tracker",
-  "version": "1.11.0",
-  "description": "Calibrated project tracking, visual proposals, lifecycle stages, traceability and coherent multi-repository delivery.",
+  "version": "1.12.0",
+  "description": "Visual-first proposals with agent handoffs, calibrated project tracking, traceability and coherent multi-repository delivery.",
   "author": {"name": "EisKaffee.ai"},
   "repository": "https://github.com/EisKaffee-ai/Common-Rules",
   "license": "Apache-2.0",
