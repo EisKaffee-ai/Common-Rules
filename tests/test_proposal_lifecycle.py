@@ -152,6 +152,178 @@ class ProposalLifecycleTests(unittest.TestCase):
                 self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
                 self.assertNotIn("warning:", r.stdout)
 
+    def visual_contract_page(self, context: str = "", *,
+                             include_decided: bool = True) -> str:
+        if include_decided:
+            context = "<h2>Decided</h2>" + context
+        return proposal("proposed").replace(
+            "</head>",
+            '<meta name="common-rules-visual-contract" content="proposal/38"></head>',
+        ).replace("</body>", context + "</body>")
+
+    def test_visual_contract_requires_luna_context(self):
+        self.write("01-x.html", self.visual_contract_page())
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('no <details id="luna-context">', r.stdout)
+
+    def test_visual_contract_requires_all_luna_fields(self):
+        self.write("01-x.html", self.visual_contract_page(
+            '<details id="luna-context"><summary>Luna implementation context</summary>'
+            '<h3>Outcome</h3></details>'
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("missing Luna context fields", r.stdout)
+        self.assertIn("Completion evidence", r.stdout)
+
+    def test_complete_visual_contract_luna_context_passes(self):
+        fields = (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        )
+        context = ('<details id="luna-context">'
+                   '<summary>Luna implementation context · agent handoff</summary>') + "".join(
+            f"<h3>{field}</h3>" for field in fields
+        ) + "</details>"
+        self.write("01-x.html", self.visual_contract_page(context))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_visual_contract_meta_accepts_attribute_order_and_single_quotes(self):
+        fields = (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        )
+        context = ('<details id="luna-context">'
+                   '<summary>Luna implementation context · agent handoff</summary>') + "".join(
+            f"<h3>{field}</h3>" for field in fields
+        ) + "</details>"
+        page = proposal("proposed").replace(
+            "</head>",
+            "<meta content='proposal/38' name='common-rules-visual-contract'></head>",
+        ).replace("</body>", "<h2>Decided</h2>" + context + "</body>")
+        self.write("01-x.html", page)
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_luna_context_must_be_a_details_element(self):
+        fields = " ".join((
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        self.write("01-x.html", self.visual_contract_page(
+            f'<span id="luna-context">{fields}</span>'
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('no <details id="luna-context">', r.stdout)
+
+    def test_luna_fields_must_be_headings_inside_the_details(self):
+        fields = " ".join((
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        self.write("01-x.html", self.visual_contract_page(
+            '<details id="luna-context"><summary>Luna implementation context</summary>'
+            '<h3>Outcome</h3></details>' + fields
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("missing Luna context fields", r.stdout)
+
+    def test_luna_comments_do_not_satisfy_fields(self):
+        self.write("01-x.html", self.visual_contract_page(
+            '<details id="luna-context"><summary>Luna implementation context</summary>'
+            '<h3>Outcome</h3>'
+            '<!-- Accepted decisions Scope in Scope out Repository ownership '
+            'Implementation map Contracts and data Ordered implementation steps '
+            'Implementation verification Risks and refusals Dependencies and assumptions '
+            'Open questions State management Completion evidence -->'
+            '</details>'
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("Accepted decisions", r.stdout)
+
+    def test_luna_context_requires_decided_heading(self):
+        fields = "".join(f"<h3>{field}</h3>" for field in (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        context = ('<details id="luna-context">'
+                   '<summary>Luna implementation context</summary>'
+                   + fields + '</details>')
+        self.write("01-x.html", self.visual_contract_page(
+            context, include_decided=False
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("no Decided heading", r.stdout)
+
+    def test_luna_context_must_be_final_section(self):
+        fields = "".join(f"<h3>{field}</h3>" for field in (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        context = ('<details id="luna-context">'
+                   '<summary>Luna implementation context</summary>'
+                   + fields + '</details><h2>Appendix</h2>')
+        self.write("01-x.html", self.visual_contract_page(context))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("final section", r.stdout)
+
+    def test_luna_context_requires_named_summary(self):
+        fields = "".join(f"<h3>{field}</h3>" for field in (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        self.write("01-x.html", self.visual_contract_page(
+            '<details id="luna-context">' + fields + '</details>'
+        ))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("Luna implementation context", r.stdout)
+
+    def test_nested_evidence_summary_does_not_replace_luna_summary(self):
+        fields = "".join(f"<h3>{field}</h3>" for field in (
+            "Outcome", "Accepted decisions", "Scope in", "Scope out",
+            "Repository ownership", "Implementation map", "Contracts and data",
+            "Ordered implementation steps", "Implementation verification",
+            "Risks and refusals", "Dependencies and assumptions", "Open questions",
+            "State management", "Completion evidence",
+        ))
+        context = ('<details id="luna-context">'
+                   '<summary>Luna implementation context · agent handoff</summary>'
+                   + fields
+                   + '<details><summary>Extra evidence</summary><p>Receipt</p></details>'
+                   + '</details>')
+        self.write("01-x.html", self.visual_contract_page(context))
+        r = run(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
     # -- the requirement itself -------------------------------------------
 
     def test_accepted_with_unanswered_decisions_fails(self):

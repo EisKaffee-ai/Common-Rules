@@ -199,6 +199,7 @@ class TestWritten(Scratch):
         self.assertIn(str(ledger), r.stdout)
         self.assertIn("fill the page", r.stdout.lower())
         self.assertIn("items", r.stdout.lower())
+        self.assertIn("Luna implementation context", r.stdout)
 
     def test_proposalcheck_and_tracker_validate_clean_on_the_result(self):
         _, _, ledger = self.make()
@@ -231,6 +232,62 @@ class TestWritten(Scratch):
         self.assertIn('class="stat"', page)
         self.assertIn('class="tk"', page)
         self.assertLess(page.index('class="tk"'), page.index('<h2>Decisions</h2>'))
+
+    def test_page_carries_visual_contract_and_luna_handoff(self):
+        _, html, _ = self.make()
+        page = html.read_text()
+        self.assertIn(
+            '<meta name="common-rules-visual-contract" content="proposal/38">',
+            page,
+        )
+        self.assertIn('id="luna-context"', page)
+        self.assertIn('Luna implementation context', page)
+        self.assertGreater(page.index('id="luna-context"'), page.index('<h2>Decided</h2>'))
+        for label in (
+            "Outcome",
+            "Accepted decisions",
+            "Scope in",
+            "Scope out",
+            "Repository ownership",
+            "Implementation map",
+            "Contracts and data",
+            "Ordered implementation steps",
+            "Implementation verification",
+            "Risks and refusals",
+            "Dependencies and assumptions",
+            "Open questions",
+            "State management",
+            "Completion evidence",
+        ):
+            self.assertIn(label, page)
+
+    def test_page_carries_proposal_and_delivery_state_rail(self):
+        _, html, _ = self.make()
+        page = html.read_text()
+        decisions = page.index('<h2>Decisions</h2>')
+        rail = page.index('class="state-rail"')
+        self.assertLess(rail, decisions)
+        self.assertIn('data-decision-state="proposed"', page)
+        self.assertIn("Decision state", page)
+        self.assertIn("Delivery state", page)
+        self.assertIn('class="current" aria-current="step"', page[rail:decisions])
+        for state in ("Proposed", "Accepted", "Planned", "Building", "Verifying", "Released"):
+            self.assertIn(state, page[rail:decisions])
+
+    def test_warning_text_uses_accessible_light_theme_token(self):
+        _, html, _ = self.make()
+        page = html.read_text()
+        self.assertIn("--warn:#805800; --warn-soft:#FFF3BF", page)
+
+    def test_page_includes_accessible_flow_scaffold_before_decisions(self):
+        _, html, _ = self.make()
+        page = html.read_text()
+        decisions = page.index('<h2>Decisions</h2>')
+        visual = page.index('class="flow"')
+        self.assertLess(visual, decisions)
+        self.assertIn('<title>', page[visual:decisions])
+        self.assertIn('<desc>', page[visual:decisions])
+        self.assertIn('var(--', page[:decisions])
 
     def test_ledger_is_the_minimal_contract(self):
         _, _, ledger = self.make()

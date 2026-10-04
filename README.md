@@ -9,15 +9,17 @@ without forcing them into one commit.
 
 ![Common Rules connects Codex and Claude Code to one calibrated project record, traceability graph, and tracker](docs/assets/product-overview.svg)
 
-[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.10.3](docs/RELEASE-1.10.3.md)
+[**Install the plugin ↓**](#install-the-plugin) · [Explore the tracker](docs/proposals/tracker/index.html) · [Read the user guide](docs/user-guide/) · [Release 1.12.0](docs/RELEASE-1.12.0.md)
 
 ## What you get
 
 - **Calibrated setup** — detects an existing or new project, repository roles,
   requirements locations, tracker locations, issue-linking policy, and
   single- or multi-repository topology before writing anything.
-- **Visual proposal loop** — turns an idea into a mobile-friendly decision page
-  and keeps iterating until the sponsor accepts it.
+- **Visual proposal loop** — turns an idea into a mobile-friendly decision page,
+  then carries an executable Luna handoff at the bottom for implementation after
+  the sponsor accepts it, with decision and delivery state summarized from their
+  authoritative proposal metadata and ledger evidence.
 - **Traceability** — connects requirement → feature → design → files → tests →
   evidence, and detects when a linked change needs its documentation updated.
 - **One project tracker** — joins separately committed repositories at known,
@@ -86,7 +88,7 @@ what it is doing and keep the tracker stage visible.
 | Adopt a new or existing project | `setup` | “Use Common Rules setup. This is an existing app; preview the manifest before writing.” |
 | Change repositories, roles, or locations | `calibrate` | “Recalibrate: the engine owns business logic and the website owns the interface.” |
 | Turn a request into tracked work | `intake` | “Record this request verbatim, find the related feature, and show the proposed scope.” |
-| Explore a decision visually | `visual-proposal` | “Create a mobile-friendly visual proposal and iterate until I accept it.” |
+| Explore a decision visually | `visual-proposal` | “Create a visual-first proposal, then prepare its Luna implementation context.” |
 | Maintain stages and evidence | `tracker` | “Show every feature that is blocked before implementation and the missing evidence.” |
 | Convert an accepted proposal into buildable work | `plan-and-route` | “Route the accepted proposal into numbered requirements, design, tests, and repository owners.” |
 | Prove the result is ready | `review-and-verify` | “Verify requirement coverage, tests, traceability, and the compatible revision set.” |
@@ -106,8 +108,8 @@ remains available for compatibility; new projects should begin with `setup`.
 ```text
 1. “Set up Common Rules for this existing application.”             → setup
 2. “Track a user-facing export feature.”                             → intake
-3. “Show three visual approaches; keep iterating until accepted.”    → visual-proposal
-4. “Turn the accepted direction into requirements and a build plan.” → plan-and-route
+3. “Show the decision visually; keep iterating until accepted.”       → visual-proposal
+4. “Use its Luna context to create requirements and the build plan.”  → plan-and-route
 5. “Verify it and prepare the release handoff.”                       → review-and-verify + land-handoff
 ```
 
@@ -165,21 +167,21 @@ and [Claude Code context-cost guide](https://code.claude.com/docs/en/features-ov
 <!-- context-budget:start -->
 | Surface | UTF-8 bytes | Estimated tokens | What actually loads |
 |---|---:|---:|---|
-| Idle skill discovery (13 names, descriptions, paths) | 2,505 | 627 | Every session/request |
-| All `SKILL.md` files combined | 26,662 | 6,666 | Not together; only the selected skill is loaded |
-| Optional references | 3,225 | 807 | Only when the selected workflow needs one |
-| Full skill-package ceiling | 29,887 | 7,472 | Comparison ceiling; never the default load |
+| Idle skill discovery (13 names, descriptions, paths) | 2,490 | 623 | Every session/request |
+| All `SKILL.md` files combined | 27,595 | 6,899 | Not together; only the selected skill is loaded |
+| Optional references | 9,312 | 2,328 | Only when the selected workflow needs one |
+| Full skill-package ceiling | 36,907 | 9,227 | Comparison ceiling; never the default load |
 | Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |
 <!-- context-budget:end -->
 
-The largest individual workflow is `warmup` at 12,465 bytes, approximately
-3,117 tokens. Its command also reports the project-specific files it reads, so
+The largest individual workflow is `warmup` at 13,328 bytes, approximately
+3,332 tokens. Its command also reports the project-specific files it reads, so
 that recovery cost remains visible rather than being confused with plugin load.
 The estimate is deliberately simple and reproducible—UTF-8 bytes divided by
 four, rounded up—and is **not process RAM** or model-tokenizer telemetry.
 
 This release shortened discovery descriptions without removing their trigger
-conditions: the conservative discovery estimate fell from 849 to 627 tokens,
+conditions: the conservative discovery estimate fell from 849 to 623 tokens,
 a 26% reduction. Detailed proposal-to-GitHub synchronization instructions live
 in an on-demand tracker reference, so unrelated tracker work does not load
 them.
@@ -197,7 +199,7 @@ The full unittest gate uses every available worker without dropping tests.
 Large test files split by class even on a cold checkout, then measured shard
 durations improve later scheduling. In the 1.10.3 release checkout, the
 124-test warmup hotspot fell from the previously documented 575-second floor
-to 174.6 seconds (about 70% faster). The final release gate completed all 2,088 tests in 189.6 seconds. Run the same aggregated gate with:
+to 174.6 seconds (about 70% faster). The final release gate completed all 2,138 tests in 191.2 seconds. Run the same aggregated gate with:
 
 ```sh
 ./bin/quiet --label merge-gate --receipt <receipt.json> --jobs auto -- \
@@ -242,6 +244,10 @@ Every user-deliverable feature moves through:
 discovery → visual proposal → acceptance → requirements → design
           → build → test → independent review → release → evidence
 ```
+
+The proposal and acceptance stages require a valid, readable, sourced decision
+artifact—not executable tests. Test obligations start when accepted scope enters
+implementation; the proposal records those future checks in its Luna handoff.
 
 ![The Common Rules feature lifecycle from discovery and visual proposal through release evidence](docs/assets/delivery-lifecycle.svg)
 

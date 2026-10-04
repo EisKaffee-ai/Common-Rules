@@ -7,149 +7,174 @@
 <meta name="proposal-id" content="{{NUMBER}}">
 <meta name="proposal-status" content="proposed">
 <meta name="common-rules-template" content="proposal/21">
+<meta name="common-rules-visual-contract" content="proposal/38">
 <!--
-  Written by common-rules bin/new-proposal from templates/proposal.html
-  (proposal 21, S-02). Replace every highlighted passage; delete none of
-  the sections. The status appears in four places that must agree: the
-  proposal-status meta above, the <title>, the <h1>, and the
-  "Proposal NN · proposed DATE" line under the heading. The Decided
-  section below says exactly what to change when the sponsor answers.
-  Visual rule: make the page answerable at a glance before Decisions. Use
-  .tk for comparisons, .big/.stat for headline figures, .verdict for the
-  recommendation, and .ev directly under the claim it supports. Inline SVG
-  diagrams must use the page's CSS variables, not hardcoded light-only fills,
-  so they remain legible in dark mode.
+  Created by common-rules bin/new-proposal. Keep the proposal/21 compatibility
+  marker and the proposal/38 visual contract. Replace highlighted content, not
+  the section identities. The proposal-status meta, <title>, <h1>, and
+  "Proposal NN · proposed DATE" subtitle must agree. Keep the human decision surface visual and short. Put verified
+  implementation detail in #luna-context at the bottom.
 -->
 <style>
   :root {
-    --ground: #F1F2F4; --surface: #FFFFFF; --ink: #16191D; --dim: #5E6873;
-    --border: #D3D8DE; --accent: #C2521F; --accent-soft: #F7E3D8;
-    --fill: #FFF3BF; --fill-ink: #5C4400;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    color-scheme: light dark;
+    --ground:#F1F2F4; --surface:#FFFFFF; --surface-2:#F8F9FA;
+    --ink:#16191D; --dim:#5E6873; --border:#D3D8DE;
+    --accent:#C2521F; --accent-soft:#F7E3D8;
+    --good:#18794E; --good-soft:#E7F5EE; --warn:#805800; --warn-soft:#FFF3BF;
+    --info:#2B63B7; --info-soft:#E7F0FF; --fill:#FFF3BF; --fill-ink:#5C4400;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color-scheme:light dark;
   }
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme:dark) {
     :root {
-      --ground: #111417; --surface: #1A1F24; --ink: #E5E8EB; --dim: #939DA7;
-      --border: #2F3841; --accent: #EE7A45; --accent-soft: #3A2419;
-      --fill: #3B3313; --fill-ink: #F2DC8C;
+      --ground:#111417; --surface:#1A1F24; --surface-2:#151A1F;
+      --ink:#E5E8EB; --dim:#939DA7; --border:#2F3841;
+      --accent:#EE7A45; --accent-soft:#3A2419;
+      --good:#73D6A6; --good-soft:#18372A; --warn:#E7BE60; --warn-soft:#3B3313;
+      --info:#8AB8FF; --info-soft:#172B49; --fill:#3B3313; --fill-ink:#F2DC8C;
     }
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55; }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 90px; }
-  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -.01em; margin: 0; }
-  h1 .num, h1 .status { color: var(--accent); }
-  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 40px 0 10px; }
-  .sub { color: var(--dim); margin: 10px 0 0; max-width: 72ch; }
-  .card { background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; margin-top: 12px; }
-  blockquote { margin: 0; padding: 14px 20px; background: var(--surface); border-left: 3px solid var(--accent); font-size: 17px; }
-  blockquote cite { display: block; margin-top: 8px; font-style: normal; font-size: 13px; color: var(--dim); }
-  .opt { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-  .opt .card h3 { margin: 0 0 6px; font-size: 16px; }
-  .tk { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); margin-top: 12px; }
-  .tk th, .tk td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
-  .tk th { color: var(--dim); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
-  .tk tr:last-child td { border-bottom: 0; }
-  .tk .take, .tk .yes { color: #18794E; font-weight: 700; }
-  .tk .leave, .tk .no { color: var(--accent); font-weight: 700; }
-  .tk .maybe, .tk .open { color: #9A6B00; font-weight: 700; }
-  .big { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
-  .stat { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; }
-  .stat strong { display: block; font-size: 28px; line-height: 1; }
-  .stat span { display: block; color: var(--dim); font-size: 13px; margin-top: 7px; }
-  .verdict { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; margin-top: 12px; }
-  .verdict b { letter-spacing: .06em; text-transform: uppercase; }
-  .ev { color: var(--dim); font-size: 13px; margin: 4px 0 0; }
-  @media (prefers-color-scheme: dark) { .tk .take, .tk .yes { color: #73D6A6; } .tk .maybe, .tk .open { color: #E7BE60; } }
-  ol.decisions { background: var(--surface); border: 1px solid var(--border); margin: 12px 0 0; padding: 14px 20px 14px 44px; }
-  ol.decisions li + li { margin-top: 6px; }
-  .slot { border: 1px dashed var(--border); padding: 14px 20px; margin-top: 12px; color: var(--dim); }
-  .slot li + li { margin-top: 8px; }
-  .m { font-family: var(--mono); font-size: .9em; }
-  pre.m { background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 8px 12px; margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .fill { background: var(--fill); color: var(--fill-ink); padding: 0 3px; }
-  .src { font-size: 13px; color: var(--dim); margin-top: 36px; }
+  *{box-sizing:border-box} body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.5 var(--sans)}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px}
+  h1{font-size:clamp(28px,6vw,42px);line-height:1.08;letter-spacing:-.025em;margin:0}
+  h1 .num,h1 .status{color:var(--accent)}
+  h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:38px 0 10px}
+  h3{font-size:16px;margin:0 0 7px}.sub,.ev,.capt{color:var(--dim)}
+  .sub{max-width:70ch;margin:9px 0 0}.eyebrow{font:700 11px/1 var(--mono);letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
+  .state-card{background:var(--surface);border:1px solid var(--border);padding:13px 15px;margin-top:18px}.state-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.state-head span{font-size:12px;color:var(--dim)}
+  .state-rail{list-style:none;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:12px 0 0;padding:0}.state-rail li{position:relative;text-align:center;padding:8px 4px;border:1px solid var(--border);background:var(--surface-2);color:var(--dim);font-size:11px}.state-rail li.current{border-color:var(--accent);background:var(--accent-soft);color:var(--ink);font-weight:700}.state-rule{font-size:12px;color:var(--dim);margin:9px 0 0}
+  .card,.panel,.stat,.context-block{background:var(--surface);border:1px solid var(--border)}
+  .card,.panel,.context-block{padding:16px 18px}.card p,.panel p,.context-block p{margin:5px 0 0}
+  blockquote{margin:0;padding:14px 18px;background:var(--surface);border-left:4px solid var(--accent);font-size:17px}
+  blockquote cite{display:block;margin-top:7px;font-style:normal;font-size:12px;color:var(--dim)}
+  .verdict{border-left:5px solid var(--accent);background:var(--accent-soft);padding:14px 17px;margin-top:12px}
+  .verdict b{letter-spacing:.08em;text-transform:uppercase}.verdict .ev{margin:5px 0 0}
+  .big{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  .stat{padding:15px}.stat strong{display:block;font-size:clamp(24px,5vw,34px);line-height:1}.stat span{display:block;color:var(--dim);font-size:12px;margin-top:7px}
+  .pair,.opt,.context-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+  .panel.before{border-top:4px solid var(--warn)}.panel.after{border-top:4px solid var(--good)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:12px;background:var(--surface-2)}
+  .chip.good{color:var(--good);background:var(--good-soft)}.chip.warn{color:var(--warn);background:var(--warn-soft)}.chip.info{color:var(--info);background:var(--info-soft)}
+  .flow{margin:10px 0 0;background:var(--surface);border:1px solid var(--border);padding:10px}.flow svg{display:block;width:100%;height:auto;max-height:245px}
+  .fig-box{fill:var(--surface-2);stroke:var(--border);stroke-width:2}.fig-accent{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}.fig-line{fill:none;stroke:var(--ink);stroke-width:2}.fig-text{fill:var(--ink);font:600 14px var(--sans)}.fig-sub{fill:var(--dim);font:12px var(--sans)}
+  .capt,.ev{font-size:12px;margin:5px 0 0}.opt .card{border-top:3px solid var(--border)}
+  .tk{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);margin-top:10px}
+  .tk th,.tk td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}.tk th{color:var(--dim);font-size:11px;letter-spacing:.07em;text-transform:uppercase}.tk tr:last-child td{border-bottom:0}
+  .take,.yes{color:var(--good);font-weight:700}.leave,.no{color:var(--accent);font-weight:700}.maybe,.open{color:var(--warn);font-weight:700}
+  ol.decisions{background:var(--surface);border:1px solid var(--border);margin:10px 0 0;padding:15px 20px 15px 45px}ol.decisions li+li{margin-top:8px}
+  .slot{border:1px dashed var(--border);padding:14px 18px;margin-top:10px;color:var(--dim)}
+  details.more,details.agent-context{background:var(--surface);border:1px solid var(--border);margin-top:10px}details summary{cursor:pointer;padding:13px 16px;font-weight:700}details[open] summary{border-bottom:1px solid var(--border)}.details-body{padding:4px 16px 16px}
+  details.agent-context{margin-top:44px;border:2px solid var(--info)}details.agent-context summary{background:var(--info-soft);color:var(--info)}
+  .context-grid{padding:12px 16px 16px}.context-block{min-width:0}.context-block.full{grid-column:1/-1}.context-block ol,.context-block ul{margin:7px 0 0;padding-left:20px}
+  .m{font-family:var(--mono);font-size:.9em}pre.m{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);padding:9px 11px;white-space:pre-wrap;overflow-wrap:anywhere}
+  .fill{background:var(--fill);color:var(--fill-ink);padding:0 3px}.src{font-size:12px;color:var(--dim);margin-top:12px}
+  @media(max-width:620px){.wrap{padding:24px 14px 70px}.big{grid-template-columns:1fr 1fr}.big .stat:last-child{grid-column:1/-1}.pair,.opt,.context-grid{grid-template-columns:1fr}.context-block.full{grid-column:auto}.state-rail{grid-template-columns:repeat(3,1fr)}.tk{display:block;overflow-x:auto;white-space:normal}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-
+<main class="wrap">
+<p class="eyebrow">Common Rules · visual proposal</p>
 <h1><span class="num">{{NUMBER}}</span> · <span class="status">proposed</span> · {{TITLE}}</h1>
-<p class="sub">Proposal {{NUMBER}} · proposed {{DATE}}. <span class="fill">One paragraph: what this asks the sponsor to decide, and why now.</span></p>
+<p class="sub">Proposal {{NUMBER}} · proposed {{DATE}}. <span class="fill">One sentence: the decision, the intended outcome, and why it matters now.</span></p>
+
+<section class="state-card" aria-label="Proposal state management">
+  <div class="state-head"><span><b>Decision state</b> · Proposed</span><span><b>Delivery state</b> · Not started (ledger)</span></div>
+  <ol class="state-rail" data-decision-state="proposed"><li class="current" aria-current="step">Proposed</li><li>Accepted</li><li>Planned</li><li>Building</li><li>Verifying</li><li>Released</li></ol>
+  <p class="state-rule">Proposal metadata owns the decision state. Ledger items and evidence own delivery. Deferred and superseded states require an explicit reason or replacement.</p>
+</section>
 
 <h2>The ask</h2>
-<blockquote>
-  <span class="fill">The sponsor's words, verbatim, read from disk: a transcript line, a message, or a ledger ask. Never a summary or a paraphrase.</span>
-  <cite><span class="fill">The sponsor, the date and time, and where the words are recorded.</span></cite>
-</blockquote>
+<blockquote><span class="fill">The sponsor's exact words from the chat, transcript, or ledger.</span><cite><span class="fill">Sponsor · date · source</span></cite></blockquote>
 
-<h2>What was found</h2>
-<div class="card">
-  <ul>
-    <li><span class="fill">A finding, measured, with the number and where it came from.</span></li>
-    <li><span class="fill">Another finding. Say what was not verified, too.</span></li>
-  </ul>
+<h2>Decision at a glance</h2>
+<div class="verdict"><b><span class="fill">RECOMMEND</span></b> <span class="fill">The one-line direction.</span><p class="ev"><span class="fill">The strongest measured reason, its source, and its limitation.</span></p></div>
+<div class="big">
+  <div class="stat"><strong><span class="fill">N</span></strong><span><span class="fill">scope or coverage</span></span></div>
+  <div class="stat"><strong><span class="fill">0×</span></strong><span><span class="fill">cost, speed, or change</span></span></div>
+  <div class="stat"><strong><span class="fill">1</span></strong><span><span class="fill">primary outcome</span></span></div>
 </div>
+
+<h2>What changes</h2>
+<div class="pair">
+  <section class="panel before"><h3>Before</h3><p><span class="fill">Current state in two short lines.</span></p><div class="chips"><span class="chip warn"><span class="fill">constraint</span></span><span class="chip"><span class="fill">measured baseline</span></span></div></section>
+  <section class="panel after"><h3>After</h3><p><span class="fill">Proposed state in two short lines.</span></p><div class="chips"><span class="chip good"><span class="fill">outcome</span></span><span class="chip info"><span class="fill">new boundary</span></span></div></section>
+</div>
+
+<h2>How it works</h2>
+<!-- Replace this scaffold with the one primary visual the decision needs. -->
+<figure class="flow">
+  <svg viewBox="0 0 720 220" role="img" xmlns="http://www.w3.org/2000/svg">
+    <title>Proposal flow scaffold</title>
+    <desc>Three stages show the current input moving through the proposed change to the intended outcome.</desc>
+    <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" class="fig-line"/></marker></defs>
+    <rect class="fig-box" x="20" y="60" width="190" height="96" rx="12"/><text class="fig-text" x="115" y="96" text-anchor="middle">CURRENT INPUT</text><text class="fig-sub" x="115" y="121" text-anchor="middle">verified source / state</text>
+    <path class="fig-line" d="M210 108H264" marker-end="url(#arrow)"/>
+    <rect class="fig-accent" x="270" y="42" width="180" height="132" rx="12"/><text class="fig-text" x="360" y="94" text-anchor="middle">PROPOSED CHANGE</text><text class="fig-sub" x="360" y="119" text-anchor="middle">authority + transformation</text>
+    <path class="fig-line" d="M450 108H504" marker-end="url(#arrow)"/>
+    <rect class="fig-box" x="510" y="60" width="190" height="96" rx="12"/><text class="fig-text" x="605" y="96" text-anchor="middle">OUTCOME</text><text class="fig-sub" x="605" y="121" text-anchor="middle">observable result</text>
+  </svg>
+  <figcaption class="capt"><span class="fill">Name the authority boundary, failure state, or important limitation.</span></figcaption>
+</figure>
 
 <h2>Options</h2>
 <div class="opt">
-  <div class="card">
-    <h3>A · <span class="fill">option name</span></h3>
-    <p><span class="fill">What gets built, what it costs, and what it rules out.</span></p>
-  </div>
-  <div class="card">
-    <h3>B · <span class="fill">option name</span></h3>
-    <p><span class="fill">What gets built, what it costs, and what it rules out.</span></p>
-  </div>
-</div>
-<p><b>Recommended:</b> <span class="fill">the option, and the one reason that decides it.</span></p>
-
-<h2>Decision at a glance</h2>
-<!-- Keep this compact. The sponsor should see the recommendation and the
-     evidence shape before reading the numbered decisions below. -->
-<div class="verdict"><b><span class="fill">TAKE / LEAVE / TRY ONCE</span></b> <span class="fill">the one-line recommendation.</span><p class="ev"><span class="fill">Evidence directly under the claim: one measurement, source, or limitation.</span></p></div>
-<div class="big">
-  <div class="stat"><strong><span class="fill">00%</span></strong><span><span class="fill">headline result or coverage</span></span></div>
-  <div class="stat"><strong><span class="fill">0×</span></strong><span><span class="fill">cost, risk, or change</span></span></div>
-  <div class="stat"><strong><span class="fill">N</span></strong><span><span class="fill">scope, options, or affected sessions</span></span></div>
+  <section class="card"><h3>A · <span class="fill">recommended option</span></h3><p><span class="fill">What it delivers and the decisive trade-off.</span></p></section>
+  <section class="card"><h3>B · <span class="fill">alternative</span></h3><p><span class="fill">What it preserves, costs, or rules out.</span></p></section>
 </div>
 <table class="tk">
   <thead><tr><th>Option / claim</th><th>Verdict</th><th>Evidence</th></tr></thead>
   <tbody>
-    <tr><td><span class="fill">the important comparison</span></td><td class="take">TAKE</td><td class="ev"><span class="fill">short supporting measurement</span></td></tr>
-    <tr><td><span class="fill">the rejected or open alternative</span></td><td class="leave">LEAVE</td><td class="ev"><span class="fill">short reason or limitation</span></td></tr>
+    <tr><td><span class="fill">recommended path</span></td><td class="take">TAKE</td><td class="ev"><span class="fill">measurement or verified constraint</span></td></tr>
+    <tr><td><span class="fill">alternative or non-goal</span></td><td class="leave">LEAVE</td><td class="ev"><span class="fill">short reason or limitation</span></td></tr>
   </tbody>
 </table>
 
 <h2>Decisions</h2>
-<p class="sub">Each numbered line is one thing the sponsor answers. Keep the numbers stable once shown: answers and ledger items cite them.</p>
+<p class="sub">Each line is one answer. Keep these IDs stable after the sponsor sees them.</p>
 <ol class="decisions">
-  <li><b>D1.</b> <span class="fill">The first decision, as a question with one answer.</span></li>
-  <li><b>D2.</b> <span class="fill">The second decision. Add or remove lines; never leave the list empty.</span></li>
+  <li><b>D1.</b> <span class="fill">First decision with one clear answer.</span></li>
+  <li><b>D2.</b> <span class="fill">Second decision; add or remove rows before review.</span></li>
 </ol>
 
 <h2>Decided</h2>
 <section class="slot">
-  <p>Not decided yet. When the sponsor answers, change this page in this order.</p>
-  <ol>
-    <li><b>The date, first.</b> Copy this line into the head, directly under the status meta, and put the real date in place of YYYY-MM-DD:
-      <pre class="m">&lt;meta name="proposal-decided" content="YYYY-MM-DD"&gt;</pre>
-      Without it, bin/proposalcheck treats the page as decided before its rules existed and checks nothing.</li>
-    <li><b>Then the status.</b> Replace the proposed status meta with this line:
-      <pre class="m">&lt;meta name="proposal-status" content="accepted"&gt;</pre>
-      and change "proposed" to "accepted" in the title, the heading, and the "Proposal NN · proposed DATE" line under it.</li>
-    <li>Write both lines exactly as shown. Do not self-close them with <span class="m">/&gt;</span>: bin/proposalcheck does not read that form, and the page would read as undecided.</li>
-    <li>Give this section the id <span class="m">decided</span>, and replace this text with the sponsor's answer quoted from disk, the date, and what each of D1, D2 ... was decided as.</li>
-    <li>Add the items to the ledger beside this page (same number, <span class="m">.json</span>).</li>
-  </ol>
-  <p>The id is added by hand, on purpose. A page that shipped with an empty answers block would pass bin/proposalcheck while recording nothing.</p>
-  <p><b>Completed in part.</b> A proposal closed as <span class="m">completed in part</span> also needs a block with the id exceptions beside the <span class="m">&lt;ol class="decisions"&gt;</span> list, naming what was not built and why. The same rule applies: add it when it is true, never in advance.</p>
+  <p><b>Pending.</b> Replace this section with the sponsor's verbatim answer, date, and D1/D2 mapping.</p>
+  <details class="more"><summary>Acceptance update instructions</summary><div class="details-body"><ol>
+    <li>Add the date first: <pre class="m">&lt;meta name="proposal-decided" content="YYYY-MM-DD"&gt;</pre></li>
+    <li>Then replace the status meta with: <pre class="m">&lt;meta name="proposal-status" content="accepted"&gt;</pre>Change proposed to accepted in the title, heading, and subtitle at the same time.</li>
+    <li>Synchronize the decision-state view: change <span class="m">data-decision-state</span> and the visible Decision state to <span class="m">accepted</span>, then move <span class="m">class="current" aria-current="step"</span> from Proposed to Accepted. Remove both attributes from the old step. Do not advance Delivery state until the ledger evidence advances.</li>
+    <li>Do not self-close either meta line; proposalcheck intentionally reads the exact checked form above.</li>
+    <li>Add the <span class="m">decided</span> id to this section and quote the sponsor's answer from disk.</li>
+    <li>For completed-in-part work, record the exceptions beside the <span class="m">&lt;ol class="decisions"&gt;</span> and explain why each exception remains.</li>
+  </ol></div></details>
 </section>
 
-<p class="src"><span class="fill">Sources: every claim above, with the file, command, transcript or measurement it rests on, and what was not verified.</span></p>
+<h2>Evidence</h2>
+<details class="more"><summary>Sources, measurements, and limitations</summary><div class="details-body"><p><span class="fill">For every important claim: source file, command, transcript, or measurement; revision/date; and what was not verified.</span></p></div></details>
 
-</div>
+<details class="agent-context" id="luna-context">
+  <summary>Luna implementation context · agent handoff</summary>
+  <div class="context-grid">
+    <section class="context-block full"><h3>Outcome</h3><p><span class="fill">One observable result. This must match the visual verdict.</span></p></section>
+    <section class="context-block"><h3>Accepted decisions</h3><ul><li><b>D1</b> · <span class="fill">Unresolved until accepted.</span></li><li><b>D2</b> · <span class="fill">Unresolved until accepted.</span></li></ul></section>
+    <section class="context-block"><h3>Repository ownership</h3><p><span class="fill">Repository → role → owned paths. Keep commits separate where required.</span></p></section>
+    <section class="context-block"><h3>Scope in</h3><ul><li><span class="fill">Included capability or behavior.</span></li></ul></section>
+    <section class="context-block"><h3>Scope out</h3><ul><li><span class="fill">Explicit non-goal or contract that must not change.</span></li></ul></section>
+    <section class="context-block full"><h3>Implementation map</h3><pre class="m"><span class="fill">verified/path.ext :: Symbol — responsibility
+verified/test.ext :: test_name — evidence</span></pre></section>
+    <section class="context-block full"><h3>Contracts and data</h3><p><span class="fill">Protocols, formats, storage, authority, limits, caching, concurrency, errors, persistence, lifecycle, and compatibility boundaries.</span></p></section>
+    <section class="context-block full"><h3>Ordered implementation steps</h3><ol><li><span class="fill">Smallest dependency-first change; output and stop condition.</span></li><li><span class="fill">Next change; output and stop condition.</span></li><li><span class="fill">Integration and evidence update.</span></li></ol></section>
+    <section class="context-block"><h3>Implementation verification</h3><ul><li><span class="fill">Future criterion → test/command/manual observation → what it will prove. Proposal acceptance itself requires no executable tests.</span></li></ul></section>
+    <section class="context-block"><h3>Risks and refusals</h3><ul><li><span class="fill">Risk, protected boundary, or condition that requires stopping.</span></li></ul></section>
+    <section class="context-block"><h3>Dependencies and assumptions</h3><ul><li><span class="fill">Verified version, artifact, fixture, service, or revision.</span></li></ul></section>
+    <section class="context-block"><h3>Open questions</h3><ul><li><span class="fill">Q1 · Unresolved only if it can change implementation.</span></li></ul></section>
+    <section class="context-block full"><h3>State management</h3><p><span class="fill">Decision state from proposal-status; delivery state from ledger items; current state; allowed next state; transition authority; required evidence; deferred/superseded reason.</span></p></section>
+    <section class="context-block full"><h3>Completion evidence</h3><p><span class="fill">For later delivery: implementation tests, review, traceability, rendered artifact, commit/revision, package, and release receipts. Proposal acceptance alone is not delivery evidence.</span></p></section>
+  </div>
+</details>
+
+</main>
 </body>
 </html>

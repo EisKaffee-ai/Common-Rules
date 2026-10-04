@@ -1,0 +1,422 @@
+{
+  "proposal": 38,
+  "title": "Visual proposals with Luna implementation context",
+  "status": "accepted",
+  "updated": "2026-10-04",
+  "tiers": {
+    "C1": {
+      "tier": "low",
+      "model": "haiku",
+      "effort": "low",
+      "rule": "Mechanical, one owned file, fully specified, no design choice"
+    },
+    "C2": {
+      "tier": "medium",
+      "model": "sonnet",
+      "effort": "medium",
+      "rule": "Bounded implementation or tests, clear spec, one or two owned files and their tests"
+    },
+    "C3": {
+      "tier": "high",
+      "model": "sonnet",
+      "effort": "high",
+      "rule": "Cross-module design; changes a gate or the ledger contract; wrong means every project inherits it"
+    },
+    "C4": {
+      "tier": "lead",
+      "model": "opus",
+      "effort": "low or medium",
+      "rule": "Planning, merging, reconciling, anything in a project's real data, a sponsor decision"
+    }
+  },
+  "phases": [
+    {
+      "id": "V",
+      "name": "Visual proposal standard",
+      "goal": "Ship one visual-first proposal template with a complete Luna implementation handoff and backward-compatible validation.",
+      "exit": "The template, skill, checker, documentation and Common Rules 1.12.0 release pass focused and full gates."
+    }
+  ],
+  "items": [
+    {
+      "id": "V-01",
+      "phase": "V",
+      "cx": "C3",
+      "title": "Canonical visual-first proposal template and visual language",
+      "what": "Replace the generic proposal scaffold with a mobile-first visual decision surface and document which visual form answers each kind of proposal question.",
+      "files": [
+        "templates/proposal.html",
+        "skills/visual-proposal/SKILL.md",
+        "skills/visual-proposal/references/visual-language.md"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_new_proposal tests.test_plugin_package"
+      ],
+      "done": "A newly generated proposal is understandable before Decisions, routes authors to the visual language, and remains readable on phones and in dark mode.",
+      "depends": [],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "V-01.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-04",
+          "event": "visual template and on-demand visual language implemented",
+          "by": "session:codex",
+          "evidence": "red-first tests failed on missing proposal/38 meta, flow and reference; focused template/package tests now pass",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-04T17:32:29+02:00",
+          "event": "State rail now exposes aria-current, accessible warning contrast, and mixed ledger state using the least-advanced-open-item rule.",
+          "by": "session:codex",
+          "evidence": "145 lifecycle/package/docs checks and 82 generator checks pass; proposalcheck clean aside from 8 historical visual warnings"
+        }
+      ]
+    },
+    {
+      "id": "V-02",
+      "phase": "V",
+      "cx": "C3",
+      "title": "Luna implementation context and compatibility gate",
+      "what": "Add the bottom #luna-context schema and validate its stable fields only for new proposal/38 visual-contract pages.",
+      "files": [
+        "templates/proposal.html",
+        "bin/proposalcheck",
+        "bin/new-proposal",
+        "tests/test_proposal_lifecycle.py",
+        "tests/test_new_proposal.py"
+      ],
+      "tests": [
+        "python3 -m unittest -q tests.test_proposal_lifecycle tests.test_new_proposal"
+      ],
+      "done": "New pages cannot lose their Luna handoff; existing proposal/21 pages remain valid; generator output explains the accepted handoff step.",
+      "depends": [
+        "V-01"
+      ],
+      "status": "in review",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "V-02.A",
+          "title": "Implementation and focused verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-04",
+          "event": "proposal/38 Luna contract implemented with backward-compatible checker",
+          "by": "session:codex",
+          "evidence": "red-first lifecycle tests failed without the checker; four focused lifecycle/new-proposal tests now pass",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-04T17:32:29+02:00",
+          "event": "Structured HTML parsing now enforces proposal/38 meta regardless of attribute order, a details#luna-context block, named summary, required internal headings, Decided-before-handoff ordering, and final-section placement.",
+          "by": "session:codex",
+          "evidence": "Parser bypass regressions pass; span, comment, outside-field, missing-Decided, missing-summary and trailing-appendix cases are rejected"
+        }
+      ]
+    },
+    {
+      "id": "V-03",
+      "phase": "V",
+      "cx": "C2",
+      "title": "Proposal 38 example, requirements, design and user guidance",
+      "what": "Use the new format for Proposal 38 and explain the human decision surface versus executable Luna handoff in the project guidance.",
+      "files": [
+        "docs/proposals/38-visual-proposals-with-luna-implementation-context.html",
+        "docs/requirements/38-visual-proposals-with-luna-context.md",
+        "docs/design/38-visual-proposals-with-luna-context.md",
+        "docs/user-guide/03-tracker-and-proposals.md",
+        "README.md",
+        "CLAUDE-workflow.md"
+      ],
+      "tests": [
+        "bin/proposalcheck --project .",
+        "python3 -m unittest -q tests.test_readme_landing tests.test_templates"
+      ],
+      "done": "Proposal 38 is the accepted worked example, requirements and design are reviewable, and public guidance matches the shipped template.",
+      "depends": [
+        "V-01",
+        "V-02"
+      ],
+      "status": "in review",
+      "tier": "medium",
+      "model": "sonnet",
+      "tag": "[ruflo · medium · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "V-03.A",
+          "title": "Documentation and worked proposal verification",
+          "share": 100,
+          "status": "in review",
+          "owner": "lead"
+        }
+      ],
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-04",
+          "event": "accepted requirements, design and visual Proposal 38 written",
+          "by": "session:codex",
+          "evidence": "A-01 and A-02 quoted verbatim; page carries accepted D1-D4 and a populated Luna implementation context",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-04T00:30:00+02:00",
+          "event": "documentation and worked proposal verified",
+          "by": "session:codex",
+          "evidence": "proposalcheck clean; tracker validate clean; 189 focused tests OK; context discovery 623 estimated tokens",
+          "status": "in review"
+        },
+        {
+          "at": "2026-10-04T17:32:29+02:00",
+          "event": "Documented that proposals require structural validation, visual review, sources and sponsor acceptance, while executable tests begin only with implementation.",
+          "by": "session:codex",
+          "evidence": "Sponsor ask A-04 recorded; workflow, skill, reference, guide, README, requirements, design, template, changelog and release notes agree"
+        }
+      ]
+    },
+    {
+      "id": "V-04",
+      "phase": "V",
+      "cx": "C3",
+      "title": "Common Rules 1.12.0 plugin release",
+      "what": "Bump the coherent plugin package, publish release notes, pass focused and full release gates, obtain independent review and release the new version.",
+      "files": [
+        "VERSION",
+        "plugin.json",
+        ".claude-plugin/plugin.json",
+        "tests/test_version.py",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.12.0.md"
+      ],
+      "tests": [
+        "bin/context-budget --json --check",
+        "bin/version-check --check",
+        "bin/gate release --project ."
+      ],
+      "done": "Version and manifests agree at 1.12.0, all release gates pass, review findings are resolved, and the tagged plugin release is available from origin.",
+      "depends": [
+        "V-01",
+        "V-02",
+        "V-03"
+      ],
+      "status": "in progress",
+      "tier": "high",
+      "model": "sonnet",
+      "tag": "[ruflo · high · sonnet]",
+      "owner": "lead",
+      "parts": [
+        {
+          "id": "V-04.A",
+          "title": "Release gate, merge, tag and publication",
+          "share": 100,
+          "status": "in progress",
+          "owner": "lead"
+        }
+      ],
+      "issue": null,
+      "log": [
+        {
+          "at": "2026-10-04T00:31:00+02:00",
+          "event": "release 1.12.0 package assembled",
+          "by": "session:codex",
+          "evidence": "VERSION and both plugin manifests set to 1.12.0; changelog, release notes and README context table updated; full release gate pending",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-04T17:32:29+02:00",
+          "event": "Release candidate remains in progress while full gate, final independent review, PR merge, tag and publication receipts are pending.",
+          "by": "session:codex",
+          "evidence": "Focused suites pass; context budget current; full release gate pending"
+        },
+        {
+          "at": "2026-10-04",
+          "event": "machine release receipt refreshed",
+          "by": "bin/release-evidence",
+          "evidence": "full merge gate: 2,138 tests in 191.2 seconds; receipt sha256 8d048607cbfc1d08f54e5d1cdfef4dc3c1d1d65bbb85651399a04d1ea6e33192",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-04T17:51:09+02:00",
+          "event": "Final independent report-only re-review completed with no actionable findings.",
+          "by": "session:proposal38-review",
+          "evidence": "Reviewer verified parser contract, mixed-state rail, accessibility, proposal-stage verification boundary, context budget and focused suites; machine receipt records 2,138 tests in 191.2 seconds."
+        }
+      ],
+      "release_gate": {
+        "status": "OK",
+        "tests": 2138,
+        "seconds": 191.2,
+        "receipt_sha256": "8d048607cbfc1d08f54e5d1cdfef4dc3c1d1d65bbb85651399a04d1ea6e33192"
+      }
+    }
+  ],
+  "traceability": [
+    {
+      "id": "TR-01",
+      "item": "V-01",
+      "requirement_ids": [
+        "CR38-R01",
+        "CR38-R02",
+        "CR38-R03",
+        "CR38-R04",
+        "CR38-R10",
+        "CR38-R12"
+      ],
+      "guide_section": "docs/requirements/38-visual-proposals-with-luna-context.md#requirements",
+      "architecture_section": "docs/design/38-visual-proposals-with-luna-context.md#visual-selection",
+      "implementation_files": [
+        "templates/proposal.html",
+        "skills/visual-proposal/SKILL.md",
+        "skills/visual-proposal/references/visual-language.md"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_new_proposal tests.test_plugin_package"
+      ],
+      "receipt_or_refusal": "accessible visual/state template and packaged reference checks pass; generator suite 82 OK",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-02",
+      "item": "V-02",
+      "requirement_ids": [
+        "CR38-R05",
+        "CR38-R06",
+        "CR38-R07",
+        "CR38-R08",
+        "CR38-R09",
+        "CR38-R11",
+        "CR38-R13",
+        "CR38-R16",
+        "CR38-R17"
+      ],
+      "guide_section": "docs/requirements/38-visual-proposals-with-luna-context.md#requirements",
+      "architecture_section": "docs/design/38-visual-proposals-with-luna-context.md#luna-field-contract",
+      "implementation_files": [
+        "bin/proposalcheck",
+        "bin/new-proposal",
+        "templates/proposal.html"
+      ],
+      "tests_commands": [
+        "python3 -m unittest -q tests.test_proposal_lifecycle tests.test_new_proposal"
+      ],
+      "receipt_or_refusal": "structured proposal/38 contract regressions and lifecycle suite pass; proposal-stage test boundary encoded",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-03",
+      "item": "V-03",
+      "requirement_ids": [
+        "CR38-R14"
+      ],
+      "guide_section": "docs/user-guide/03-tracker-and-proposals.md#luna-implementation-context",
+      "architecture_section": "docs/design/38-visual-proposals-with-luna-context.md#skill-and-documentation",
+      "implementation_files": [
+        "README.md",
+        "docs/user-guide/03-tracker-and-proposals.md",
+        "CLAUDE-workflow.md"
+      ],
+      "tests_commands": [
+        "bin/proposalcheck --project .",
+        "python3 -m unittest -q tests.test_readme_landing tests.test_templates"
+      ],
+      "receipt_or_refusal": "documentation, template and context budget checks pass; discovery remains 623 estimated tokens",
+      "owner": "lead",
+      "status": "in review"
+    },
+    {
+      "id": "TR-04",
+      "item": "V-04",
+      "requirement_ids": [
+        "CR38-R15"
+      ],
+      "guide_section": "docs/requirements/38-visual-proposals-with-luna-context.md#acceptance-criteria",
+      "architecture_section": "docs/design/38-visual-proposals-with-luna-context.md#release-ownership",
+      "implementation_files": [
+        "VERSION",
+        "plugin.json",
+        ".claude-plugin/plugin.json",
+        "CHANGELOG.md",
+        "docs/RELEASE-1.12.0.md"
+      ],
+      "tests_commands": [
+        "bin/gate release --project ."
+      ],
+      "receipt_or_refusal": "Machine release receipt: 2,138 full-suite tests pass in 191.2 seconds; sha256 8d048607cbfc1d08f54e5d1cdfef4dc3c1d1d65bbb85651399a04d1ea6e33192; independent review and CI pending",
+      "owner": "lead",
+      "status": "in progress"
+    }
+  ],
+  "asks": [
+    {
+      "id": "A-01",
+      "at": "2026-10-04T00:00:00+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "Can you convert this into a standard template in the common rules and guideline on how to visualize different elements and create a proposal whenever a proposal is asked, add it in the common rules and make a new common rules release for the Common Rules plugin.",
+      "became": null,
+      "state": "answered",
+      "source": "Codex chat",
+      "note": "Create the canonical visual proposal template, guidance, and plugin release."
+    },
+    {
+      "id": "A-02",
+      "at": "2026-10-04T00:01:00+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "So the template should be just visualized, and in the bottom of the template there should be a section for any agent to read to get the deeper details on how everything is handled in a context format. So if I create a proposal using a high-end model, then I can give it to Luna to implement it using the detailed steps below. So you can create a section called Luna, you know, details instructions below, and then Luna can follow it to implement it that way.",
+      "became": null,
+      "state": "answered",
+      "source": "Codex chat",
+      "note": "The visual surface stays concise; a bottom Luna implementation context carries the detailed executable handoff."
+    },
+    {
+      "id": "A-03",
+      "at": "2026-10-04T00:45:00+02:00",
+      "by": "sponsor",
+      "kind": "feature",
+      "quote": "there shoul dbe the state menagement of th eproposal",
+      "became": null,
+      "state": "answered",
+      "source": "Codex chat",
+      "note": "Add visual and agent-readable proposal state management without duplicating ledger authority."
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-04T17:24:32+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "update common rules at proposals dont need tests",
+      "became": null,
+      "state": "answered",
+      "source": "Codex chat",
+      "note": "Proposal creation, review, and acceptance require structural/document validation and sponsor acceptance, not executable implementation tests; future implementation verification remains in the handoff."
+    }
+  ],
+  "proposed_changes": [],
+  "execution": {}
+}

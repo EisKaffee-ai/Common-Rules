@@ -441,7 +441,8 @@ def create(top: Path, number_arg: str | None, title_arg: str) -> int:
         print(f"  {note}")
     print("Next: fill the page -- the ask in the sponsor's words, what was found, the options,")
     print("and the decisions D1, D2 ... in place of the highlighted text. When the sponsor accepts,")
-    print("record the answers in the Decided section and add the items to the ledger.")
+    print("record the answers in Decided, complete the Luna implementation context, and add")
+    print("the accepted work items to the ledger.")
     return 0
 
 
@@ -528,6 +529,7 @@ def page_for(top: Path, ledger_arg: str) -> int:
               "section to record the decision")
     print("Next: fill the page -- the ask in the sponsor's words, what was found, the options,")
     print("and the decisions D1, D2 ... in place of the highlighted text.")
+    print("Complete the Luna implementation context before handing accepted work to an agent.")
     return 0
 
 
