@@ -60,6 +60,24 @@ class WarmupDedupeTests(unittest.TestCase):
         self.assertIn("no change since the last warm-up", second.stdout)
         self.assertNotIn("Read in order:", second.stdout)
 
+    def test_same_session_and_state_path_do_not_suppress_another_project(self):
+        other = Project(seeded=True)
+        self.addCleanup(other.close)
+        env = {**os.environ, "COMMON_RULES_SESSION_ID": "session-one"}
+        first = subprocess.run(
+            [sys.executable, str(WARMUP), "--project", str(self.project.root),
+             "--no-recall", "--no-pull", "--state", str(self.state)],
+            capture_output=True, text=True, env=env,
+        )
+        second = subprocess.run(
+            [sys.executable, str(WARMUP), "--project", str(other.root),
+             "--no-recall", "--no-pull", "--state", str(self.state)],
+            capture_output=True, text=True, env=env,
+        )
+        self.assertEqual(0, first.returncode, first.stdout + first.stderr)
+        self.assertEqual(0, second.returncode, second.stdout + second.stderr)
+        self.assertIn("Read in order:", second.stdout)
+
 
 def ledger_data():
     return {
@@ -202,6 +220,27 @@ class RufloLevelsTests(unittest.TestCase):
         self.assertEqual(0, land.returncode, land.stdout + land.stderr)
         self.assertEqual("mm", self.count.read_text(), "release evidence must be stronger than checkpoint evidence")
         self.assertEqual(2, self.log.read_text().count("testgaps"))
+
+    def test_repeated_checkpoint_reuses_receipt_without_redispatching_testgaps(self):
+        first = self.run_item("checkpoint")
+        second = self.run_item("checkpoint")
+        self.assertEqual(0, first.returncode, first.stdout + first.stderr)
+        self.assertEqual(0, second.returncode, second.stdout + second.stderr)
+        self.assertEqual(1, self.log.read_text().count("testgaps"))
+
+    def test_repeated_land_reuses_receipt_without_redispatching_testgaps(self):
+        first = self.run_item("land")
+        second = self.run_item("land")
+        self.assertEqual(0, first.returncode, first.stdout + first.stderr)
+        self.assertEqual(0, second.returncode, second.stdout + second.stderr)
+        self.assertEqual(1, self.log.read_text().count("testgaps"))
+
+    def test_checkpoint_stores_checkpoint_and_conformance_compatible_done_keys(self):
+        result = self.run_item("checkpoint")
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        log = self.log.read_text()
+        self.assertIn("item:W-01:checkpoint", log)
+        self.assertIn("item:W-01:done", log)
 
     def test_done_is_a_checkpoint_compatibility_alias(self):
         done = self.run_item("done")

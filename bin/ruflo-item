@@ -344,30 +344,30 @@ def _run_gate(gate: str, project: Path) -> int:
         raise
 
 
-def _run_level_gate(level: str, project: Path, item_ids: list[str]) -> int:
-    """Run or reuse the level's revision/configuration-bound gate receipt."""
+def _run_level_gate(level: str, project: Path, item_ids: list[str]) -> tuple[bool, bool]:
+    """Return (green, ran_now) for the level-bound gate receipt."""
     gate = GR.command_for(project, level)
     if not gate:
         name = "quick" if level == "development" else "merge"
         print(f"{PREFIX} no {name} gate declared -- refusing", file=sys.stderr)
-        return 1
+        return False, False
     reason = gate.split("#", 1)[1].strip() if gate.strip().startswith("false") and "#" in gate else None
     worktree = GR.fingerprint(project)
     prior = GR.reusable(project, level, gate, worktree)
     if prior:
         print(f"{PREFIX} {level} gate receipt reused for {', '.join(item_ids)} "
               f"(from {prior['level']} at {prior['at']})")
-        return 0
+        return True, False
     print(f"{PREFIX} running {level} gate once for {', '.join(item_ids)}: {gate}")
     if _run_gate(gate, project) != 0:
         if reason:
             print(f"{PREFIX} gate refuses -- {reason}", file=sys.stderr)
         else:
             print(f"{PREFIX} {level} gate failed", file=sys.stderr)
-        return 1
+        return False, True
     GR.record(project, level, gate, worktree)
     print(f"{PREFIX} {level} gate green")
-    return 0
+    return True, True
 
 
 def _split_item_flags(specs: list[str], parser: argparse.ArgumentParser) -> list[tuple[str, str]]:
@@ -432,7 +432,8 @@ def cmd_done(binary: list[str], project: Path, ruflo_cwd: Path,
     testgaps dispatch in that case -- unchanged from today's single-id
     behaviour, where a failed store already meant "no testgaps"."""
     item_ids = [item_id for item_id, _ in items]
-    if _run_level_gate("release", project, item_ids):
+    green, gate_ran = _run_level_gate("release", project, item_ids)
+    if not green:
         return 1
 
     failed = []
@@ -453,8 +454,9 @@ def cmd_done(binary: list[str], project: Path, ruflo_cwd: Path,
         print(f"{PREFIX} done failed to record: {', '.join(failed)}", file=sys.stderr)
         return 1
 
-    _note_ignored("hooks worker dispatch", run_ruflo(
-        binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
+    if gate_ran:
+        _note_ignored("hooks worker dispatch", run_ruflo(
+            binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
     return 0
 
 
@@ -462,7 +464,8 @@ def cmd_ready(binary: list[str], project: Path, ruflo_cwd: Path,
               items: list[tuple[str, str]], ns: str) -> int:
     """Focused development evidence: quick gate and ready memory, no worker."""
     item_ids = [item_id for item_id, _ in items]
-    if _run_level_gate("development", project, item_ids):
+    green, _gate_ran = _run_level_gate("development", project, item_ids)
+    if not green:
         return 1
     failed = []
     for item_id, summary in items:
@@ -480,7 +483,8 @@ def cmd_checkpoint(binary: list[str], project: Path, ruflo_cwd: Path,
                    items: list[tuple[str, str]], ns: str, legacy_done: bool = False) -> int:
     """Feature-bundle checkpoint: merge gate once, memory, then testgaps."""
     item_ids = [item_id for item_id, _ in items]
-    if _run_level_gate("checkpoint", project, item_ids):
+    green, gate_ran = _run_level_gate("checkpoint", project, item_ids)
+    if not green:
         return 1
     failed = []
     for item_id, summary in items:
@@ -488,17 +492,20 @@ def cmd_checkpoint(binary: list[str], project: Path, ruflo_cwd: Path,
             _note_ignored("hooks post-task", run_ruflo(
                 binary, ruflo_cwd, "hooks", "post-task", "--task-id", item_id,
                 "--success", "true", "--store-results", "true"))
-        key = f"item:{item_id}:{'done' if legacy_done else 'checkpoint'}"
-        if not _note_required("memory store", run_ruflo(
-                binary, ruflo_cwd, "memory", "store", "--namespace", ns,
-                "--key", key, "--value", f"{now_iso()} {summary}")):
-            failed.append(item_id)
-        else:
-            print(f"{PREFIX} stored {key}")
+        suffixes = ("done",) if legacy_done else ("checkpoint", "done")
+        for suffix in suffixes:
+            key = f"item:{item_id}:{suffix}"
+            if not _note_required("memory store", run_ruflo(
+                    binary, ruflo_cwd, "memory", "store", "--namespace", ns,
+                    "--key", key, "--value", f"{now_iso()} {summary}")):
+                failed.append(item_id)
+            else:
+                print(f"{PREFIX} stored {key}")
     if failed:
         return 1
-    _note_ignored("hooks worker dispatch", run_ruflo(
-        binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
+    if gate_ran:
+        _note_ignored("hooks worker dispatch", run_ruflo(
+            binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
     return 0
 
 

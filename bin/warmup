@@ -1272,7 +1272,8 @@ def main(argv) -> int:
                 candidate = json.loads(args.state.read_text())
             except (OSError, json.JSONDecodeError):
                 candidate = None
-            if isinstance(candidate, dict) and candidate.get("session_token") == token:
+            if (isinstance(candidate, dict) and candidate.get("session_token") == token
+                    and candidate.get("project") == s.get("project")):
                 old = candidate
         if old is not None:
             print(delta(old, s))
