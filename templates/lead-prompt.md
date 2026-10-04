@@ -29,7 +29,7 @@ this job and is not watching in real time. You are.
 - The two prohibitions in `HANDOFF.md` are absolute, in every brief, with
   no exception you grant yourself.
 
-## 2 Ruflo is bundle-scoped
+## 2 Ruflo is mandatory
 
 - The rule and its four steps are stated once, in `skills/warmup/SKILL.md`
   §3 — this file does not restate them.
@@ -40,7 +40,8 @@ this job and is not watching in real time. You are.
   `note`; focused evidence uses `ready`; a coherent batch uses `checkpoint`;
   release evidence uses `land`. Micro visual edits and individual review
   comments do not open Ruflo items. `done` is a compatibility alias for
-  `checkpoint`.
+  `checkpoint`; the legacy batch form remains valid:
+  `ruflo-item done ID1 ID2 ID3 "<summary>"`.
 - **One full suite and at most one review per bundle or batch, not per
   item** (proposal 26, C-03). `bin/ruflo-item checkpoint` takes every id in
   the bundle and one shared summary and runs the merge gate exactly once for
@@ -143,8 +144,7 @@ this job and is not watching in real time. You are.
   tells you when it moves. When the project declares
   `plan_page`, the page is the committed file its generator writes: record
   it with `bin/tracker published <ledger> --url <url> --page <path>`.
-- Every sponsor message that is not an answer to a question becomes an ask
-  row in the same turn. Comments within one open review use
+- Ask-row recording follows `HANDOFF.md`. Comments within one open review use
   `tracker ask --review <item>` and coalesce into that row's feedback list.
 
 ## 5 Do not stop

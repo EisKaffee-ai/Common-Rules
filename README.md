@@ -166,9 +166,9 @@ and [Claude Code context-cost guide](https://code.claude.com/docs/en/features-ov
 | Surface | UTF-8 bytes | Estimated tokens | What actually loads |
 |---|---:|---:|---|
 | Idle skill discovery (13 names, descriptions, paths) | 2,505 | 627 | Every session/request |
-| All `SKILL.md` files combined | 25,751 | 6,438 | Not together; only the selected skill is loaded |
+| All `SKILL.md` files combined | 26,662 | 6,666 | Not together; only the selected skill is loaded |
 | Optional references | 3,225 | 807 | Only when the selected workflow needs one |
-| Full skill-package ceiling | 28,976 | 7,244 | Comparison ceiling; never the default load |
+| Full skill-package ceiling | 29,887 | 7,472 | Comparison ceiling; never the default load |
 | Hook configuration and scripts | — | 0 idle | Execute outside context; returned output is the only cost |
 <!-- context-budget:end -->
 

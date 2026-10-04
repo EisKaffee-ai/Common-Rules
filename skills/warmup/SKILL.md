@@ -86,6 +86,9 @@ ask), never from the summary.
   compatibility alias for `checkpoint`. The wrapper reuses a green receipt
   only at the same verification level and unchanged worktree/configuration.
   It stops the daemon it started; never kill it by name.
+  The canonical Ruflo sequence remains `memory search` and `hooks route` before, `hooks
+  post-task` and `memory store` after; the wrapper applies that sequence at
+  the bundle lifecycle boundary instead of repeating it for every comment.
   **Never register Ruflo's full MCP tool set for this reason.** `bin/ruflo-item`
   is a CLI wrapper, not an MCP client — it shells out to the `claude-flow`/
   `ruflo` binary for `hooks pre-task`, `memory search`, `hooks route`,
