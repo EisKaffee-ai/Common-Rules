@@ -111,6 +111,7 @@ import argparse
 import datetime
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -984,6 +985,20 @@ def default_state_path(project: Path) -> Path:
     return p / "common-rules-warmup-state.json"
 
 
+def session_token() -> str | None:
+    """A host-provided stable id used only to suppress duplicate full cards.
+
+    No token means no assumption: a state file may have survived an earlier
+    chat, so a fresh caller still receives the complete warm card. Tests and
+    integrations may provide COMMON_RULES_SESSION_ID explicitly.
+    """
+    for name in ("COMMON_RULES_SESSION_ID", "CODEX_THREAD_ID", "CLAUDE_CODE_SESSION_ID"):
+        value = os.environ.get(name)
+        if value and value.strip():
+            return value.strip()
+    return None
+
+
 def do_queue(project: Path, s: dict) -> str:
     """`--queue`'s report: one line per item actually written, or a single
     line saying there was nothing new. Writes to the first ledger under
@@ -1199,6 +1214,9 @@ def main(argv) -> int:
 
     if args.context:
         s["context"] = shown(args.context)
+    token = session_token()
+    if token and args.state and not args.json and not args.check and not args.since:
+        s["session_token"] = token
 
     # R-05: only the plain card and --reheat fast-forward the shared rules
     # checkout -- --check, --json, --since and --migrate are queries, not the
@@ -1245,9 +1263,30 @@ def main(argv) -> int:
         args.state = state_path  # always saved, so the next --reheat has a baseline
         code = 0
     else:
-        if args.queue:
-            s["queue_report"] = do_queue(Path(s["project"]), s)
-        print(card(s))
+        # Proposal 33 R-04.A: the same live session asking for a plain warm-up
+        # twice gets a delta, not another mandatory-read card. A state file
+        # from a different or unknown session never suppresses the fresh card.
+        old = None
+        if args.state and token:
+            try:
+                candidate = json.loads(args.state.read_text())
+            except (OSError, json.JSONDecodeError):
+                candidate = None
+            if isinstance(candidate, dict) and candidate.get("session_token") == token:
+                old = candidate
+        if old is not None:
+            print(delta(old, s))
+            report = standard_report(s)
+            if report:
+                print()
+                print(report)
+            if args.queue:
+                print()
+                print(do_queue(Path(s["project"]), s))
+        else:
+            if args.queue:
+                s["queue_report"] = do_queue(Path(s["project"]), s)
+            print(card(s))
         code = 0
 
     if args.state:

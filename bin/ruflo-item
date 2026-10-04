@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""ruflo-item -- the mandatory Ruflo loop around one plan item (proposal 20, D11).
+"""ruflo-item -- Ruflo memory and gates around one meaningful feature bundle.
 
   ruflo-item start  <ID> "<task>"           hooks pre-task, memory search, hooks route, memory store
   ruflo-item start  --item ID:TEXT [--item ID:TEXT ...]
                                              several ids, each with its own task text, in one invocation
-  ruflo-item done   <ID> [<ID> ...] "<summary>"
-                                             the project's merge gate ONCE for the whole bundle, then
-                                             hooks post-task + memory store per id, then testgaps once
-  ruflo-item done   --item ID:TEXT [--item ID:TEXT ...]
-                                             several ids, each with its own done summary; gate still runs once
   ruflo-item note   <ID> "<text>"           memory store, keyed to the item, timestamped from the real clock
+  ruflo-item ready  <ID> [<ID> ...] "<summary>"
+                                             quick gate once; no post-task or testgaps
+  ruflo-item checkpoint <ID> [<ID> ...] "<summary>"
+                                             merge gate once; checkpoint memory and testgaps once
+  ruflo-item land   <ID> [<ID> ...] "<summary>"
+                                             release gate; post-task, done memory and testgaps once
+  ruflo-item done   ...                      compatibility alias for checkpoint
   ruflo-item recall "<keywords>"            memory list, then memory search
   ruflo-item from-ledger <LEDGER.json> [--since YYYY-MM-DD]
                                              record start+done for every item closed on or after --since
@@ -26,16 +28,11 @@
 
   -- one process, one daemon start, one stop, the merge gate run once.
 
-`done` takes one or more item ids followed by one summary shared by all of
-them (proposal 26, C-03: `bin/ruflo-item done` accepts several item ids and
-runs the merge gate once, not once per item -- `templates/brief.md`'s "one
-gate run" per bundle needs exactly this from the tool that runs the gate).
-The gate itself runs once for the whole call; `hooks post-task` and the
-`item:<ID>:done` memory store still run once per id, because each item's own
-ledger row needs its own done record (the same "an item without start and
-done in Ruflo memory is not done" rule `start` already satisfies per id);
-`hooks worker dispatch --trigger testgaps` runs once at the end of the call,
-not once per id, matching the single gate run it follows.
+Every transition accepts one or more item ids followed by one shared summary,
+or repeatable `--item ID:TEXT`. Gates run once per bundle. Green receipts are
+reused only at the same verification level with the same command and exact
+worktree bytes; checkpoint evidence never certifies release. Only
+`checkpoint`/legacy `done` and `land` dispatch `testgaps`.
 
 BATCHING (proposal 31, O-11 / finding 31/F-05). Every Ruflo call auto-starts
 its daemon and every `ruflo-item` invocation stops it again in a `finally`
@@ -188,6 +185,7 @@ sys.path.insert(0, str(RULES_DIR))
 
 from tools import project as P  # noqa: E402
 from tools import ruflo as RU  # noqa: E402
+from tools import gate_receipts as GR  # noqa: E402
 from tools.tracker import ledger as LED  # noqa: E402
 
 PREFIX = "ruflo-item:"
@@ -346,6 +344,32 @@ def _run_gate(gate: str, project: Path) -> int:
         raise
 
 
+def _run_level_gate(level: str, project: Path, item_ids: list[str]) -> int:
+    """Run or reuse the level's revision/configuration-bound gate receipt."""
+    gate = GR.command_for(project, level)
+    if not gate:
+        name = "quick" if level == "development" else "merge"
+        print(f"{PREFIX} no {name} gate declared -- refusing", file=sys.stderr)
+        return 1
+    reason = gate.split("#", 1)[1].strip() if gate.strip().startswith("false") and "#" in gate else None
+    worktree = GR.fingerprint(project)
+    prior = GR.reusable(project, level, gate, worktree)
+    if prior:
+        print(f"{PREFIX} {level} gate receipt reused for {', '.join(item_ids)} "
+              f"(from {prior['level']} at {prior['at']})")
+        return 0
+    print(f"{PREFIX} running {level} gate once for {', '.join(item_ids)}: {gate}")
+    if _run_gate(gate, project) != 0:
+        if reason:
+            print(f"{PREFIX} gate refuses -- {reason}", file=sys.stderr)
+        else:
+            print(f"{PREFIX} {level} gate failed", file=sys.stderr)
+        return 1
+    GR.record(project, level, gate, worktree)
+    print(f"{PREFIX} {level} gate green")
+    return 0
+
+
 def _split_item_flags(specs: list[str], parser: argparse.ArgumentParser) -> list[tuple[str, str]]:
     """Parse repeated `--item ID:TEXT` flags into [(id, text), ...], split on
     the *first* `:` only, so TEXT itself may contain colons. `parser.error()`
@@ -407,26 +431,9 @@ def cmd_done(binary: list[str], project: Path, ruflo_cwd: Path,
     recorded; the call returns nonzero if any id failed, and skips the final
     testgaps dispatch in that case -- unchanged from today's single-id
     behaviour, where a failed store already meant "no testgaps"."""
-    gate = P.test_command(project)
-    if not gate:
-        print(f"{PREFIX} no merge gate declared, and none could be guessed -- "
-              f"refusing, the same as `bin/land` does", file=sys.stderr)
-        return 1
-
-    reason = None
-    if gate.strip().startswith("false") and "#" in gate:
-        reason = gate.split("#", 1)[1].strip()
-
     item_ids = [item_id for item_id, _ in items]
-    print(f"{PREFIX} running gate once for {', '.join(item_ids)}: {gate}")
-    returncode = _run_gate(gate, project)
-    if returncode != 0:
-        if reason:
-            print(f"{PREFIX} gate refuses -- {reason}", file=sys.stderr)
-        else:
-            print(f"{PREFIX} gate failed", file=sys.stderr)
+    if _run_level_gate("release", project, item_ids):
         return 1
-    print(f"{PREFIX} gate green")
 
     failed = []
     for item_id, summary in items:
@@ -446,6 +453,50 @@ def cmd_done(binary: list[str], project: Path, ruflo_cwd: Path,
         print(f"{PREFIX} done failed to record: {', '.join(failed)}", file=sys.stderr)
         return 1
 
+    _note_ignored("hooks worker dispatch", run_ruflo(
+        binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
+    return 0
+
+
+def cmd_ready(binary: list[str], project: Path, ruflo_cwd: Path,
+              items: list[tuple[str, str]], ns: str) -> int:
+    """Focused development evidence: quick gate and ready memory, no worker."""
+    item_ids = [item_id for item_id, _ in items]
+    if _run_level_gate("development", project, item_ids):
+        return 1
+    failed = []
+    for item_id, summary in items:
+        key = f"item:{item_id}:ready"
+        if not _note_required("memory store", run_ruflo(
+                binary, ruflo_cwd, "memory", "store", "--namespace", ns,
+                "--key", key, "--value", f"{now_iso()} {summary}")):
+            failed.append(item_id)
+        else:
+            print(f"{PREFIX} stored {key}")
+    return 1 if failed else 0
+
+
+def cmd_checkpoint(binary: list[str], project: Path, ruflo_cwd: Path,
+                   items: list[tuple[str, str]], ns: str, legacy_done: bool = False) -> int:
+    """Feature-bundle checkpoint: merge gate once, memory, then testgaps."""
+    item_ids = [item_id for item_id, _ in items]
+    if _run_level_gate("checkpoint", project, item_ids):
+        return 1
+    failed = []
+    for item_id, summary in items:
+        if legacy_done:
+            _note_ignored("hooks post-task", run_ruflo(
+                binary, ruflo_cwd, "hooks", "post-task", "--task-id", item_id,
+                "--success", "true", "--store-results", "true"))
+        key = f"item:{item_id}:{'done' if legacy_done else 'checkpoint'}"
+        if not _note_required("memory store", run_ruflo(
+                binary, ruflo_cwd, "memory", "store", "--namespace", ns,
+                "--key", key, "--value", f"{now_iso()} {summary}")):
+            failed.append(item_id)
+        else:
+            print(f"{PREFIX} stored {key}")
+    if failed:
+        return 1
     _note_ignored("hooks worker dispatch", run_ruflo(
         binary, ruflo_cwd, "hooks", "worker", "dispatch", "--trigger", "testgaps"))
     return 0
@@ -558,14 +609,14 @@ def main(argv: list[str]) -> int:
                                "':'. Mutually exclusive with the positional ID TASK form. Example: "
                                "start --item O-11:'wire it up' --item O-12:'stamp workflow.html'")
 
-    p_done = sub.add_parser("done")
-    p_done.add_argument("args", nargs="*", metavar="ID [ID ...] SUMMARY",
-                         help="one or more item ids followed by one summary shared by all of them "
-                              "(today's shape) -- the last positional argument is always the summary")
-    p_done.add_argument("--item", action="append", default=[], metavar="ID:TEXT",
-                         help="a batch id and its own done summary; repeatable, split on the first "
-                              "':'. Mutually exclusive with the positional ID... SUMMARY form. The "
-                              "merge gate still runs exactly once for the whole call.")
+    completion_parsers = {}
+    for name in ("ready", "checkpoint", "land", "done"):
+        p = sub.add_parser(name, help=("compatibility alias for checkpoint" if name == "done" else None))
+        p.add_argument("args", nargs="*", metavar="ID [ID ...] SUMMARY",
+                       help="one or more item ids followed by one summary shared by all of them")
+        p.add_argument("--item", action="append", default=[], metavar="ID:TEXT",
+                       help="a batch id and its own summary; repeatable, split on the first ':'")
+        completion_parsers[name] = p
 
     p_note = sub.add_parser("note")
     p_note.add_argument("id")
@@ -584,7 +635,7 @@ def main(argv: list[str]) -> int:
 
     # Batch-shape validation happens before any Ruflo binary is resolved --
     # a malformed call should fail fast, not after a cold start.
-    start_items = done_items = since = None
+    start_items = completion_items = since = None
     if args.cmd == "start":
         if args.item:
             if args.args:
@@ -594,16 +645,17 @@ def main(argv: list[str]) -> int:
             if len(args.args) != 2:
                 p_start.error("need exactly ID and TASK, or one or more --item ID:TEXT")
             start_items = [(args.args[0], args.args[1])]
-    elif args.cmd == "done":
+    elif args.cmd in completion_parsers:
+        parser = completion_parsers[args.cmd]
         if args.item:
             if args.args:
-                p_done.error("pass either ID... SUMMARY or one or more --item ID:TEXT, not both")
-            done_items = _split_item_flags(args.item, p_done)
+                parser.error("pass either ID... SUMMARY or one or more --item ID:TEXT, not both")
+            completion_items = _split_item_flags(args.item, parser)
         else:
             if len(args.args) < 2:
-                p_done.error("need one or more ids and a shared SUMMARY, or one or more --item ID:TEXT")
+                parser.error("need one or more ids and a shared SUMMARY, or one or more --item ID:TEXT")
             *ids, summary = args.args
-            done_items = [(item_id, summary) for item_id in ids]
+            completion_items = [(item_id, summary) for item_id in ids]
     elif args.cmd == "from-ledger":
         if args.since:
             try:
@@ -626,8 +678,13 @@ def main(argv: list[str]) -> int:
     try:
         if args.cmd == "start":
             return cmd_start(binary, project, ruflo_cwd, start_items, ns)
-        if args.cmd == "done":
-            return cmd_done(binary, project, ruflo_cwd, done_items, ns)
+        if args.cmd == "ready":
+            return cmd_ready(binary, project, ruflo_cwd, completion_items, ns)
+        if args.cmd in ("checkpoint", "done"):
+            return cmd_checkpoint(binary, project, ruflo_cwd, completion_items, ns,
+                                  legacy_done=args.cmd == "done")
+        if args.cmd == "land":
+            return cmd_done(binary, project, ruflo_cwd, completion_items, ns)
         if args.cmd == "note":
             return cmd_note(binary, project, ruflo_cwd, args.id, args.text, ns)
         if args.cmd == "recall":

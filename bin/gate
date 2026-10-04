@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Run development/checkpoint/release verification with reusable receipts."""
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+RULES_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(RULES_DIR))
+
+from tools import gate_receipts as G  # noqa: E402
+
+
+def main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(prog="gate")
+    parser.add_argument("level", choices=G.LEVELS)
+    parser.add_argument("--project", type=Path, default=Path.cwd())
+    parser.add_argument("--force", action="store_true", help="ignore a reusable receipt")
+    args = parser.parse_args(argv)
+    project = args.project.resolve()
+    command = G.command_for(project, args.level)
+    if not command:
+        name = "quick" if args.level == "development" else "merge"
+        print(f"gate: no {name} gate declared -- refusing", file=sys.stderr)
+        return 1
+    reason = command.split("#", 1)[1].strip() if command.strip().startswith("false") and "#" in command else None
+    worktree = G.fingerprint(project)
+    prior = None if args.force else G.reusable(project, args.level, command, worktree)
+    if prior:
+        print(f"gate: {args.level} reused green receipt from {prior['level']} at {prior['at']}")
+        return 0
+    print(f"gate: running {args.level}: {command}")
+    result = subprocess.run(["bash", "-c", command], cwd=str(project))
+    if result.returncode:
+        print(f"gate: refused -- {reason}" if reason else f"gate: {args.level} failed", file=sys.stderr)
+        return 1
+    receipt = G.record(project, args.level, command, worktree)
+    print(f"gate: {args.level} green · receipt {receipt['worktree'][:12]}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

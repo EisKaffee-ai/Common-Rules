@@ -700,6 +700,27 @@ def test_command(project: Path) -> str:
     return ""
 
 
+def quick_command(project: Path) -> str:
+    """The declared development gate, or a refusal.
+
+    A quick gate is deliberately never guessed from the merge gate: doing so
+    would turn the cheap development level back into the full-suite loop it
+    exists to avoid. Projects that want `ready` declare `gates.quick`.
+    """
+    root = Path(project)
+    data, why = _raw(root)
+    if why == INVALID:
+        return f"false  # {FILE} is not valid JSON"
+    if why == NOT_OBJECT:
+        return f"false  # {FILE} is not a JSON object"
+    refusal = _gate_refusal(data)
+    if refusal:
+        return f"false  # {FILE} {refusal}"
+    if isinstance(data, dict) and isinstance(data.get("gates"), dict) and "quick" in data["gates"]:
+        return data["gates"]["quick"].strip()
+    return ""
+
+
 def staging_target(project: Path) -> str | None:
     """bin/land's staging_branch() twin: the declared staging_branch, or None
     when it is not declared or not usable -- in which case land goes straight
