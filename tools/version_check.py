@@ -6,14 +6,17 @@ Imported by both `bin/version-check` (reports and `--check`s) and
 O-12): one implementation of "what does the CHANGELOG require", not two
 computing it independently and drifting apart on the answer.
 
-THE MARKER FOR WHERE THE LAST RELEASE IS: VERSION's own git history, not a
+This module checks LOCAL CANDIDATE consistency, not official publication.
+Actual release version selection uses tools/release_version.py with current
+official published-release evidence and local/remote tag collision checks.
+An unshipped VERSION edit must never become that official baseline.
+
+THE MARKER FOR LOCAL CANDIDATE HISTORY IS: VERSION's own git history, not a
 tag or a CHANGELOG heading. Specifically, `last_release_commit()` is the
 oldest commit in the run of commits (walking back from HEAD) whose VERSION
 blob already equals HEAD's -- the commit that most recently set VERSION to
 its current value. This needs no separate bookkeeping a session can forget
-to update: VERSION already changes exactly when a release happens (that is
-what "bump the version" means), so the marker and the event it marks are
-the same fact, the way `rulecheck`'s STAMP is the same fact as "aligned".
+to update: it records candidate version changes, without asserting publication.
 A git tag was considered and rejected: proposal 32's V-04 (tagging 1.0.0)
 is a separate, deliberately rare act the lead performs on a green main, and
 gating every ordinary PR's merge on a tag existing would block all of them

@@ -218,6 +218,20 @@ class TestBumpRule(unittest.TestCase):
 
 
 class TestCheckExitCodes(unittest.TestCase):
+
+    def test_public_output_identifies_candidate_marker_and_official_limit(self):
+        out = self.repo.run_tool("--check")
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("since local candidate marker", out.stdout)
+        self.assertNotIn("since last release", out.stdout)
+        self.assertIn("not official release authority", out.stdout)
+        self.assertIn("release-version", out.stdout)
+
+    def test_help_identifies_candidate_scope_and_release_preflight(self):
+        out = self.repo.run_tool("--help")
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("local candidate", out.stdout)
+        self.assertIn("release-version", out.stdout)
     """bin/version-check --check: passes on agreement, fails on disagreement,
     writes nothing either way."""
 
