@@ -2,7 +2,7 @@
   "proposal": 32,
   "title": "Semantic versions and a lock for the standard",
   "status": "proposed",
-  "updated": "2026-09-19",
+  "updated": "2026-10-15",
   "tiers": {
     "C1": {
       "tier": "low",
@@ -76,7 +76,7 @@
       "depends": [
         "V-01"
       ],
-      "status": "done",
+      "status": "in progress",
       "tier": "medium",
       "model": "sonnet",
       "tag": "[ruflo · medium · sonnet]",
@@ -89,10 +89,42 @@
           "by": "session:v32-semver builder",
           "evidence": "adbf804",
           "status": "done"
+        },
+        {
+          "at": "2026-10-15T08:32:41+02:00",
+          "event": "Sponsor reopens release-versioning follow-up: official published baseline with SemVer; prior candidate checks remain historical.",
+          "by": "lead",
+          "evidence": "docs/requirements/official-release-semver.md",
+          "status": "in progress"
+        },
+        {
+          "at": "2026-10-15T08:40:05+02:00",
+          "event": "Initial implementation21 tests green after red-first missing CLI; independent review found raw-ref collision and valid stable build metadata gaps. Narrow fixes and bounded-file hardening underway, not release-ready.",
+          "by": "lead",
+          "evidence": "docs/requirements/official-release-semver.md"
         }
       ],
       "points": 3,
-      "value": "high"
+      "value": "high",
+      "parts": [
+        {
+          "id": "V-02.A",
+          "title": "Official published-release baseline and SemVer preflight",
+          "share": 100,
+          "status": "in review",
+          "log": [
+            {
+              "at": "2026-10-15T08:43:53+02:00",
+              "event": "Implementation and independent source review complete: root28 release and26 existing version tests pass; independent28+22 synthetic tests pass,4 real-checkout tests omitted. Full merge/release gate not executed; no release publication or immutable tag change.",
+              "by": "lead",
+              "evidence": "docs/handovers/official-release-semver-review-20261015.md",
+              "status": "in review"
+            }
+          ]
+        }
+      ],
+      "requirements_path": "docs/requirements/official-release-semver.md",
+      "verification_command": "python3 -B -m unittest discover -s tests -p test_release_version.py -q"
     },
     {
       "id": "V-03",
@@ -200,6 +232,34 @@
       "owner": "lead",
       "source": "Fix Common Rules trackers session",
       "note": "Recorded as a tracked release/compatibility task; P30/P-14 remains the authoritative visual-fix record."
+    },
+    {
+      "id": "A-04",
+      "at": "2026-10-15T08:31:49+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "also the release locally has been increased to 8.8... but the last official release is 8.1... so the release bump should always be repect to ther official release. update the common rules repo",
+      "became": "V-02",
+      "state": "became-item",
+      "owner": "lead",
+      "source": "chat",
+      "note": "Official-release SemVer follow-up implemented under V-02.A; independent review, merge and release acceptance remain separate.",
+      "answered_at": "2026-10-15T08:43:10+02:00",
+      "answered_by": "lead"
+    },
+    {
+      "id": "A-05",
+      "at": "2026-10-15T08:31:49+02:00",
+      "by": "sponsor",
+      "kind": "decision",
+      "quote": "using semantic versioning",
+      "became": "V-02",
+      "state": "became-item",
+      "owner": "lead",
+      "source": "chat",
+      "note": "Semantic Versioning required, including numeric precedence and valid stable build metadata.",
+      "answered_at": "2026-10-15T08:43:10+02:00",
+      "answered_by": "lead"
     }
   ],
   "proposed_changes": [],

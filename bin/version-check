@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""version-check -- does VERSION say what the CHANGELOG actually shipped?
+"""version-check -- does local candidate VERSION agree with the CHANGELOG?
 
 `VERSION` (proposal 32, V-01) holds a semver beside the `<count>-<sha>` stamp
 `rulecheck` has always reported. A semver nobody keeps current is worse than
@@ -8,7 +8,7 @@ no semver at all -- it looks authoritative and lies. This is the sponsor's
 bump, never a number typed by hand.
 
   version-check             report VERSION, the bump the CHANGELOG requires
-                             since the last release, and whether they agree
+                             since the local candidate marker, and whether they agree
   version-check --check     report only; exit non-zero on disagreement or if
                              it cannot be told at all; writes nothing either way
 
@@ -16,15 +16,14 @@ Exit codes: 0 agree (including "nothing pending"); 1 disagree (VERSION was
 not bumped enough, or at all, for what shipped); 2 could not check (VERSION
 is not tracked in git, or CHANGELOG.md or VERSION cannot be read).
 
-THE BUMP RULE and where "the last release" is read from are both documented
+THE BUMP RULE and where the local candidate marker is read from are documented
 in `tools/version_check.py`'s module docstring -- read that first. In short:
 MAJOR needs a `**Breaking change (major):**` line in the entry (declared,
 never inferred); MINOR is any entry carrying rulecheck's own
 `**Standard change (mandatory):**` line; PATCH is everything else that
-shipped. The marker for "where the last release was" is VERSION's own git
-history, not a tag or a heading -- see the module docstring for why a tag
-was rejected (it would block every ordinary merge until proposal 32's V-04
-tags 1.0.0, a rare, separate act).
+changed. The local candidate marker is VERSION's own git history. This
+checks development consistency, not official release authority. Use
+bin/release-version with complete official release evidence for release preflight.
 
 Wired into `.common-rules.json`'s `gates.merge`, beside
 `bin/workflow-stamp --check`, and mirrored byte-identically in
@@ -44,10 +43,12 @@ from tools.version_check import required_bump  # noqa: E402
 def report(b) -> None:
     cur = b.current if b.current is not None else "(unreadable)"
     since = b.since[:10] if b.since else "(none)"
+    print("version-check: local candidate consistency only; not official release "
+          "authority. Use bin/release-version with official evidence for release preflight.")
     if b.state == "could not check":
         print(f"version-check: could not check -- {b.why}", file=sys.stderr)
         return
-    print(f"version-check: VERSION is {cur}; since last release ({since}) the "
+    print(f"version-check: VERSION is {cur}; since local candidate marker ({since}) the "
           f"CHANGELOG requires at least a {b.required} bump "
           f"(applied: {b.applied}).")
     if b.entries:
@@ -58,11 +59,13 @@ def report(b) -> None:
         print("version-check: VERSION agrees with the CHANGELOG.")
     else:
         print(f"version-check: VERSION does NOT agree -- bump it to at least "
-              f"a {b.required} release, or explain in the CHANGELOG why not.")
+              f"a {b.required} candidate bump, or explain in the CHANGELOG why not.")
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="version-check")
+    parser = argparse.ArgumentParser(
+        prog="version-check", description="Check local candidate VERSION/CHANGELOG consistency.",
+        epilog="Not official release authority; use bin/release-version with official evidence for release preflight.")
     parser.add_argument("--check", action="store_true",
                         help="report only; write nothing; exit non-zero on disagreement")
     args = parser.parse_args(argv)

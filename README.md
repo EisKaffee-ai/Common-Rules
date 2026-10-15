@@ -74,6 +74,29 @@ marketplaces. See the official [Claude Code marketplace guide](https://code.clau
 > approve the calibration. Installing the plugin does not automatically trust
 > hooks or grant GitHub write access.
 
+## Release-version preflight
+
+Release bumps use the officially published stable baseline, not unreleased
+local version edits. After fetching every relevant GitHub releases API page,
+concatenate the records into `releases.json`; save both local and remote bare
+tag names as `{"local": [...], "remote": [...]}` in `tags.json`. Then run:
+
+```sh
+bin/release-version --repository OWNER/REPO --releases-file releases.json \
+  --tags-file tags.json --source-url https://api.github.com/repos/OWNER/REPO/releases \
+  --tag-prefix v --bump patch --complete-evidence
+```
+
+Choose `patch`, `minor` or `major` from the public-contract changes under
+[Semantic Versioning](https://semver.org/). Repeat `--tag-prefix` for component
+aliases; the first controls the proposed tag, all are checked for collisions.
+Drafts/prereleases do not establish a stable baseline. Missing publication
+evidence or an existing candidate tag refuses instead of guessing. This is an
+offline, caller-attested preflight—not authentication, release approval or
+publication. Full release gates still apply. Unreleased local 0.8.8 and official
+0.8.1 therefore propose 0.8.2 for a patch, provided no candidate alias collides.
+Input files are limited to 8 MiB each and must be regular non-symlink files.
+
 ## Choose the skill by intent
 
 You do not have to memorize the catalog. In Codex, describe the outcome in

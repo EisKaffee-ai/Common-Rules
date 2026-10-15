@@ -158,6 +158,23 @@ non-zero on disagreement and writes nothing. It runs in the merge gate
 beside `bin/workflow-stamp --check`, so a `VERSION` that has drifted from
 what the changelog actually shipped fails before the branch lands, not after.
 
+**Release versions start from official publication, not local candidates.**
+Before a release, obtain current official stable-release evidence for the named
+repository/component, including all relevant pages and version-prefix aliases.
+Ignore draft/prerelease records and unreleased VERSION edits when choosing the
+stable baseline. Apply [Semantic Versioning](https://semver.org/): compatible
+fixes use PATCH, compatible additions MINOR, breaking public contracts MAJOR;
+record any explicitly adopted pre-1.0 policy. An internal restructure alone
+does not prove a breaking API change. `bin/release-version` computes the next
+version from a supplied complete release snapshot and local/remote tag inventory;
+it refuses unknown evidence and collisions, never silently skips a number or
+moves a tag. The offline input is caller-supplied evidence, not authentication
+or a release certificate. `version-check` still checks local candidate/changelog
+consistency; changing VERSION is not proof anything was officially released.
+Keep the baseline URL, change class, proposed version, tag checks and exact
+release revision in the handoff. Release gates and separate publication
+authorization still apply; a version preflight cannot waive them.
+
 Nothing sits unmerged more than about two hours of working time. Long-lived
 branches are the whole cause of the collision class: on 2026-08-05 two branches
 independently created the same new file and independently rewrote the same

@@ -1,3 +1,20 @@
+# Unreleased — Official-release SemVer baseline — 15 October 2026
+
+**Standard change (mandatory):** release version selection starts from the
+latest officially published stable release for the relevant component, not
+unshipped local VERSION bumps, commits, drafts, prereleases or the highest tag.
+Apply Semantic Versioning for the actual changes and retain existing immutable
+tags. This changes release-boundary behavior for adopting projects; it does not
+require a network lookup or release gate on every development commit.
+
+The offline `bin/release-version` preflight validates complete caller-supplied
+GitHub release evidence and a combined local/remote tag inventory, calculates
+an exact major/minor/patch increment and refuses missing evidence or collision.
+It neither authenticates a snapshot nor publishes anything. Existing candidate
+changelog checks remain, explicitly separated from official release authority.
+No Common Rules release number is chosen by this entry; its own next release
+must use the same official-baseline rule after the actual release gates pass.
+
 # 1.12.0 — Visual proposals with executable Luna context — 4 October 2026
 
 **Standard change (mandatory):** every new Common Rules proposal is now a
